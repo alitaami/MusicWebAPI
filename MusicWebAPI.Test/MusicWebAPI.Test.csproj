@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MusicWebAPI\MusicWebAPI.API.csproj" />
+  </ItemGroup>
+
 </Project>

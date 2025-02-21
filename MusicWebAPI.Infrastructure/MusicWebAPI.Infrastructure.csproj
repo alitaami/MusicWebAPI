@@ -8,8 +8,6 @@
 
   <ItemGroup>
     <Folder Include="Caching\" />
-    <Folder Include="Data\Context\" />
-    <Folder Include="Data\Repositories\" />
     <Folder Include="Logging\" />
   </ItemGroup>
 
