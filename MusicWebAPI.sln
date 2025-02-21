@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35806.99 d17.13
+VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicWebAPI", "MusicWebAPI\MusicWebAPI.csproj", "{EE7372A8-88C6-4270-A0BB-7B0483F2124F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicWebAPI.API", "MusicWebAPI\MusicWebAPI.API.csproj", "{EE7372A8-88C6-4270-A0BB-7B0483F2124F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicWebAPI.Application", "MusicWebAPI.Application\MusicWebAPI.Application.csproj", "{751A8036-4E6E-4F86-987C-846DB6C99EF6}"
 EndProject
