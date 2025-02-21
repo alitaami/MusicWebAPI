@@ -18,6 +18,7 @@ namespace MusicWebAPI.Infrastructure.Logging
             _logger = new LoggerConfiguration()
                 .WriteTo.Console()
                 .WriteTo.File("logs/musicwebapi_log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.Seq("http://localhost:5341")
                 .CreateLogger();
         }
 

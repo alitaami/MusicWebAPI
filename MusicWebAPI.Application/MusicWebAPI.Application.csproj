@@ -9,10 +9,12 @@
   <ItemGroup>
     <Folder Include="Commands\" />
     <Folder Include="DTOs\" />
-    <Folder Include="Mappings\" />
     <Folder Include="Queries\" />
-    <Folder Include="Services\" />
     <Folder Include="ViewModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
   </ItemGroup>
 
   <ItemGroup>

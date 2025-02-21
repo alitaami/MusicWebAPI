@@ -46,7 +46,7 @@ namespace MusicWebAPI.Infrastructure.Data.Context
             {
                 // Apply singularizing or pluralizing logic here
                 string tableName = entityType.GetTableName();
-                entityType.SetTableName(PluralizeTableName(tableName));
+                entityType.SetTableName(Pluralize(tableName));
             }
 
 
@@ -54,17 +54,34 @@ namespace MusicWebAPI.Infrastructure.Data.Context
             // Configure your entity models here
         }
 
-        private string PluralizeTableName(string tableName)
+
+        private static readonly Dictionary<string, string> IrregularPluralization = new Dictionary<string, string>
         {
-            // Implement custom pluralization logic here (similar to the previous approach)
-            if (tableName.EndsWith("y"))
-                return tableName.Substring(0, tableName.Length - 1) + "ies";
+            { "person", "people" },
+            { "child", "children" },
+            { "man", "men" },
+            { "woman", "women" }
+        };
 
-            if (tableName.EndsWith("s"))
-                return tableName + "es";
+        private static string Pluralize(string word)
+        {
+            // Check for irregular words first
+            if (IrregularPluralization.ContainsKey(word.ToLower()))
+            {
+                return IrregularPluralization[word.ToLower()];
+            }
 
-            return tableName + "s";
+            // Basic pluralization rules
+            if (word.EndsWith("y"))
+                return word.Substring(0, word.Length - 1) + "ies";
+
+            if (word.EndsWith("s"))
+                return word + "es";
+
+            return word + "s"; // Default rule
         }
+
+
         #region Save Changes Override
         public override int SaveChanges()
         {
