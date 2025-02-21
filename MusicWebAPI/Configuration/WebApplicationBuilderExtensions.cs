@@ -15,6 +15,9 @@ using MusicWebAPI.Infrastructure.Data.Repositories;
 using MusicWebAPI.Domain.Interfaces.Repositories;
 using MusicWebAPI.Application.Services.Base;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -48,6 +51,8 @@ public static class WebApplicationBuilderExtensions
 
             AddAppServices(builder);
 
+            AddJwtAuthentication(builder, configuration);
+
             AddSwagger(builder);
 
             ApiRateLimiter(builder);
@@ -60,6 +65,38 @@ public static class WebApplicationBuilderExtensions
             logger.Error(ex, "An error occurred while configuring services");
             throw;
         }
+    }
+    private static void AddJwtAuthentication(WebApplicationBuilder builder, IConfiguration configuration)
+    {
+        // Read JWT settings from configuration
+        var jwtSection = configuration.GetSection("JwtSettings");
+        var secretKey = jwtSection["SecretKey"];
+        var issuer = jwtSection["Issuer"];
+        var audience = jwtSection["Audience"];
+
+        // Configure JWT authentication
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.RequireHttpsMetadata = true;
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = issuer,
+                ValidateAudience = true,
+                ValidAudience = audience,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+        });
+        builder.Services.AddAuthorization();
     }
     private static void AddAppDbContext(WebApplicationBuilder builder, IConfiguration configuration)
     {
@@ -74,7 +111,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
 
-       // builder.Services.AddAutoMapper(typeof(WebApplication));
+        // builder.Services.AddAutoMapper(typeof(WebApplication));
 
         builder.Services.AddEndpointsApiExplorer();
 

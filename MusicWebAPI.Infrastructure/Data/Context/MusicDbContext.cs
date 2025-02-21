@@ -1,7 +1,9 @@
 ﻿using Common.Utilities;
 using Entities.Base;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MusicWebAPI.Core.Utilities;
+using MusicWebAPI.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MusicWebAPI.Infrastructure.Data.Context
 {
-    public class MusicDbContext : DbContext
+    public class MusicDbContext : IdentityDbContext<User>
     {
         public MusicDbContext(DbContextOptions<MusicDbContext> options) : base(options) { }
 

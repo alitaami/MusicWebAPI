@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using Mappings.CustomMapping;
+using Microsoft.Extensions.Configuration;
 using MusicWebAPI.Domain.Interfaces.Repositories;
+using MusicWebAPI.Domain.Interfaces.Services;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,12 +17,15 @@ namespace MusicWebAPI.Application.Services.Base
     {
         private IMapper _mapper;
         private IRepositoryManager _repositoryManager;
+        private readonly IConfiguration _configuration;
 
-        //private IUserService _userService;
+        private IJwtService _jwtService;
 
-        public ServiceManager(IRepositoryManager repositoryManager)
+        public ServiceManager(IRepositoryManager repositoryManager, IConfiguration configuration)
         {
             _repositoryManager = repositoryManager;
+            _configuration = configuration;
+
             var mapperConfig = new MapperConfiguration(config =>
             {
                 config.AddCustomMappingProfile();
@@ -28,15 +34,15 @@ namespace MusicWebAPI.Application.Services.Base
             _mapper = mapper;
         }
 
-        //public IAdminService Admin
-        //{
-        //    get
-        //    {
-        //        if (this._adminService == null)
-        //            this._adminService = new AdminService(_repositoryManager, _mapper);
+        public IJwtService Jwt
+        {
+            get
+            {
+                if (this._jwtService == null)
+                    this._jwtService = new JwtService(_configuration);
 
-        //        return this._adminService;
-        //    }
-        //}
+                return this._jwtService;
+            }
+        }
     }
 }
