@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Caching\" />
+    <Folder Include="Data\Context\" />
+    <Folder Include="Data\Repositories\" />
+    <Folder Include="Logging\" />
+  </ItemGroup>
+
+</Project>
