@@ -24,7 +24,7 @@ namespace Common.Utilities
                 {
                     smtpServer.UseDefaultCredentials = false;
                     smtpServer.Port = 587;
-                    smtpServer.Credentials = new NetworkCredential("prozheali@gmail.com", "ayszpqnyevqvbujn");
+                    smtpServer.Credentials = new NetworkCredential("prozheali@gmail.com", "**********");
                     smtpServer.EnableSsl = true;
 
                     try
