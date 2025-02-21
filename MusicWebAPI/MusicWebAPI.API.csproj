@@ -16,7 +16,11 @@
 
   <ItemGroup>
     <Folder Include="Endpoints\" />
-    <Folder Include="Middlewares\" />
+    <Folder Include="Configurations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MusicWebAPI.Application\MusicWebAPI.Application.csproj" />
   </ItemGroup>
 
 </Project>

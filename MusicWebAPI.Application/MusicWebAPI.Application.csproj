@@ -15,4 +15,8 @@
     <Folder Include="ViewModels\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MusicWebAPI.Infrastructure\MusicWebAPI.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>

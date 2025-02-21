@@ -8,8 +8,11 @@
 
   <ItemGroup>
     <Folder Include="Entities\" />
-    <Folder Include="Exceptions\" />
     <Folder Include="Interfaces\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MusicWebAPI.Core\MusicWebAPI.Core.csproj" />
   </ItemGroup>
 
 </Project>
