@@ -1,0 +1,29 @@
+﻿version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: sa123
+      POSTGRES_DB: MusicDb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - musicnet
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "sa"]
+      interval: 10s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  musicnet:  # Ensure this part is included!
+    driver: bridge

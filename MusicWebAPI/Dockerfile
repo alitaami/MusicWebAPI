@@ -12,19 +12,23 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["MusicWebAPI/MusicWebAPI.csproj", "MusicWebAPI/"]
-RUN dotnet restore "./MusicWebAPI/MusicWebAPI.csproj"
+COPY ["MusicWebAPI/MusicWebAPI.API.csproj", "MusicWebAPI/"]
+COPY ["MusicWebAPI.Application/MusicWebAPI.Application.csproj", "MusicWebAPI.Application/"]
+COPY ["MusicWebAPI.Infrastructure/MusicWebAPI.Infrastructure.csproj", "MusicWebAPI.Infrastructure/"]
+COPY ["MusicWebAPI.Domain/MusicWebAPI.Domain.csproj", "MusicWebAPI.Domain/"]
+COPY ["MusicWebAPI.Core/MusicWebAPI.Core.csproj", "MusicWebAPI.Core/"]
+RUN dotnet restore "./MusicWebAPI/MusicWebAPI.API.csproj"
 COPY . .
 WORKDIR "/src/MusicWebAPI"
-RUN dotnet build "./MusicWebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./MusicWebAPI.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./MusicWebAPI.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./MusicWebAPI.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "MusicWebAPI.dll"]
+ENTRYPOINT ["dotnet", "MusicWebAPI.API.dll"]

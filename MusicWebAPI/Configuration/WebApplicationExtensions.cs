@@ -1,5 +1,7 @@
 ﻿using Configuration.Swagger;
+using Microsoft.EntityFrameworkCore;
 using MusicWebAPI.API.Middlewares;
+using MusicWebAPI.Infrastructure.Data.Context;
 using Serilog;
 
 public static class WebApplicationExtensions
@@ -14,6 +16,22 @@ public static class WebApplicationExtensions
 
         try
         {
+            // Apply database migrations automatically (synchronously)
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var services = scope.ServiceProvider;
+            //    var context = services.GetRequiredService<MusicDbContext>();
+            //    context.Database.MigrateAsync().GetAwaiter().GetResult(); // Apply migrations synchronously
+            //}
+
+            //// Seed data (optional) (synchronously)
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var services = scope.ServiceProvider;
+            //    var context = services.GetRequiredService<MusicDbContext>();
+            //    SeedData.Initialize(services, context).GetAwaiter().GetResult(); // Seed data synchronously
+            //}
+
             app.UseMiddleware<LoggingMiddleware>();
             app.UseMiddleware<ErrorHandlingMiddleware>();
 

@@ -1,4 +1,5 @@
 ﻿using MusicWebAPI.Core;
+using MusicWebAPI.Core.Resources;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;

@@ -1,13 +1,20 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Entities.Base;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MusicWebAPI.Domain.Entities
 {
-    public class User : IdentityUser
+    public class User : IdentityUser, IEntity // Keep IEntity for reflection registration
     {
+        public string FullName { get; set; }
+        public string Bio { get; set; } // Artist Bio (Optional)
+        public string ImageUrl { get; set; } // Profile Picture or Artist Image
+        public bool IsArtist { get; set; } // True if the user is an artist
+
+        // Navigation Properties
+        public ICollection<Playlist> Playlists { get; set; }
+        public ICollection<Album> Albums { get; set; }
+        public ICollection<Song> Songs { get; set; }
     }
 }

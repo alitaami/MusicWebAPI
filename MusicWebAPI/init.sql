@@ -1,0 +1,256 @@
+﻿-- Create Role (if not exists)
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'sa') THEN
+        CREATE ROLE sa WITH LOGIN PASSWORD 'sa123';
+        ALTER ROLE sa CREATEDB;
+    END IF;
+END
+$$;
+
+-- Create Database (if not exists)
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = 'MusicDb') THEN
+        CREATE DATABASE "MusicDb" WITH OWNER sa;
+    END IF;
+END
+$$;
+
+-- Connect to the database
+--\c MusicDb;
+
+-- Create Users Table with Identity columns
+CREATE TABLE IF NOT EXISTS Users (
+    Id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    UserName VARCHAR(100) NOT NULL,
+    FullName VARCHAR(200),
+    Bio TEXT,
+    ImageUrl VARCHAR(500),
+    IsArtist BOOLEAN NOT NULL,
+    PasswordHash VARCHAR(256) NOT NULL,  -- Added for Identity
+    SecurityStamp VARCHAR(50) NOT NULL   -- Added for Identity
+);
+
+-- Create Genres Table
+CREATE TABLE IF NOT EXISTS Genres (
+    Id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    Name VARCHAR(100) NOT NULL
+);
+
+-- Create Albums Table
+CREATE TABLE IF NOT EXISTS Albums (
+    Id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    Title VARCHAR(200) NOT NULL,
+    UserId UUID NOT NULL,
+    ReleaseDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+);
+
+-- Create Songs Table
+CREATE TABLE IF NOT EXISTS Songs (
+    Id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    Title VARCHAR(200) NOT NULL,
+    UserId UUID NOT NULL,
+    AlbumId UUID NOT NULL,
+    GenreId UUID NOT NULL,
+    Duration INTERVAL NOT NULL,
+    AudioUrl VARCHAR(500) NOT NULL,
+    FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE,
+    FOREIGN KEY (AlbumId) REFERENCES Albums(Id) ON DELETE CASCADE,
+    FOREIGN KEY (GenreId) REFERENCES Genres(Id) ON DELETE CASCADE
+);
+
+-- Create Playlists Table
+CREATE TABLE IF NOT EXISTS Playlists (
+    Id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    Name VARCHAR(200) NOT NULL,
+    UserId UUID NOT NULL,
+    FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+);
+
+-- Create PlaylistSongs Table (Many-to-Many Relationship)
+CREATE TABLE IF NOT EXISTS PlaylistSongs (
+    PlaylistId UUID NOT NULL,
+    SongId UUID NOT NULL,
+    PRIMARY KEY (PlaylistId, SongId),
+    FOREIGN KEY (PlaylistId) REFERENCES Playlists(Id) ON DELETE CASCADE,
+    FOREIGN KEY (SongId) REFERENCES Songs(Id) ON DELETE CASCADE
+);
+
+-------------------------------
+-- Seed Data for Users
+-------------------------------
+
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Users WHERE Id = '0080abda-f996-42df-81a4-024fdaa47b0c') THEN
+        INSERT INTO Users (Id, UserName, FullName, Bio, ImageUrl, IsArtist, PasswordHash, SecurityStamp)
+        VALUES (
+            '0080abda-f996-42df-81a4-024fdaa47b0c', 
+            'Dariush', 
+            'Dariush Eghbali', 
+            'Artist bio', 
+            'https://example.com/artist1.jpg', 
+            TRUE, 
+            'AQAAAAEAACcQAAAAEDVrqk0JsP0tBzXjj+XD9nVkGMy3dWQpQgvRZWG4cytUxu3k6XwH5a2pG4xJ+BwJQg==', -- Pre-computed password hash for "19851381"
+            'c0d6e8a5-72a9-4d3a-9e5f-123456789abc'
+        );
+    END IF;
+END
+$$;
+
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Users WHERE Id = '7525f791-f9d5-4915-817e-d658f37fc0ee') THEN
+        INSERT INTO Users (Id, UserName, FullName, Bio, ImageUrl, IsArtist, PasswordHash, SecurityStamp)
+        VALUES (
+            '7525f791-f9d5-4915-817e-d658f37fc0ee', 
+            'AliTaami', 
+            'Ali Taami', 
+            'User bio', 
+            'https://example.com/artist2.jpg', 
+            FALSE, 
+            'AQAAAAEAACcQAAAAEDVrqk0JsP0tBzXjj+XD9nVkGMy3dWQpQgvRZWG4cytUxu3k6XwH5a2pG4xJ+BwJQg==', -- Pre-computed password hash for "19851381"
+            'd1f7e8b6-83b0-5e4a-af7f-abcdef012345'
+        );
+    END IF;
+END
+$$;
+
+-------------------------------
+-- Seed Data for Genres
+-------------------------------
+
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Genres WHERE Id = '2ec9b0e3-1e30-4498-ba25-1b3b2a0f28f0') THEN
+        INSERT INTO Genres (Id, Name)
+        VALUES ('2ec9b0e3-1e30-4498-ba25-1b3b2a0f28f0', 'Rock');
+    END IF;
+END
+$$;
+
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Genres WHERE Id = 'cd94c620-fdc5-43e0-a2f9-8a026cbce18d') THEN
+        INSERT INTO Genres (Id, Name)
+        VALUES ('cd94c620-fdc5-43e0-a2f9-8a026cbce18d', 'Pop');
+    END IF;
+END
+$$;
+
+-------------------------------
+-- Seed Data for Albums
+-------------------------------
+
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Albums WHERE Id = '4db1a461-b2fc-41c9-9e9f-88119d65767f') THEN
+        INSERT INTO Albums (Id, Title, UserId, ReleaseDate)
+        VALUES ('4db1a461-b2fc-41c9-9e9f-88119d65767f', 'Album One', '0080abda-f996-42df-81a4-024fdaa47b0c', CURRENT_TIMESTAMP);
+    END IF;
+END
+$$;
+
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Albums WHERE Id = '244e0ae2-9585-489f-abff-c006544b0698') THEN
+        INSERT INTO Albums (Id, Title, UserId, ReleaseDate)
+        VALUES ('244e0ae2-9585-489f-abff-c006544b0698', 'Album Two', '0080abda-f996-42df-81a4-024fdaa47b0c', CURRENT_TIMESTAMP - INTERVAL '1 month');
+    END IF;
+END
+$$;
+
+-------------------------------
+-- Seed Data for Songs
+-------------------------------
+
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Songs WHERE Title = 'Song One') THEN
+        INSERT INTO Songs (Id, Title, UserId, AlbumId, GenreId, Duration, AudioUrl)
+        VALUES (
+            gen_random_uuid(), 
+            'Song One', 
+            '0080abda-f996-42df-81a4-024fdaa47b0c', 
+            '4db1a461-b2fc-41c9-9e9f-88119d65767f', 
+            '2ec9b0e3-1e30-4498-ba25-1b3b2a0f28f0', 
+            '00:03:45', 
+            'https://example.com/song1.mp3'
+        );
+    END IF;
+END
+$$;
+
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Songs WHERE Title = 'Song Two') THEN
+        INSERT INTO Songs (Id, Title, UserId, AlbumId, GenreId, Duration, AudioUrl)
+        VALUES (
+            gen_random_uuid(), 
+            'Song Two', 
+            '0080abda-f996-42df-81a4-024fdaa47b0c', 
+            '4db1a461-b2fc-41c9-9e9f-88119d65767f', 
+            '2ec9b0e3-1e30-4498-ba25-1b3b2a0f28f0', 
+            '00:03:40', 
+            'https://example.com/song2.mp3'
+        );
+    END IF;
+END
+$$;
+
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Songs WHERE Title = 'Song Three') THEN
+        INSERT INTO Songs (Id, Title, UserId, AlbumId, GenreId, Duration, AudioUrl)
+        VALUES (
+            gen_random_uuid(), 
+            'Song Three', 
+            '0080abda-f996-42df-81a4-024fdaa47b0c', 
+            '244e0ae2-9585-489f-abff-c006544b0698', 
+            'cd94c620-fdc5-43e0-a2f9-8a026cbce18d', 
+            '00:04:20', 
+            'https://example.com/song3.mp3'
+        );
+    END IF;
+END
+$$;
+
+-------------------------------
+-- Seed Data for Playlists (optional)
+-------------------------------
+/*
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Playlists WHERE UserId = '7525f791-f9d5-4915-817e-d658f37fc0ee') THEN
+        INSERT INTO Playlists (Id, Name, UserId)
+        VALUES (gen_random_uuid(), 'My Favorite Songs', '7525f791-f9d5-4915-817e-d658f37fc0ee');
+    END IF;
+END
+$$;
+
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM PlaylistSongs) THEN
+        INSERT INTO PlaylistSongs (PlaylistId, SongId)
+        SELECT 
+            (SELECT Id FROM Playlists WHERE UserId = '7525f791-f9d5-4915-817e-d658f37fc0ee' LIMIT 1),
+            (SELECT Id FROM Songs ORDER BY random() LIMIT 1);
+    END IF;
+END
+$$;
+*/
