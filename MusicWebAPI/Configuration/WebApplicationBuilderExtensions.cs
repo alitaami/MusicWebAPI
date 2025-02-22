@@ -18,6 +18,8 @@ using MusicWebAPI.Domain.Interfaces.Services.Base;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using MusicWebAPI.Domain.Interfaces.Services.MusicWebAPI.Domain.Interfaces;
+using MusicWebAPI.Infrastructure.Logging;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -111,6 +113,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
 
+        builder.Services.AddSingleton<ILoggerManager, LoggerManager>();
         // builder.Services.AddAutoMapper(typeof(WebApplication));
 
         builder.Services.AddEndpointsApiExplorer();
