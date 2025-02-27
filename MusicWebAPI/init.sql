@@ -28,7 +28,8 @@ CREATE TABLE IF NOT EXISTS Users (
     UserName VARCHAR(100) NOT NULL,
     FullName VARCHAR(200),
     Bio TEXT,
-    ImageUrl VARCHAR(500),
+    Email VARCHAR(100),
+   -- ImageUrl VARCHAR(500),
     IsArtist BOOLEAN NOT NULL,
     PasswordHash VARCHAR(256) NOT NULL,  -- Added for Identity
     SecurityStamp VARCHAR(50) NOT NULL   -- Added for Identity
@@ -88,10 +89,11 @@ DO
 $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM Users WHERE Id = '0080abda-f996-42df-81a4-024fdaa47b0c') THEN
-        INSERT INTO Users (Id, UserName, FullName, Bio, ImageUrl, IsArtist, PasswordHash, SecurityStamp)
+        INSERT INTO Users (Id, UserName, Email, FullName, Bio, ImageUrl, IsArtist, PasswordHash, SecurityStamp)
         VALUES (
             '0080abda-f996-42df-81a4-024fdaa47b0c', 
             'Dariush', 
+            'DariushEghbali@gmail.com', 
             'Dariush Eghbali', 
             'Artist bio', 
             'https://example.com/artist1.jpg', 
@@ -107,11 +109,11 @@ DO
 $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM Users WHERE Id = '7525f791-f9d5-4915-817e-d658f37fc0ee') THEN
-        INSERT INTO Users (Id, UserName, FullName, Bio, ImageUrl, IsArtist, PasswordHash, SecurityStamp)
+        INSERT INTO Users (Id, UserName, Email, FullName, Bio, ImageUrl, IsArtist, PasswordHash, SecurityStamp)
         VALUES (
             '7525f791-f9d5-4915-817e-d658f37fc0ee', 
             'AliTaami', 
-            'Ali Taami', 
+            'AliTaami@gmail.com', 
             'User bio', 
             'https://example.com/artist2.jpg', 
             FALSE, 

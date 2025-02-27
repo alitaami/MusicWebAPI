@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using MusicWebAPI.Core.Resources;
 using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Domain.Interfaces.Services;
@@ -13,9 +14,11 @@ namespace MusicWebAPI.Application.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
 
-        public UserService(UserManager<User> userManager, IMapper mapper)
+        public UserService(UserManager<User> userManager, IMapper mapper, IConfiguration configuration)
         {
+            _configuration = configuration;
             _userManager = userManager;
             _mapper = mapper;
         }
@@ -35,6 +38,20 @@ namespace MusicWebAPI.Application.Services
             return user;
         }
 
+        public async Task<string> LoginUser(string email, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                throw new UnauthorizedException(Resource.InvalidCredentials);
+
+            var isPasswordValid = await _userManager.CheckPasswordAsync(user, password);
+            if (!isPasswordValid)
+                throw new UnauthorizedException(Resource.InvalidCredentials);
+
+            return JwtHelper.GenerateToken(user, _configuration);
+        }
+
+        #region Common
         private async Task<bool> IsUserExists(string email, string username)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
@@ -57,5 +74,6 @@ namespace MusicWebAPI.Application.Services
                 await _userManager.AddToRoleAsync(user, Resource.UserRole);
             }
         }
+        #endregion
     }
 }

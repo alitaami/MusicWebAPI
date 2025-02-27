@@ -20,7 +20,7 @@ public static class SeedData
                     UserName = "Dariush",
                     FullName = "Dariush Eghbali",
                     Bio = "Artist bio",
-                    ImageUrl = "https://example.com/artist1.jpg",
+                    //ImageUrl = "https://example.com/artist1.jpg",
                     IsArtist = true
                 };
           
@@ -45,7 +45,7 @@ public static class SeedData
                     UserName = "AliTaami",
                     FullName = "Ali Taami",
                     Bio = "User bio",
-                    ImageUrl = "https://example.com/artist2.jpg",
+                    //ImageUrl = "https://example.com/artist2.jpg",
                     IsArtist = false
                 };
 

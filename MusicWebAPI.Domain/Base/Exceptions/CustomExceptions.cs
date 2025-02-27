@@ -31,6 +31,12 @@ namespace MusicWebAPI.Domain.Base.Exceptions
             public InternalServerErrorException(string message) : base(message) { }
             public int StatusCode => 500;
         }
+        
+        public class UnauthorizedException : Exception
+        {
+            public UnauthorizedException(string message) : base(message) { }
+            public int StatusCode => 401;
+        }
 
     }
 }

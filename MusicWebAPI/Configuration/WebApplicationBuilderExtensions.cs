@@ -13,7 +13,6 @@ using MusicWebAPI.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using MusicWebAPI.Infrastructure.Data.Repositories;
 using MusicWebAPI.Domain.Interfaces.Repositories;
-using MusicWebAPI.Application.Services.Base;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -23,6 +22,8 @@ using MusicWebAPI.Infrastructure.Logging;
 using MusicWebAPI.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using System.Reflection;
+using static MusicWebAPI.Application.ViewModels.UserViewModel;
+using Mappings.CustomMapping;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -112,24 +113,34 @@ public static class WebApplicationBuilderExtensions
     }
     private static void AddAppServices(WebApplicationBuilder builder)
     {
+        // Register Repositories , Services and LoggerManager
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
+        builder.Services.AddScoped<ILoggerManager, LoggerManager>();
 
         // Identity Configuration
-        builder.Services.AddIdentity<User, IdentityRole>()
-            .AddEntityFrameworkStores<MusicDbContext>()
-            .AddDefaultTokenProviders();
+        builder.Services.AddIdentity<User, IdentityRole>(options =>
+        {
+            options.Password.RequireDigit = false;
+            options.Password.RequireLowercase = false;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequiredLength = 6;
+        })
+        .AddEntityFrameworkStores<MusicDbContext>()
+        .AddDefaultTokenProviders();
 
-        // MediatR
+        // MediatR Configuration
         builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+         
+        // AutoMapper Configuration
+        builder.Services.InitializeAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-        builder.Services.AddSingleton<ILoggerManager, LoggerManager>();
-     
-        // builder.Services.AddAutoMapper(typeof(WebApplication));
-
+        // Enable API Explorer for Swagger
         builder.Services.AddEndpointsApiExplorer();
 
+        // IIS Configuration (if needed)
         builder.Services.Configure<IISServerOptions>(options =>
         {
             options.AllowSynchronousIO = true;

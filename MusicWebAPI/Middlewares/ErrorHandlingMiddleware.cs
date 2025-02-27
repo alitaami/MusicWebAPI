@@ -35,7 +35,8 @@ public class ErrorHandlingMiddleware
             NotFoundException notFoundEx => new ApiResult<object>(notFoundEx.Message, 404),
             BadRequestException badRequestEx => new ApiResult<object>(badRequestEx.Message, 400),
             LogicException logicEx => new ApiResult<object>(logicEx.Message, 422),
-            InternalServerErrorException internalEx => new ApiResult<object>(internalEx.Message, 500),
+            InternalServerErrorException internalEx => new ApiResult<object>(internalEx.Message),
+            UnauthorizedException authorizeEx => new ApiResult<object>(authorizeEx.Message, 401),
             _ => new ApiResult<object>("An unexpected error occurred", 500),
         };
 

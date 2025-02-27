@@ -6,19 +6,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using System;
+using static MusicWebAPI.Application.ViewModels.UserViewModel;
+using AutoMapper;
 
 namespace MusicWebAPI.Application.Commands.Handlers
 {
-    public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, string>
+    public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, RegisterUserViewModel>
     {
         private readonly IServiceManager _serviceManager;
-
-        public RegisterUserHandler(IServiceManager serviceManager)
+        private readonly IMapper _mapper;
+        public RegisterUserHandler(IServiceManager serviceManager, IMapper mapper)
         {
             _serviceManager = serviceManager;
+            _mapper = mapper;
         }
 
-        public async Task<string> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
+
+        public async Task<RegisterUserViewModel> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
             // Call the UserService to register the user
             var registeredUser = await _serviceManager.User.RegisterUser(new User
@@ -29,8 +33,9 @@ namespace MusicWebAPI.Application.Commands.Handlers
                 IsArtist = request.IsArtist
             }, request.Password);
 
-            // Return the User Id (or any other information) after registration
-            return registeredUser.Id;  
+            var result = _mapper.Map<RegisterUserViewModel>(registeredUser);
+
+            return result;
         }
     }
 }

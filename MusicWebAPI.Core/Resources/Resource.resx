@@ -123,6 +123,9 @@
   <data name="DuplicateUserError" xml:space="preserve">
     <value>User with this email or username already exists!</value>
   </data>
+  <data name="InvalidCredentials" xml:space="preserve">
+    <value>Email or Password is not correct! Try again.</value>
+  </data>
   <data name="PasswordMin" xml:space="preserve">
     <value>Password must be 8 or more than 8 characters!</value>
   </data>

@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 namespace MusicWebAPI.Domain.Interfaces.Services.Base
 {
     public interface IServiceManager
-    {
-        IJwtService Jwt { get; }
+    { 
         IUserService  User { get; }
     }
 }

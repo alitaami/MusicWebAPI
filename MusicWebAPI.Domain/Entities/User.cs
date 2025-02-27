@@ -9,7 +9,6 @@ namespace MusicWebAPI.Domain.Entities
     {
         public string FullName { get; set; }
         public string Bio { get; set; } // Artist Bio (Optional)
-        public string ImageUrl { get; set; } // Profile Picture or Artist Image
         public bool IsArtist { get; set; } // True if the user is an artist
 
         // Navigation Properties
