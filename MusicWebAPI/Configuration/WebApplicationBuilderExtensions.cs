@@ -20,6 +20,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MusicWebAPI.Domain.Interfaces.Services.MusicWebAPI.Domain.Interfaces;
 using MusicWebAPI.Infrastructure.Logging;
+using MusicWebAPI.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using System.Reflection;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -113,7 +116,16 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
 
+        // Identity Configuration
+        builder.Services.AddIdentity<User, IdentityRole>()
+            .AddEntityFrameworkStores<MusicDbContext>()
+            .AddDefaultTokenProviders();
+
+        // MediatR
+        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
         builder.Services.AddSingleton<ILoggerManager, LoggerManager>();
+     
         // builder.Services.AddAutoMapper(typeof(WebApplication));
 
         builder.Services.AddEndpointsApiExplorer();
