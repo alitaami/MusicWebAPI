@@ -44,5 +44,4 @@ namespace MusicWebAPI.Core.Base
                 _ => new ApiResult<T>("An unexpected error occurred", 500)
             };
     }
-
 }

@@ -24,6 +24,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Reflection;
 using static MusicWebAPI.Application.ViewModels.UserViewModel;
 using Mappings.CustomMapping;
+using MusicWebAPI.API.Endpoints;
 
 public static class WebApplicationBuilderExtensions
 {

@@ -1,5 +1,6 @@
 ﻿using Configuration.Swagger;
 using Microsoft.EntityFrameworkCore;
+using MusicWebAPI.API.Endpoints;
 using MusicWebAPI.API.Middlewares;
 using MusicWebAPI.Infrastructure.Data.Context;
 using Serilog;
@@ -43,6 +44,9 @@ public static class WebApplicationExtensions
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+
+            // Register the Minimal API routes
+            UserEndpoints.RegisterUserEndpoints(app); // Call the method that registers endpoints
 
             app.UseRateLimiter();
 
