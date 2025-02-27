@@ -22,7 +22,7 @@ namespace MusicWebAPI.Core.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resource {
+    public class Resource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace MusicWebAPI.Core.Resources {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MusicWebAPI.Core.Resources.Resource", typeof(Resource).Assembly);
@@ -51,7 +51,7 @@ namespace MusicWebAPI.Core.Resources {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,29 +61,65 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to رمز عبور نباید کمتر از 8 حرف باشد.
+        ///   Looks up a localized string similar to Artist.
         /// </summary>
-        internal static string PasswordMin {
+        public static string ArtistRole {
+            get {
+                return ResourceManager.GetString("ArtistRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User with this email or username already exists!.
+        /// </summary>
+        public static string DuplicateUserError {
+            get {
+                return ResourceManager.GetString("DuplicateUserError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password must be 8 or more than 8 characters!.
+        /// </summary>
+        public static string PasswordMin {
             get {
                 return ResourceManager.GetString("PasswordMin", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to رمزعبور باید شامل اعداد ، حروف کوچک و بزرگ و حروف خاص باشد.
+        ///   Looks up a localized string similar to Password should contain every type of characters!.
         /// </summary>
-        internal static string PasswordQuality {
+        public static string PasswordQuality {
             get {
                 return ResourceManager.GetString("PasswordQuality", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to رمزعبور باید شامل حروف خاص باشد.
+        ///   Looks up a localized string similar to Password should contain special characters!.
         /// </summary>
-        internal static string PasswordUnique {
+        public static string PasswordUnique {
             get {
                 return ResourceManager.GetString("PasswordUnique", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User registration failed!.
+        /// </summary>
+        public static string UserRegistrationError {
+            get {
+                return ResourceManager.GetString("UserRegistrationError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to User.
+        /// </summary>
+        public static string UserRole {
+            get {
+                return ResourceManager.GetString("UserRole", resourceCulture);
             }
         }
     }

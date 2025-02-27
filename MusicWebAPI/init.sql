@@ -228,6 +228,26 @@ BEGIN
 END
 $$;
 
+
+-- Create Roles (if not exists)
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'Artist') THEN
+        CREATE ROLE Artist;
+    END IF;
+END
+$$;
+
+DO
+$$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'User') THEN
+        CREATE ROLE User;
+    END IF;
+END
+$$;
+
 -------------------------------
 -- Seed Data for Playlists (optional)
 -------------------------------

@@ -117,13 +117,25 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ArtistRole" xml:space="preserve">
+    <value>Artist</value>
+  </data>
+  <data name="DuplicateUserError" xml:space="preserve">
+    <value>User with this email or username already exists!</value>
+  </data>
   <data name="PasswordMin" xml:space="preserve">
-    <value>رمز عبور نباید کمتر از 8 حرف باشد</value>
+    <value>Password must be 8 or more than 8 characters!</value>
   </data>
   <data name="PasswordQuality" xml:space="preserve">
-    <value>رمزعبور باید شامل اعداد ، حروف کوچک و بزرگ و حروف خاص باشد</value>
+    <value>Password should contain every type of characters!</value>
   </data>
   <data name="PasswordUnique" xml:space="preserve">
-    <value>رمزعبور باید شامل حروف خاص باشد</value>
+    <value>Password should contain special characters!</value>
+  </data>
+  <data name="UserRegistrationError" xml:space="preserve">
+    <value>User registration failed!</value>
+  </data>
+  <data name="UserRole" xml:space="preserve">
+    <value>User</value>
   </data>
 </root>
