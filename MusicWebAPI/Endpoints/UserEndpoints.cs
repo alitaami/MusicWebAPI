@@ -27,7 +27,8 @@ namespace MusicWebAPI.API.Endpoints
             .WithName("RegisterUser")
             .Produces<User>(StatusCodes.Status200OK)
             .Produces<string>(StatusCodes.Status400BadRequest)
-            .WithTags("User");
+            .WithTags("User")
+            .WithOpenApi(); // This enables Swagger for Minimal API
 
             // Login user endpoint
             app.MapPost("/api/login", async (IMediator mediator, LoginUserCommand command) =>
@@ -48,7 +49,8 @@ namespace MusicWebAPI.API.Endpoints
             .WithName("LoginUser")
             .Produces<string>(StatusCodes.Status200OK)
             .Produces<string>(StatusCodes.Status400BadRequest)
-            .WithTags("User");
+            .WithTags("User")
+            .WithOpenApi(); // This enables Swagger for Minimal API
         }
     }
 }

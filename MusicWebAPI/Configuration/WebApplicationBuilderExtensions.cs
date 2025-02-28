@@ -118,7 +118,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
-        builder.Services.AddScoped<ILoggerManager, LoggerManager>();
+        builder.Services.AddSingleton<ILoggerManager, LoggerManager>();
 
         // Identity Configuration
         builder.Services.AddIdentity<User, IdentityRole>(options =>

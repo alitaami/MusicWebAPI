@@ -11,11 +11,11 @@ using static MusicWebAPI.Application.ViewModels.UserViewModel;
 
 namespace MusicWebAPI.Application.Commands.Handlers
 {
-    public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, LoginUserViewModel>
+    public class LoginUserHandler : IRequestHandler<LoginUserCommand, LoginUserViewModel>
     {
         private readonly IServiceManager _serviceManager;
 
-        public LoginUserCommandHandler(IServiceManager serviceManager)
+        public LoginUserHandler(IServiceManager serviceManager)
         {
             _serviceManager = serviceManager;
         }

@@ -11,9 +11,9 @@ public static class WebApplicationExtensions
     {
         // Initialize Serilog with basic configuration
         Log.Logger = new LoggerConfiguration()
-            .WriteTo.Console()
-            .WriteTo.File("logs/musicwebapi_log.txt", rollingInterval: RollingInterval.Day)
-            .CreateLogger();
+           .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {NewLine}{Exception}")
+           .WriteTo.File("logs/musicwebapi_log.txt", rollingInterval: RollingInterval.Day)
+           .CreateLogger();
 
         try
         {
@@ -44,7 +44,7 @@ public static class WebApplicationExtensions
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
-
+            
             // Register the Minimal API routes
             UserEndpoints.RegisterUserEndpoints(app); // Call the method that registers endpoints
 
