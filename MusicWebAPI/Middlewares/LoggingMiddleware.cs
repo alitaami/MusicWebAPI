@@ -20,40 +20,38 @@ namespace MusicWebAPI.API.Middlewares
             var request = context.Request;
             var response = context.Response;
 
-            // Log request details (method, url, headers)
             _logger.LogInfo($"Request: {request.Method} {request.Path} - Headers: {JsonSerializer.Serialize(request.Headers)}");
 
-            // Create a stopwatch to measure the request duration
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
+            var originalResponseBody = response.Body; // Store original response body
+            using var responseBodyStream = new MemoryStream();
+
             try
             {
-                // Capture the response body by using a MemoryStream
-                var originalResponseBody = response.Body;
-                using (var responseBodyStream = new MemoryStream())
-                {
-                    response.Body = responseBodyStream;
+                response.Body = responseBodyStream;  // Swap response body with memory stream
 
-                    await _next(context);  // Call the next middleware
+                await _next(context);  // Call the next middleware
 
-                    // Log response status code after the response is finished
-                    _logger.LogInfo($"Response: {response.StatusCode}");
+                responseBodyStream.Seek(0, SeekOrigin.Begin);
+                string responseBodyText = await new StreamReader(responseBodyStream).ReadToEndAsync();
 
-                    // Copy the response content back to the original response stream
-                    await responseBodyStream.CopyToAsync(originalResponseBody);
-                }
+                _logger.LogInfo($"Response: {response.StatusCode} - Body: {responseBodyText}");
+
+                // Reset position to write back to original stream
+                responseBodyStream.Seek(0, SeekOrigin.Begin);
+                await responseBodyStream.CopyToAsync(originalResponseBody);
             }
             catch (Exception ex)
             {
-                // Log any errors that occur during the request
                 _logger.LogError($"Exception: {ex.Message}");
-                throw;  // Re-throw the exception to maintain the stack trace
+                throw;
             }
             finally
             {
+                response.Body = originalResponseBody; // Restore the original response body
                 stopwatch.Stop();
-                // Log the time it took to process the request
                 _logger.LogInfo($"Request processed in {stopwatch.ElapsedMilliseconds} ms");
             }
         }
