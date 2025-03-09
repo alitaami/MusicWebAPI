@@ -417,7 +417,7 @@ public static class WebApplicationBuilderExtensions
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
 
             // Add a rate limiting policy named "test"
-            options.AddPolicy("test", httpContext =>
+            options.AddPolicy("main", httpContext =>
                 // Get a fixed window rate limiter based on the client's IP address   
                 RateLimitPartition.GetFixedWindowLimiter(
                     partitionKey: httpContext.Connection.RemoteIpAddress?.ToString(),

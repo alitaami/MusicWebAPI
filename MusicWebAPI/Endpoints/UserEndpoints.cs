@@ -12,44 +12,31 @@ namespace MusicWebAPI.API.Endpoints
             // Register user endpoint
             app.MapPost("/api/register", async (IMediator mediator, RegisterUserCommand command) =>
             {
-                try
-                {
-                    var user = await mediator.Send(command);
+                var user = await mediator.Send(command);
 
-                    // Return success response wrapped in ApiResult
-                    return new UserEndpoints().Ok(user);
-                }
-                catch (Exception ex)
-                { 
-                    return new UserEndpoints().BadRequest<User>(ex.Message);
-                }
+                return new UserEndpoints().Ok(user);
             })
             .WithName("RegisterUser")
             .Produces<User>(StatusCodes.Status200OK)
             .Produces<string>(StatusCodes.Status400BadRequest)
             .WithTags("User")
+            .RequireRateLimiting("main")
             .WithOpenApi(); // This enables Swagger for Minimal API
 
             // Login user endpoint
             app.MapPost("/api/login", async (IMediator mediator, LoginUserCommand command) =>
             {
-                try
-                {
-                    // getting JWT token
-                    var token = await mediator.Send(command);
+                // getting JWT token
+                var token = await mediator.Send(command);
 
-                    // Return success response wrapped in ApiResult
-                    return new UserEndpoints().Ok( token );
-                }
-                catch (Exception ex)
-                { 
-                    return new UserEndpoints().BadRequest<string>(ex.Message);
-                }
+                return new UserEndpoints().Ok(token);
+
             })
             .WithName("LoginUser")
             .Produces<string>(StatusCodes.Status200OK)
             .Produces<string>(StatusCodes.Status400BadRequest)
             .WithTags("User")
+            .RequireRateLimiting("main")
             .WithOpenApi(); // This enables Swagger for Minimal API
         }
     }

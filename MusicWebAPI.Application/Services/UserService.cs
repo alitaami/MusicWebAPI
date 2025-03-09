@@ -42,8 +42,7 @@ namespace MusicWebAPI.Application.Services
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
-                //throw new UnauthorizedException(Resource.InvalidCredentials);
-                throw new UnauthorizedException("wtf");
+                throw new UnauthorizedException(Resource.InvalidCredentials);
 
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, password);
             if (!isPasswordValid)

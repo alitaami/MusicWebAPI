@@ -8,7 +8,7 @@ namespace MusicWebAPI.Domain.Entities
     public class User : IdentityUser//, IEntity // Keep IEntity for reflection registration
     {
         public string FullName { get; set; }
-        public string Bio { get; set; } // Artist Bio (Optional)
+        public string Bio { get; set; } = string.Empty; // Artist Bio (Optional)
         public bool IsArtist { get; set; } // True if the user is an artist
 
         // Navigation Properties

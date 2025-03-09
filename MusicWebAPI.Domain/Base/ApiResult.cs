@@ -29,19 +29,5 @@ namespace MusicWebAPI.Core.Base
             IsSuccess = false;
             StatusCode = statusCode;
         }
-
-        // Implicit operator for success
-        public static implicit operator ApiResult<T>(T data) => new ApiResult<T>(data);
-
-        // Implicit operator for error (using exceptions)
-        public static implicit operator ApiResult<T>(Exception ex) =>
-            ex switch
-            {
-                NotFoundException => new ApiResult<T>(ex.Message, 404),
-                BadRequestException => new ApiResult<T>(ex.Message, 400),
-                LogicException => new ApiResult<T>(ex.Message, 422),
-                InternalServerErrorException => new ApiResult<T>(ex.Message, 500),
-                _ => new ApiResult<T>("An unexpected error occurred", 500)
-            };
     }
 }

@@ -24,7 +24,7 @@ namespace Configuration.Swagger
                 //options.DefaultModelRendering(ModelRendering.Model);
                 //options.DefaultModelsExpandDepth(-1);
                 //options.DisplayOperationId();
-                //options.DisplayRequestDuration();
+                options.DisplayRequestDuration();
                 //options.DocExpansion(DocExpansion.None);
                 //options.EnableDeepLinking();
                 //options.EnableFilter();
