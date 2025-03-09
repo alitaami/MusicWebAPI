@@ -1,154 +1,194 @@
-﻿using MusicWebAPI.Domain.Entities;
+﻿using Microsoft.AspNetCore.Identity;
+using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Infrastructure.Data.Context;
-using Microsoft.EntityFrameworkCore;
-using Serilog;
-using Microsoft.AspNetCore.Identity;
-using System.Runtime.Intrinsics.X86;
+using System;
+using System.Linq;
 
 public static class SeedData
 {
-    public static async Task Initialize(IServiceProvider serviceProvider, MusicDbContext context)
+    public static void Initialize(IServiceProvider serviceProvider, MusicDbContext context)
     {
         try
         {
-            // Check if there are existing users, and add if necessary
-            if (!await context.Users.AnyAsync(u => u.Id == "0080abda-f996-42df-81a4-024fdaa47b0c"))
+            // Create a new instance of PasswordHasher
+            var passwordHasher = new PasswordHasher<User>();
+
+            // Check if user "Dariush" already exists
+            if (!context.Users.Any(u => u.UserName == "Dariush"))
             {
-                var user1 = new User
+                // Create user object
+                var dariush = new User
                 {
-                    Id = "0080abda-f996-42df-81a4-024fdaa47b0c",
                     UserName = "Dariush",
                     FullName = "Dariush Eghbali",
+                    Email = "dariush@gmail.com",
+                    NormalizedEmail = "DARIUSH@GMAIL.COM",
+                    NormalizedUserName = "DARIUSH",
                     Bio = "Artist bio",
-                    //ImageUrl = "https://example.com/artist1.jpg",
-                    IsArtist = true
+                    IsArtist = true,
+                    SecurityStamp = Guid.NewGuid().ToString(),  // Required field for Identity
+                    ConcurrencyStamp = Guid.NewGuid().ToString()  // Optional field for concurrency
                 };
-          
-                // Create an instance of the PasswordHasher for your User type
-                var passwordHasher = new PasswordHasher<User>();
 
-                // Hash the password (for example "19851381 ")
-                user1.PasswordHash = passwordHasher.HashPassword(user1, "19851381");
+                // Hash the password manually
+                dariush.PasswordHash = passwordHasher.HashPassword(dariush, "19851381");
 
-                // Optionally, set a SecurityStamp (or leave it to be generated automatically)
-                user1.SecurityStamp = Guid.NewGuid().ToString();
-
-
-                await context.Users.AddAsync(user1);
+                // Add user to the context
+                context.Users.Add(dariush);
             }
 
-            if (!await context.Users.AnyAsync(u => u.Id == "7525f791-f9d5-4915-817e-d658f37fc0ee"))
+            // Check if user "AliTaami" already exists
+            if (!context.Users.Any(u => u.UserName == "AliTaami"))
             {
-                var user2 = new User
+                // Create user object
+                var ali = new User
                 {
-                    Id = "7525f791-f9d5-4915-817e-d658f37fc0ee",
                     UserName = "AliTaami",
+                    NormalizedUserName = "ALITAAMI",
                     FullName = "Ali Taami",
+                    Email = "alitaami@gmail.com",
                     Bio = "User bio",
-                    //ImageUrl = "https://example.com/artist2.jpg",
-                    IsArtist = false
+                    IsArtist = false,
+                    NormalizedEmail = "ALITAAMI@GMAIL.COM",
+                    SecurityStamp = Guid.NewGuid().ToString(),  // Required field for Identity
+                    ConcurrencyStamp = Guid.NewGuid().ToString()  // Optional field for concurrency
                 };
 
-                // Create an instance of the PasswordHasher for your User type
-                var passwordHasher = new PasswordHasher<User>();
+                // Hash the password manually
+                ali.PasswordHash = passwordHasher.HashPassword(ali, "19851381");
 
-                // Hash the password (for example "19851381 ")
-                user2.PasswordHash = passwordHasher.HashPassword(user2, "19851381");
-
-                // Optionally, set a SecurityStamp (or leave it to be generated automatically)
-                user2.SecurityStamp = Guid.NewGuid().ToString();
-
-                await context.Users.AddAsync(user2);
+                // Add user to the context
+                context.Users.Add(ali);
             }
 
-            // Check if genres already exist before inserting
-            if (!await context.Genres.AnyAsync(g => g.Id == new Guid("2ec9b0e3-1e30-4498-ba25-1b3b2a0f28f0")))
+            // Save changes to the database
+            context.SaveChanges();
+
+            // Seed roles
+            if (!context.Roles.Any(r => r.Name == "Artist"))
             {
-                var genre1 = new Genre { Id = new Guid("2ec9b0e3-1e30-4498-ba25-1b3b2a0f28f0"), Name = "Rock" };
-                await context.Genres.AddAsync(genre1);
+                context.Roles.Add(new IdentityRole { Name = "Artist", NormalizedName = "ARTIST" });
             }
 
-            if (!await context.Genres.AnyAsync(g => g.Id == new Guid("cd94c620-fdc5-43e0-a2f9-8a026cbce18d")))
+            if (!context.Roles.Any(r => r.Name == "User"))
             {
-                var genre2 = new Genre { Id = new Guid("cd94c620-fdc5-43e0-a2f9-8a026cbce18d"), Name = "Pop" };
-                await context.Genres.AddAsync(genre2);
+                context.Roles.Add(new IdentityRole { Name = "User", NormalizedName = "USER" });
             }
 
-            // Check if albums exist before inserting
-            if (!await context.Albums.AnyAsync(a => a.Id == new Guid("4db1a461-b2fc-41c9-9e9f-88119d65767f")))
+            context.SaveChanges();
+
+            // Assign roles to users
+            var user1 = context.Users.FirstOrDefault(u => u.UserName == "Dariush");
+            var user2 = context.Users.FirstOrDefault(u => u.UserName == "AliTaami");
+
+            var artistRole = context.Roles.FirstOrDefault(r => r.Name == "Artist");
+            var userRole = context.Roles.FirstOrDefault(r => r.Name == "User");
+
+            if (user1 != null && artistRole != null)
             {
-                var album1 = new Album
+                context.UserRoles.Add(new IdentityUserRole<string> { UserId = user1.Id, RoleId = artistRole.Id });
+            }
+
+            if (user2 != null && userRole != null)
+            {
+                context.UserRoles.Add(new IdentityUserRole<string> { UserId = user2.Id, RoleId = userRole.Id });
+            }
+
+            context.SaveChanges();
+
+            // Seed genres
+            if (context.Database.CanConnect() && !context.Genres.Any())
+            {
+                context.Genres.AddRange(
+                    new Genre { Id = Guid.NewGuid(), Name = "Rock" },
+                    new Genre { Id = Guid.NewGuid(), Name = "Pop" }
+                );
+                context.SaveChanges();
+            }
+
+            // Seed albums
+            var user1Entity = context.Users.FirstOrDefault(u => u.UserName == "Dariush");
+            if (user1Entity != null)
+            {
+                if (!context.Albums.Any(a => a.Title == "Album One"))
                 {
-                    Id = new Guid("4db1a461-b2fc-41c9-9e9f-88119d65767f"),
-                    Title = "Album One",
-                    ReleaseDate = DateTime.UtcNow,
-                    UserId = "0080abda-f996-42df-81a4-024fdaa47b0c"
-                };
-                await context.Albums.AddAsync(album1);
-            }
+                    var album1 = new Album
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Album One",
+                        ReleaseDate = DateTime.UtcNow,
+                        UserId = user1Entity.Id
+                    };
+                    context.Albums.Add(album1);
+                }
 
-            if (!await context.Albums.AnyAsync(a => a.Id == new Guid("244e0ae2-9585-489f-abff-c006544b0698")))
-            {
-                var album2 = new Album
+                if (!context.Albums.Any(a => a.Title == "Album Two"))
                 {
-                    Id = new Guid("244e0ae2-9585-489f-abff-c006544b0698"),
-                    Title = "Album Two",
-                    ReleaseDate = DateTime.UtcNow.AddMonths(-1),
-                    UserId = "0080abda-f996-42df-81a4-024fdaa47b0c"
-                };
-                await context.Albums.AddAsync(album2);
+                    var album2 = new Album
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Album Two",
+                        ReleaseDate = DateTime.UtcNow.AddMonths(-1),
+                        UserId = user1Entity.Id
+                    };
+                    context.Albums.Add(album2);
+                }
+
+                context.SaveChanges();
             }
 
-            // Check if songs already exist before inserting
-            if (!await context.Songs.AnyAsync(s => s.Title == "Song One"))
+            var rockGenre = context.Genres.FirstOrDefault(g => g.Name == "Rock");
+            var popGenre = context.Genres.FirstOrDefault(g => g.Name == "Pop");
+
+            // Seed songs
+            if (!context.Songs.Any(s => s.Title == "Song One"))
             {
                 var song1 = new Song
                 {
                     Title = "Song One",
-                    UserId = "0080abda-f996-42df-81a4-024fdaa47b0c",
-                    AlbumId = new Guid("244e0ae2-9585-489f-abff-c006544b0698"),
-                    GenreId = new Guid("2ec9b0e3-1e30-4498-ba25-1b3b2a0f28f0"),
+                    UserId = user1Entity?.Id,
+                    AlbumId = context.Albums.FirstOrDefault(a => a.Title == "Album Two")?.Id ?? Guid.NewGuid(),
+                    GenreId = rockGenre?.Id ?? Guid.NewGuid(), // Rock
                     Duration = TimeSpan.FromMinutes(3),
                     AudioUrl = "https://example.com/song1.mp3"
                 };
-                await context.Songs.AddAsync(song1);
+                context.Songs.Add(song1);
             }
 
-            if (!await context.Songs.AnyAsync(s => s.Title == "Song Two"))
+            if (!context.Songs.Any(s => s.Title == "Song Two"))
             {
                 var song2 = new Song
                 {
                     Title = "Song Two",
-                    UserId = "0080abda-f996-42df-81a4-024fdaa47b0c",
-                    AlbumId = new Guid("4db1a461-b2fc-41c9-9e9f-88119d65767f"),
-                    GenreId = new Guid("cd94c620-fdc5-43e0-a2f9-8a026cbce18d"),
+                    UserId = user1Entity?.Id,
+                    AlbumId = context.Albums.FirstOrDefault(a => a.Title == "Album One")?.Id ?? Guid.NewGuid(),
+                    GenreId = popGenre?.Id ?? Guid.NewGuid(), // Pop
                     Duration = TimeSpan.FromMinutes(4),
                     AudioUrl = "https://example.com/song2.mp3"
                 };
-                await context.Songs.AddAsync(song2);
+                context.Songs.Add(song2);
             }
 
-            if (!await context.Songs.AnyAsync(s => s.Title == "Song Three"))
+            if (!context.Songs.Any(s => s.Title == "Song Three"))
             {
                 var song3 = new Song
                 {
                     Title = "Song Three",
-                    UserId = "0080abda-f996-42df-81a4-024fdaa47b0c",
-                    AlbumId = new Guid("4db1a461-b2fc-41c9-9e9f-88119d65767f"),
-                    GenreId = new Guid("cd94c620-fdc5-43e0-a2f9-8a026cbce18d"),
+                    UserId = user1Entity?.Id,
+                    AlbumId = context.Albums.FirstOrDefault(a => a.Title == "Album One")?.Id ?? Guid.NewGuid(),
+                    GenreId = popGenre?.Id ?? Guid.NewGuid(), // Pop
                     Duration = TimeSpan.FromMinutes(4),
                     AudioUrl = "https://example.com/song3.mp3"
                 };
-                await context.Songs.AddAsync(song3);
+                context.Songs.Add(song3);
             }
 
-            // Save changes after all the additions
-            await context.SaveChangesAsync();
+            // Save all changes
+            context.SaveChanges();
         }
         catch (Exception ex)
         {
-            // Log the error here
-            Log.Information("An error occurred: {ex.Message}");
+            // Log the error
             Console.WriteLine($"An error occurred: {ex.Message}");
         }
     }

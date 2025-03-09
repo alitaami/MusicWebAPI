@@ -26,10 +26,10 @@ namespace Entities.Base
         public TKey Id { get; set; }
         
         /// <inheritdoc/>
-        public DateTime? CreatedDate { get; set; } = DateTime.Now;
+        public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
 
         /// <inheritdoc/>
-        public DateTime? ModifiedDate { get; set; } = DateTime.Now;
+        public DateTime? ModifiedDate { get; set; } = DateTime.UtcNow;
 
         /// <inheritdoc/>
         public int? CreatedByUserId { get; set; } = -1;

@@ -23,7 +23,7 @@ namespace MusicWebAPI.Application.Commands.Handlers
         public async Task<LoginUserViewModel> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
             // getting the JWT token by user properties
-            var token = await _serviceManager.User.LoginUser(request.Email, request.Password);
+             var token = await _serviceManager.User.LoginUser(request.Email, request.Password);
 
             return new LoginUserViewModel
             {

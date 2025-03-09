@@ -2,17 +2,16 @@
 
 services:
   postgres:
-    image: postgres:latest
+    image: bitnami/postgresql:latest
     container_name: postgres_container
     environment:
-      POSTGRES_USER: sa
-      POSTGRES_PASSWORD: sa123
-      POSTGRES_DB: MusicDb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - musicnet
     healthcheck:
@@ -20,10 +19,35 @@ services:
       interval: 10s
       retries: 5
 
+  api:
+    build:
+      context: ..
+      dockerfile: MusicWebAPI/Dockerfile
+    container_name: musicwebapi_container
+    ports:
+      - "8080:8080"
+    networks:
+      - musicnet
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__MusicDbConnection=${ConnectionStrings__MusicDbConnection}
+      - JwtSettings__SecretKey=${JwtSettings__SecretKey}
+      - JwtSettings__Issuer=${JwtSettings__Issuer}
+      - JwtSettings__Audience=${JwtSettings__Audience}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 10s
+      retries: 5
+
 volumes:
   postgres_data:
     driver: local
+  data_protection_keys:
+    driver: local
 
 networks:
-  musicnet:  # Ensure this part is included!
+  musicnet:
     driver: bridge

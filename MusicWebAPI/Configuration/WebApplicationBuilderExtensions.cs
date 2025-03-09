@@ -25,6 +25,7 @@ using System.Reflection;
 using static MusicWebAPI.Application.ViewModels.UserViewModel;
 using Mappings.CustomMapping;
 using MusicWebAPI.API.Endpoints;
+using MusicWebAPI.Application.Commands;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -36,6 +37,8 @@ public static class WebApplicationBuilderExtensions
             .WriteTo.File("logs/musicwebapi_log.txt", rollingInterval: RollingInterval.Day) // Logs to a file
             .WriteTo.Seq("http://localhost:5341") // Optional: Seq for structured logging (Web UI Panel)
             .CreateLogger();
+
+        builder.Host.UseSerilog();
 
         // Set the logger globally for the application
         builder.Logging.ClearProviders(); // Remove other logging providers
@@ -57,6 +60,8 @@ public static class WebApplicationBuilderExtensions
             AddMinimalMvc(builder);
 
             AddAppServices(builder);
+
+            AddCors(builder);
 
             AddJwtAuthentication(builder, configuration);
 
@@ -109,9 +114,22 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services.AddDbContext<MusicDbContext>(options =>
         {
-            options.UseNpgsql(builder.Configuration.GetConnectionString("MusicDbConnection"));
+            options.UseNpgsql(builder.Configuration.GetConnectionString("MusicDbConnection"))
+            .EnableSensitiveDataLogging()
+            .LogTo(Console.WriteLine, LogLevel.Information);
         });
     }
+    private static void AddCors(WebApplicationBuilder builder)
+    {
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", builder =>
+            {
+                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+            });
+        });
+    }
+
     private static void AddAppServices(WebApplicationBuilder builder)
     {
         // Register Repositories , Services and LoggerManager
@@ -121,25 +139,31 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<ILoggerManager, LoggerManager>();
 
         // Identity Configuration
-        builder.Services.AddIdentity<User, IdentityRole>(options =>
-        {
-            options.Password.RequireDigit = false;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequiredLength = 6;
-        })
-        .AddEntityFrameworkStores<MusicDbContext>()
-        .AddDefaultTokenProviders();
+        //builder.Services.AddIdentity<User, IdentityRole>(options =>
+        //{
+        //    options.Password.RequireDigit = false;
+        //    options.Password.RequireLowercase = false;
+        //    options.Password.RequireNonAlphanumeric = false;
+        //    options.Password.RequireUppercase = false;
+        //    options.Password.RequiredLength = 6;
+        //})
+        //.AddEntityFrameworkStores<MusicDbContext>()
+        //.AddDefaultTokenProviders();
+
+        builder.Services.AddIdentity<User, IdentityRole>()
+            .AddEntityFrameworkStores<MusicDbContext>()
+            .AddDefaultTokenProviders();
 
         // MediatR Configuration
-        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-         
+        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginUserCommand).Assembly));
+
         // AutoMapper Configuration
         builder.Services.InitializeAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         // Enable API Explorer for Swagger
         builder.Services.AddEndpointsApiExplorer();
+
+        builder.Services.AddHealthChecks();
 
         // IIS Configuration (if needed)
         builder.Services.Configure<IISServerOptions>(options =>
@@ -159,9 +183,9 @@ public static class WebApplicationBuilderExtensions
                          .AddNewtonsoftJson(options =>
                          {
                              options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                             options.SerializerSettings.NullValueHandling = NullValueHandling.Include;
                              options.SerializerSettings.Converters.Add(new StringEnumConverter());
                              options.SerializerSettings.Culture = new CultureInfo("en");
-                             options.SerializerSettings.NullValueHandling = NullValueHandling.Include;
                              options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
                              options.SerializerSettings.DateParseHandling = DateParseHandling.DateTime;
                              options.SerializerSettings.MissingMemberHandling = MissingMemberHandling.Ignore;
@@ -171,7 +195,6 @@ public static class WebApplicationBuilderExtensions
                              };
                              options.AllowInputFormatterExceptionMessages = true;
                          });
-
     }
 
     public static void AddMinimalMvc(WebApplicationBuilder builder)
@@ -301,22 +324,22 @@ public static class WebApplicationBuilderExtensions
             //    }
             //});
 
-            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-            {
-                Type = SecuritySchemeType.OAuth2,
-                Flows = new OpenApiOAuthFlows
-                {
-                    Password = new OpenApiOAuthFlow
-                    {
-                        TokenUrl = new Uri("https://localhost:7076/api/Account/Login"),
-                        Scopes = new Dictionary<string, string>
-            {
-                {"read", "Read access to protected resources."},
-                {"write", "Write access to protected resources."},
-            }
-                    }
-                }
-            });
+            //options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            //{
+            //    Type = SecuritySchemeType.OAuth2,
+            //    Flows = new OpenApiOAuthFlows
+            //    {
+            //        Password = new OpenApiOAuthFlow
+            //        {
+            //            TokenUrl = new Uri("https://localhost:7002/api/Login"),
+            //            Scopes = new Dictionary<string, string>
+            //{
+            //    {"read", "Read access to protected resources."},
+            //    {"write", "Write access to protected resources."},
+            //}
+            //        }
+            //    }
+            //});
 
             #endregion
 

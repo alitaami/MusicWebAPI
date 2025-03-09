@@ -1,5 +1,6 @@
 ﻿using Common.Utilities;
 using Entities.Base;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MusicWebAPI.Core.Utilities;
@@ -16,7 +17,7 @@ namespace MusicWebAPI.Infrastructure.Data.Context
     public class MusicDbContext : IdentityDbContext<User>
     {
         public MusicDbContext(DbContextOptions<MusicDbContext> options) : base(options) { }
-        public DbSet<User> Users { get; set; }
+       public DbSet<User> Users { get; set; }
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Album> Albums { get; set; }
         public DbSet<Song> Songs { get; set; }
@@ -27,9 +28,9 @@ namespace MusicWebAPI.Infrastructure.Data.Context
         {
             base.OnModelCreating(modelBuilder);
 
+            #region Reflection
             // Get the assembly containing IEntity
-            var entitiesAssembly = typeof(IEntity).Assembly;
-
+            //  var entitiesAssembly = typeof(IEntity).Assembly;
 
             // Comment reason : because when we wanna register them by reflection, we can not have access to entities from SeedData.cs !
 
@@ -37,6 +38,25 @@ namespace MusicWebAPI.Infrastructure.Data.Context
             //modelBuilder.RegisterAllEntities<IEntity>(entitiesAssembly);
             //modelBuilder.RegisterEntityTypeConfiguration(entitiesAssembly);
             //modelBuilder.AddRestrictDeleteBehaviorConvention();
+
+            // Pluralize table names
+            //foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            //{
+            //    string tableName = entityType.GetTableName();
+            //    entityType.SetTableName(Pluralize(tableName));
+            //}
+            #endregion
+
+            modelBuilder.HasDefaultSchema("public"); // Ensures it works with PostgreSQL
+
+            // Optional: Rename Identity table names (e.g., "AspNetUsers" -> "Users")
+            modelBuilder.Entity<User>().ToTable("Users", "public");
+            modelBuilder.Entity<IdentityRole>().ToTable("Roles", "public");
+            modelBuilder.Entity<IdentityUserRole<string>>().ToTable("UserRoles", "public");
+            modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims", "public");
+            modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins", "public");
+            modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens", "public");
+            modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims", "public");
 
             // Map relationships for IdentityUser (User)
             modelBuilder.Entity<User>()
@@ -50,21 +70,16 @@ namespace MusicWebAPI.Infrastructure.Data.Context
                 .HasForeignKey(s => s.UserId);
 
             modelBuilder.Entity<Song>()
-    .HasOne(s => s.Album)
-    .WithMany(a => a.Songs)
-    .HasForeignKey(s => s.AlbumId);
+                .HasOne(s => s.Album)
+                .WithMany(a => a.Songs)
+                .HasForeignKey(s => s.AlbumId);
 
             modelBuilder.Entity<Song>()
                 .HasOne(s => s.Genre)
                 .WithMany(g => g.Songs)
                 .HasForeignKey(s => s.GenreId);
 
-            // Pluralize table names
-            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-            {
-                string tableName = entityType.GetTableName();
-                entityType.SetTableName(Pluralize(tableName));
-            }
+
         }
 
         private static readonly Dictionary<string, string> IrregularPluralization = new Dictionary<string, string>

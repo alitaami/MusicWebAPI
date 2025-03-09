@@ -7,6 +7,8 @@
 		<PreserveCompilationContext>true</PreserveCompilationContext>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<DocumentationFile>bin\Debug\MyApi.xml</DocumentationFile>
+		<UserSecretsId>b5aac156-58c1-4bba-83e9-2c177a08a9c3</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -15,17 +17,15 @@
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="Pluralize.NET" Version="1.0.2" />
 		<PackageReference Include="Serilog.Sinks.Seq" Version="9.0.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.0.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.13" />
-		<PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="7.2.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.3.1" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.2" />
+		<PackageReference Include="Swashbuckle.AspNetCore.Newtonsoft" Version="7.3.1" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\MusicWebAPI.Application\MusicWebAPI.Application.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="wwwroot\" />
 	</ItemGroup>
 
 </Project>

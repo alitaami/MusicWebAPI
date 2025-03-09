@@ -9,19 +9,37 @@ public static class JwtHelper
 {
     public static string GenerateToken(User user, IConfiguration configuration)
     {
-        var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
-        var signinCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
+        var jwtSection = configuration.GetSection("JwtSettings"); // Match with JSON
+        var secretKey = jwtSection["SecretKey"]; // Fix key name
+        var issuer = jwtSection["Issuer"];
+        var audience = jwtSection["Audience"];
+
+        Console.WriteLine("Secret Key Loaded: " + secretKey); // Debugging line
+
+        if (string.IsNullOrWhiteSpace(secretKey))
+        {
+            throw new ArgumentException("JWT Key cannot be null or empty.");
+        }
+
+        // Check if the secret key is less than 128 bits, and pad if necessary
+        if (secretKey.Length < 16)
+        {
+            throw new ArgumentException("JWT Key must be at least 128 bits (16 characters long).");
+        }
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+        var signinCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Role, user.IsArtist ? "Artist" : "User")
-        };
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim(ClaimTypes.Role, user.IsArtist ? "Artist" : "User")
+    };
 
         var tokenOptions = new JwtSecurityToken(
-            issuer: configuration["Jwt:Issuer"],
-            audience: configuration["Jwt:Audience"],
+            issuer: issuer,
+            audience: audience,
             claims: claims,
             expires: DateTime.UtcNow.AddHours(2),
             signingCredentials: signinCredentials

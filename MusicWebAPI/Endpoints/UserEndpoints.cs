@@ -39,7 +39,7 @@ namespace MusicWebAPI.API.Endpoints
                     var token = await mediator.Send(command);
 
                     // Return success response wrapped in ApiResult
-                    return new UserEndpoints().Ok(new { Token = token });
+                    return new UserEndpoints().Ok( token );
                 }
                 catch (Exception ex)
                 { 
