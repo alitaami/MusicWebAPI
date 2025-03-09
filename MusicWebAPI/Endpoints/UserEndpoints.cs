@@ -2,7 +2,6 @@
 using MusicWebAPI.Application.Commands;
 using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.API.Base;
-
 namespace MusicWebAPI.API.Endpoints
 {
     public class UserEndpoints : ApiResponseBase
@@ -13,8 +12,8 @@ namespace MusicWebAPI.API.Endpoints
             app.MapPost("/api/register", async (IMediator mediator, RegisterUserCommand command) =>
             {
                 var user = await mediator.Send(command);
-
-                return new UserEndpoints().Ok(user);
+             
+                return Ok(user);
             })
             .WithName("RegisterUser")
             .Produces<User>(StatusCodes.Status200OK)
@@ -29,7 +28,7 @@ namespace MusicWebAPI.API.Endpoints
                 // getting JWT token
                 var token = await mediator.Send(command);
 
-                return new UserEndpoints().Ok(token);
+                return Ok(token);
 
             })
             .WithName("LoginUser")

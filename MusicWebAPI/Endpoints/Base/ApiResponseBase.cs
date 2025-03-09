@@ -13,7 +13,7 @@ namespace MusicWebAPI.API.Base
         /// <summary>
         /// Standard success response with wrapped data.
         /// </summary>
-        protected IResult Ok<T>(T data)
+        public static IResult Ok<T>(T data)
         {
             return Results.Ok(new ApiResult<T>(data, StatusCodes.Status200OK));
         }
@@ -21,7 +21,7 @@ namespace MusicWebAPI.API.Base
         /// <summary>
         /// Standard error response for bad requests.
         /// </summary>
-        protected IResult BadRequest(string errorMessage)
+        public static IResult BadRequest(string errorMessage)
         {
             return Results.BadRequest(new ApiResult<string>(errorMessage, StatusCodes.Status400BadRequest));
         }
