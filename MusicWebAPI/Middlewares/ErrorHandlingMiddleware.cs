@@ -1,4 +1,11 @@
-﻿using MusicWebAPI.Core.Base;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using System;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using MusicWebAPI.Core.Base;
 using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
 
 public class ErrorHandlingMiddleware
@@ -16,31 +23,79 @@ public class ErrorHandlingMiddleware
     {
         try
         {
+            // Read and log request body without disposing it
+            var requestBody = await GetRequestBodyAsync(httpContext);
+            _logger.LogInformation("Request Body: {RequestBody}", requestBody);
+
             await _next(httpContext);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "An unexpected error occurred.");
+            // Log the detailed exception
+            await LogErrorAsync(httpContext, ex);
+
+            // Handle the exception and return a proper response
             await HandleExceptionAsync(httpContext, ex);
         }
+    }
+
+    private async Task<string> GetRequestBodyAsync(HttpContext httpContext)
+    {
+        if (httpContext.Request.ContentLength > 0)
+        {
+            httpContext.Request.EnableBuffering(); // Allow the body to be read multiple times
+            httpContext.Request.Body.Position = 0; // Reset position to start reading
+
+            using (var reader = new StreamReader(httpContext.Request.Body, Encoding.UTF8, leaveOpen: true))
+            {
+                string body = await reader.ReadToEndAsync();
+                httpContext.Request.Body.Position = 0; // Reset again for the next middleware to read
+                return body;
+            }
+        }
+        return string.Empty;
+    }
+
+    private async Task LogErrorAsync(HttpContext httpContext, Exception exception)
+    {
+        var logDetails = new
+        {
+            Timestamp = DateTime.UtcNow,
+            HttpMethod = httpContext.Request.Method,
+            RequestPath = httpContext.Request.Path,
+            QueryString = httpContext.Request.QueryString.ToString(),
+            Headers = httpContext.Request.Headers.ToDictionary(k => k.Key, v => v.Value.ToString()),
+            Body = await GetRequestBodyAsync(httpContext),
+            ExceptionType = exception.GetType().ToString(),
+            ExceptionMessage = exception.Message,
+            StackTrace = exception.StackTrace,
+            InnerException = exception.InnerException?.Message,
+        };
+
+        _logger.LogError("An unexpected error occurred: {@LogDetails}", logDetails);
     }
 
     private Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
 
-        // Convert the exception into a consistent ApiResult response
-        ApiResult<object> result = exception switch
+        int statusCode = exception switch
         {
-            NotFoundException notFoundEx => new ApiResult<object>(notFoundEx.Message, 404),
-            BadRequestException badRequestEx => new ApiResult<object>(badRequestEx.Message, 400),
-            LogicException logicEx => new ApiResult<object>(logicEx.Message, 422),
-            InternalServerErrorException internalEx => new ApiResult<object>(internalEx.Message),
-            UnauthorizedException authorizeEx => new ApiResult<object>(authorizeEx.Message, 401),
-            _ => new ApiResult<object>("An unexpected error occurred", 500),
+            NotFoundException => StatusCodes.Status404NotFound,
+            BadRequestException => StatusCodes.Status400BadRequest,
+            LogicException => StatusCodes.Status422UnprocessableEntity,
+            InternalServerErrorException => StatusCodes.Status500InternalServerError,
+            UnauthorizedException => StatusCodes.Status401Unauthorized,
+            _ => StatusCodes.Status500InternalServerError
         };
 
-        context.Response.StatusCode = result.StatusCode;
+        context.Response.StatusCode = statusCode;
+
+        var message = statusCode == StatusCodes.Status500InternalServerError
+            ? "An error occurred."
+            : exception.Message;
+
+        var result = new ApiResult<object>(message, statusCode);
         return context.Response.WriteAsJsonAsync(result);
     }
 }
