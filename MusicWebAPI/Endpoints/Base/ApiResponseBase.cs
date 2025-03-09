@@ -13,7 +13,7 @@ namespace MusicWebAPI.API.Base
         /// <summary>
         /// Standard success response with wrapped data.
         /// </summary>
-        public static IResult Ok<T>(T data)
+        protected static IResult Ok<T>(T data)
         {
             return Results.Ok(new ApiResult<T>(data, StatusCodes.Status200OK));
         }
@@ -21,7 +21,7 @@ namespace MusicWebAPI.API.Base
         /// <summary>
         /// Standard error response for bad requests.
         /// </summary>
-        public static IResult BadRequest(string errorMessage)
+        protected static IResult BadRequest(string errorMessage)
         {
             return Results.BadRequest(new ApiResult<string>(errorMessage, StatusCodes.Status400BadRequest));
         }
@@ -29,7 +29,7 @@ namespace MusicWebAPI.API.Base
         /// <summary>
         /// Standard error response for not found errors.
         /// </summary>
-        protected IResult NotFound(string errorMessage)
+        protected static IResult NotFound(string errorMessage)
         {
             return Results.NotFound(new ApiResult<string>(errorMessage, StatusCodes.Status404NotFound));
         }
@@ -37,7 +37,7 @@ namespace MusicWebAPI.API.Base
         /// <summary>
         /// Standard internal server error response.
         /// </summary>
-        protected IResult InternalServerError(string errorMessage)
+        protected static IResult InternalServerError(string errorMessage)
         {
             return Results.Problem(detail: errorMessage, statusCode: StatusCodes.Status500InternalServerError);
         }
@@ -45,7 +45,7 @@ namespace MusicWebAPI.API.Base
         /// <summary>
         /// Standard unauthorized error response.
         /// </summary>
-        protected IResult Unauthorized(string errorMessage)
+        protected static IResult Unauthorized(string errorMessage)
         {
             return Results.Unauthorized();
         }
