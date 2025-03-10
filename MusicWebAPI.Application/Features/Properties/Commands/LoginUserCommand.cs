@@ -11,9 +11,7 @@ namespace MusicWebAPI.Application.Commands
 {
     public class LoginUserCommand : IRequest<LoginUserViewModel>
     {
-        [Required]
         public string Email { get; set; }
-        [Required]
         public string Password { get; set; }
     }
 

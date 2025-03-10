@@ -2,6 +2,8 @@
 using MusicWebAPI.Application.Commands;
 using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.API.Base;
+using System.Web.WebPages.Html;
+using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
 namespace MusicWebAPI.API.Endpoints
 {
     public class UserEndpoints : ApiResponseBase
@@ -10,7 +12,7 @@ namespace MusicWebAPI.API.Endpoints
         {
             // Register user endpoint
             app.MapPost("/api/register", async (IMediator mediator, RegisterUserCommand command) =>
-            {
+            { 
                 var user = await mediator.Send(command);
              
                 return Ok(user);

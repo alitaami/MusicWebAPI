@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
-
-namespace MusicWebAPI.Core.Base
+﻿namespace MusicWebAPI.Core.Base
 {
     public class ApiResult<T>
     {
@@ -13,6 +6,7 @@ namespace MusicWebAPI.Core.Base
         public string ErrorMessage { get; set; }
         public bool IsSuccess { get; set; }
         public int StatusCode { get; set; }
+        public List<string> Errors { get; set; } // Add this field for validation errors
 
         // Constructor for success responses
         public ApiResult(T data, int statusCode = 200)
@@ -20,6 +14,7 @@ namespace MusicWebAPI.Core.Base
             Data = data;
             IsSuccess = true;
             StatusCode = statusCode;
+            Errors = new List<string>(); // Initialize as empty list
         }
 
         // Constructor for error responses
@@ -28,6 +23,7 @@ namespace MusicWebAPI.Core.Base
             ErrorMessage = errorMessage;
             IsSuccess = false;
             StatusCode = statusCode;
-        }
+            Errors = new List<string>(); // Initialize as empty list
+        } 
     }
 }

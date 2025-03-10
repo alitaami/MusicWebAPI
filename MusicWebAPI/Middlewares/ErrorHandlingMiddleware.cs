@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using MusicWebAPI.Core.Base;
 using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
+using System.ComponentModel.DataAnnotations;
+using ValidationException = MusicWebAPI.Domain.Base.Exceptions.CustomExceptions.ValidationException;
 
 public class ErrorHandlingMiddleware
 {
@@ -86,16 +88,30 @@ public class ErrorHandlingMiddleware
             LogicException => StatusCodes.Status422UnprocessableEntity,
             InternalServerErrorException => StatusCodes.Status500InternalServerError,
             UnauthorizedException => StatusCodes.Status401Unauthorized,
+            ValidationException validationEx => StatusCodes.Status422UnprocessableEntity,
             _ => StatusCodes.Status500InternalServerError
         };
 
         context.Response.StatusCode = statusCode;
 
-        var message = statusCode == StatusCodes.Status500InternalServerError
-            ? "An error occurred."
-            : exception.Message;
+        #region ValidationException Process
 
-        var result = new ApiResult<object>(message, statusCode);
+        // If it's a ValidationException, extract the errors
+        var errors = exception switch
+        {
+            ValidationException validationException => validationException.Errors,
+            LogicException _ => new List<string>(), // Empty errors list for LogicException
+            _ => new List<string>()
+
+        };
+        #endregion
+
+        var result = new ApiResult<object>(exception.Message, statusCode)
+        {
+            Errors = errors // Add the errors to the response
+        };
+
         return context.Response.WriteAsJsonAsync(result);
     }
+
 }

@@ -31,12 +31,24 @@ namespace MusicWebAPI.Domain.Base.Exceptions
             public InternalServerErrorException(string message) : base(message) { }
             public int StatusCode => 500;
         }
-        
+
         public class UnauthorizedException : Exception
         {
             public UnauthorizedException(string message) : base(message) { }
             public int StatusCode => 401;
         }
 
+        // Update the ValidationException to accept a list of validation errors
+        public class ValidationException : Exception
+        {
+            public ValidationException(List<string> errors)
+                : base("Validation errors occurred.")
+            {
+                Errors = errors;
+            }
+
+            public List<string> Errors { get; }
+            public int StatusCode => 422; // Unprocessable Entity
+        }
     }
 }

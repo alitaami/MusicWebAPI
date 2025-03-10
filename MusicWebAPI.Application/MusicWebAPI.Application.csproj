@@ -8,13 +8,16 @@
 
   <ItemGroup>
     <Folder Include="DTOs\" />
-    <Folder Include="Queries\" />
+    <Folder Include="Features\Properties\Queries\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
     <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.1.0" />
+    <PackageReference Include="Microsoft.AspNet.WebPages" Version="3.3.0" />
   </ItemGroup>
 
   <ItemGroup>

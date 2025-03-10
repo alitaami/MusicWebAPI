@@ -26,6 +26,10 @@ using static MusicWebAPI.Application.ViewModels.UserViewModel;
 using Mappings.CustomMapping;
 using MusicWebAPI.API.Endpoints;
 using MusicWebAPI.Application.Commands;
+using MediatR;
+using MusicWebAPI.Application.Validators;
+using FluentValidation;
+using MusicWebAPI.Application;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -69,6 +73,7 @@ public static class WebApplicationBuilderExtensions
 
             ApiRateLimiter(builder);
 
+            builder.Services.AddApplicationServices(); //Adding configuration of 'Application layer'
 
             return builder;
         }
@@ -136,29 +141,10 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
-        builder.Services.AddSingleton<ILoggerManager, LoggerManager>();
-
-        // Identity Configuration
-        //builder.Services.AddIdentity<User, IdentityRole>(options =>
-        //{
-        //    options.Password.RequireDigit = false;
-        //    options.Password.RequireLowercase = false;
-        //    options.Password.RequireNonAlphanumeric = false;
-        //    options.Password.RequireUppercase = false;
-        //    options.Password.RequiredLength = 6;
-        //})
-        //.AddEntityFrameworkStores<MusicDbContext>()
-        //.AddDefaultTokenProviders();
 
         builder.Services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<MusicDbContext>()
             .AddDefaultTokenProviders();
-
-        // MediatR Configuration
-        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginUserCommand).Assembly));
-
-        // AutoMapper Configuration
-        builder.Services.InitializeAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         // Enable API Explorer for Swagger
         builder.Services.AddEndpointsApiExplorer();

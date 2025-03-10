@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using static MusicWebAPI.Application.ViewModels.UserViewModel;
 using AutoMapper;
+using MusicWebAPI.Application.Validators;
 
 namespace MusicWebAPI.Application.Commands.Handlers
 {
@@ -20,7 +21,6 @@ namespace MusicWebAPI.Application.Commands.Handlers
             _serviceManager = serviceManager;
             _mapper = mapper;
         }
-
 
         public async Task<RegisterUserViewModel> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {

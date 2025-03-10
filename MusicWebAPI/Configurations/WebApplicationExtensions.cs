@@ -57,7 +57,6 @@ public static class WebApplicationExtensions
                 Log.Logger.Error("An error occurred while migrating and seeding the database: " + ex.Message);
             }
 
-
             return app;
         }
         catch (Exception ex)
