@@ -15,8 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicWebAPI.Infrastructure"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicWebAPI.IntegrationTests", "MusicWebAPI.IntegrationTests\MusicWebAPI.IntegrationTests.csproj", "{860731CC-CA47-4CCB-89DF-FDE1CF940322}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicWebAPI.UnitTests", "MusicWebAPI.UnitTests\MusicWebAPI.UnitTests.csproj", "{AB509AE3-3FB5-4552-8F53-9CFEF8E8DF25}"
 EndProject
 Global
@@ -45,10 +43,6 @@ Global
 		{B0E09502-CF64-4699-A7F8-C2F4055E9505}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0E09502-CF64-4699-A7F8-C2F4055E9505}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0E09502-CF64-4699-A7F8-C2F4055E9505}.Release|Any CPU.Build.0 = Release|Any CPU
-		{860731CC-CA47-4CCB-89DF-FDE1CF940322}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{860731CC-CA47-4CCB-89DF-FDE1CF940322}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{860731CC-CA47-4CCB-89DF-FDE1CF940322}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{860731CC-CA47-4CCB-89DF-FDE1CF940322}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AB509AE3-3FB5-4552-8F53-9CFEF8E8DF25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AB509AE3-3FB5-4552-8F53-9CFEF8E8DF25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AB509AE3-3FB5-4552-8F53-9CFEF8E8DF25}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -58,7 +52,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{860731CC-CA47-4CCB-89DF-FDE1CF940322} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{AB509AE3-3FB5-4552-8F53-9CFEF8E8DF25} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
