@@ -9,12 +9,6 @@ public static class WebApplicationExtensions
 {
     public static WebApplication Configure(this WebApplication app)
     {
-        // Initialize Serilog with basic configuration
-        Log.Logger = new LoggerConfiguration()
-           .WriteTo.Console(outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] {Message} {NewLine}{Exception}")
-           .WriteTo.File("logs/musicwebapi_log.txt", rollingInterval: RollingInterval.Day)
-           .CreateLogger();
-
         try
         {
             app.UseMiddleware<ErrorHandlingMiddleware>();
@@ -54,14 +48,14 @@ public static class WebApplicationExtensions
             }
             catch (Exception ex)
             {
-                Log.Logger.Error("An error occurred while migrating and seeding the database: " + ex.Message);
+                Log.Fatal(ex, "Database migration failed. Application will now exit.");
             }
 
             return app;
         }
         catch (Exception ex)
         {
-            Log.Logger.Error(ex.Message);
+            Log.Fatal(ex, "Application startup failed.");
             throw;
         }
     }

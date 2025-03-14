@@ -6,7 +6,6 @@ using Serilog;
 using System.Threading.RateLimiting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using Newtonsoft.Json.Serialization;
 using MusicWebAPI.Infrastructure.Data.Context;
@@ -17,45 +16,55 @@ using MusicWebAPI.Domain.Interfaces.Services.Base;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using MusicWebAPI.Domain.Interfaces.Services.MusicWebAPI.Domain.Interfaces;
-using MusicWebAPI.Infrastructure.Logging;
 using MusicWebAPI.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using System.Reflection;
-using static MusicWebAPI.Application.ViewModels.UserViewModel;
-using Mappings.CustomMapping;
-using MusicWebAPI.API.Endpoints;
-using MusicWebAPI.Application.Commands;
-using MediatR;
-using MusicWebAPI.Application.Validators;
-using FluentValidation;
 using MusicWebAPI.Application;
+using Serilog.Sinks.Elasticsearch;
+using Serilog.Events;
+using Serilog.Formatting.Elasticsearch;
+using DotNetEnv;
 
 public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
     {
-        // Initialize Serilog with configuration
+        Env.Load();
+        var configuration = builder.Configuration;
+
+        // Enable Serilog self-logging (optional for debugging Serilog itself)
+        Serilog.Debugging.SelfLog.Enable(Console.Error);
+
+        // Retrieve values from the .env file
+        var logFilePath = Environment.GetEnvironmentVariable("LOG_FILE_PATH");
+        var elasticsearchUri = Environment.GetEnvironmentVariable("ELASTICSEARCH_URL");
+        var indexFormat = Environment.GetEnvironmentVariable("INDEX_FORMAT");
+
+        // Configure the logger entirely in code
         var logger = new LoggerConfiguration()
-            .WriteTo.Console() // Logs to console
-            .WriteTo.File("logs/musicwebapi_log.txt", rollingInterval: RollingInterval.Day) // Logs to a file
-            .WriteTo.Seq("http://localhost:5341") // Optional: Seq for structured logging (Web UI Panel)
+            .Enrich.FromLogContext()
+            .Enrich.WithMachineName()
+            .Enrich.WithThreadId()
+            .WriteTo.Console()
+            .WriteTo.File(logFilePath, rollingInterval: RollingInterval.Day)
+            .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(elasticsearchUri))
+            {
+                AutoRegisterTemplate = true,
+                IndexFormat = indexFormat,
+                FailureCallback = HandleElasticsearchFailure,
+                EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog | EmitEventFailureHandling.RaiseCallback,
+                CustomFormatter = new ExceptionAsObjectJsonFormatter(renderMessage: true)
+            })
             .CreateLogger();
 
-        builder.Host.UseSerilog();
-
-        // Set the logger globally for the application
-        builder.Logging.ClearProviders(); // Remove other logging providers
-        builder.Logging.AddSerilog(logger); // Add Serilog as the logging provider
+        // Use Serilog as the logging provider
+        builder.Host.UseSerilog(logger);
+        builder.Logging.ClearProviders();
+        builder.Logging.AddSerilog(logger);
 
         try
         {
             if (builder is null)
                 throw new ArgumentNullException(nameof(builder));
-
-            var configuration = builder.Configuration;
-
-            ConfigLogging(builder);
 
             AddAppDbContext(builder, configuration);
 
@@ -79,10 +88,16 @@ public static class WebApplicationBuilderExtensions
         }
         catch (Exception ex)
         {
-            logger.Error(ex, "An error occurred while configuring services");
+            Log.Error(ex, "An error occurred while configuring services");
             throw;
         }
     }
+
+    private static void HandleElasticsearchFailure(LogEvent logEvent, Exception ex)
+    {
+        Console.WriteLine($"Unable to log event: {ex.Message} | Log: {logEvent.RenderMessage()}");
+    }
+
     private static void AddJwtAuthentication(WebApplicationBuilder builder, IConfiguration configuration)
     {
         // Read JWT settings from configuration

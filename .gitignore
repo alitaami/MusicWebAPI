@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /MusicWebAPI/appsettings.json
 /MusicWebAPI/.env
+/MusicWebAPI/elasticsearch_data
+/MusicWebAPI/kibana_data

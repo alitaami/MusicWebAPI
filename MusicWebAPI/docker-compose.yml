@@ -9,15 +9,65 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - musicnet
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "sa"]
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 10s
       retries: 5
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "${ELASTICSEARCH_PORT}:9200"
+    networks:
+      - musicnet
+    volumes:
+    - ./elasticsearch_data:/usr/share/elasticsearch/data  # Explicitly mount to a host directory
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider ${ELASTICSEARCH_URL}/_cluster/health || exit 1"]
+      interval: 10s
+      retries: 5
+    entrypoint: >
+      /bin/bash -c "
+        # Start Elasticsearch in the background
+        /usr/share/elasticsearch/bin/elasticsearch & 
+        # Wait for Elasticsearch to be ready
+        until curl -s ${ELASTICSEARCH_URL}; do sleep 1; done; 
+        # Create the index
+        curl -X PUT '${ELASTICSEARCH_URL}/musicwebapi-logs-2025.03.14';
+        # Update the mapping to ensure @timestamp is a date field
+        curl -X PUT '${ELASTICSEARCH_URL}/musicwebapi-logs-2025.03.14/_mapping' -H 'Content-Type: application/json' -d '{ 
+          \"properties\": { 
+            \"@timestamp\": { \"type\": \"date\" } 
+          } 
+        }';
+        # Keep Elasticsearch running in the foreground
+        wait
+      "
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.7.1
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
+    ports:
+      - "${KIBANA_PORT}:5601"
+    networks:
+      - musicnet
+    volumes:
+    - ./kibana_data:/usr/share/kibana/data  # Explicitly mount to a host directory
+    depends_on:
+      - elasticsearch
+    restart: always
 
   api:
     build:
@@ -25,7 +75,7 @@ services:
       dockerfile: MusicWebAPI/Dockerfile
     container_name: musicwebapi_container
     ports:
-      - "8080:8080"
+      - "${API_PORT}:8080"
     networks:
       - musicnet
     environment:
@@ -34,17 +84,25 @@ services:
       - JwtSettings__SecretKey=${JwtSettings__SecretKey}
       - JwtSettings__Issuer=${JwtSettings__Issuer}
       - JwtSettings__Audience=${JwtSettings__Audience}
+      - LOG_FILE_PATH=${LOG_FILE_PATH} 
+      - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}  
+      - INDEX_FORMAT=${INDEX_FORMAT}  
+      - API_URL=${API_URL} 
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      test: ["CMD", "curl", "--fail", "${API_URL}/health"]
       interval: 10s
       retries: 5
 
 volumes:
   postgres_data:
     driver: local
+  elasticsearch_data:
+    driver: local  # Persistent volume for Elasticsearch data
+  kibana_data:
+    driver: local  # Persistent volume for Kibana data
   data_protection_keys:
     driver: local
 

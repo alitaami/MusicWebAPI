@@ -1,11 +1,6 @@
 // Initialize Serilog with basic configuration
 using Serilog;
-
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .WriteTo.File("logs/musicwebapi_log.txt", rollingInterval: RollingInterval.Day)
-    .CreateLogger();
-
+ 
 try
 {
     WebApplication
