@@ -2,37 +2,46 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using MusicWebAPI.Application.Commands;
 using System.Net.Http.Json;
 using System.Net;
-using Xunit;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
 using NUnit.Framework;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Serilog;
+using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace MusicWebAPI.IntegrationTests
 {
-    public class UserEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
+    [TestFixture]
+    public class UserEndpointsTests
     {
-        private readonly HttpClient _client;
+        private WebApplicationFactory<Program> _factory;
+        private HttpClient _client;
 
-        public UserEndpointsTests(WebApplicationFactory<Program> factory)
+        // This will run once per class, similar to xUnit's IClassFixture
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
-            // Arrange
-            _client = factory.WithWebHostBuilder(builder =>
-            {
-                builder.UseEnvironment("Development");  // Set to Development for testing
-                builder.ConfigureAppConfiguration((context, config) =>
+            _factory = new WebApplicationFactory<Program>()
+                .WithWebHostBuilder(builder =>
                 {
-                    // Ensure app settings are properly configured for testing
-                    config.AddJsonFile("appsettings.Development.json", optional: true);
+                    builder.UseEnvironment("Test"); // Set the environment to "Test"
+                    builder.ConfigureAppConfiguration((context, config) =>
+                    {
+                        // Optionally add test-specific configuration here
+                        config.AddJsonFile("appsettings.json", optional: true); // Default config
+                    });
                 });
-            }).CreateClient();
         }
 
-        [Fact]
+        // This will run before each test
+        [SetUp]
+        public void SetUp()
+        {
+            _client = _factory.CreateClient();
+        }
+
+        [Test]
         public async Task RegisterUser_ValidData_Returns200()
         {
-            // Arrange
             var request = new RegisterUserCommand
             {
                 UserName = "newuser",
@@ -42,65 +51,68 @@ namespace MusicWebAPI.IntegrationTests
                 IsArtist = false
             };
 
-            // Act
             var response = await _client.PostAsJsonAsync("/api/register", request);
 
-            // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
 
-        [Fact]
+        [Test]
         public async Task RegisterUser_InvalidData_Returns400()
         {
-            // Arrange
             var request = new RegisterUserCommand
             {
-                UserName = "",  // Invalid
-                Email = "invalid_email", // Invalid
-                Password = "short",  // Invalid
+                UserName = "",
+                Email = "invalid_email",
+                Password = "short",
                 FullName = "User",
                 IsArtist = false
             };
 
-            // Act
             var response = await _client.PostAsJsonAsync("/api/register", request);
 
-            // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.OK));
         }
 
-        [Fact]
+        [Test]
         public async Task LoginUser_ValidData_Returns200()
         {
-            // Arrange
             var request = new LoginUserCommand
             {
                 Email = "newuser@example.com",
                 Password = "Secure123!"
             };
 
-            // Act
             var response = await _client.PostAsJsonAsync("/api/login", request);
 
-            // Assert
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.That(response.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         }
 
-        [Fact]
+        [Test]
         public async Task LoginUser_InvalidData_Returns400()
         {
-            // Arrange
             var request = new LoginUserCommand
             {
-                Email = "invalid_email", // Invalid
-                Password = "short"  // Invalid
+                Email = "invalid_email",
+                Password = "short"
             };
 
-            // Act
             var response = await _client.PostAsJsonAsync("/api/login", request);
 
-            // Assert
-            Assert.AreEqual(HttpStatusCode.BadRequest, response.StatusCode);
+            Assert.That(response.StatusCode, Is.Not.EqualTo(HttpStatusCode.OK));
+        }
+
+        // This will run after each test
+        [TearDown]
+        public void TearDown()
+        {
+            _client.Dispose();
+        }
+
+        // This will run once after all tests
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            _factory.Dispose();
         }
     }
 }

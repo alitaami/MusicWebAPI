@@ -10,10 +10,10 @@ using MusicWebAPI.Domain.Interfaces.Services.Base;
 using static MusicWebAPI.Application.ViewModels.UserViewModel;
 using System.Reflection.Metadata;
 
-namespace MusicWebAPI.Tests.Application.Commands.Handlers
+namespace MusicWebAPI.UnitTests.TDD
 {
     [TestFixture]
-    public class UserHandlerTests
+    public class UserTests
     {
         private Mock<IServiceManager> _serviceManagerMock;
         private Mock<IMapper> _mapperMock;
@@ -90,10 +90,10 @@ namespace MusicWebAPI.Tests.Application.Commands.Handlers
             };
 
             _serviceManagerMock.Setup(s => s.User.RegisterUser(It.IsAny<User>(), It.IsAny<string>()))
-                .ThrowsAsync(new System.Exception("User already exists"));
+                .ThrowsAsync(new Exception("User already exists"));
 
             // Act & Assert
-            Assert.ThrowsAsync<System.Exception>(async () => await _registerUserHandler.Handle(command, CancellationToken.None));
+            Assert.ThrowsAsync<Exception>(async () => await _registerUserHandler.Handle(command, CancellationToken.None));
         }
 
         [Test]
