@@ -10,6 +10,6 @@ namespace MusicWebAPI.Domain.Interfaces.Services
     public interface IUserService
     {
         Task<User> RegisterUser(User user, string password);
-         Task<string> LoginUser(string email, string password);
+        Task<string> LoginUser(string email, string password);
     }
 }

@@ -9,13 +9,14 @@ using MusicWebAPI.Core.Base;
 using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
 using System.ComponentModel.DataAnnotations;
 using ValidationException = MusicWebAPI.Domain.Base.Exceptions.CustomExceptions.ValidationException;
+using MusicWebAPI.Domain.Interfaces.Services.MusicWebAPI.Domain.Interfaces;
 
 public class ErrorHandlingMiddleware
 {
     private readonly RequestDelegate _next;
-    private readonly ILogger<ErrorHandlingMiddleware> _logger;
+    private readonly ILoggerManager _logger;
 
-    public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger)
+    public ErrorHandlingMiddleware(RequestDelegate next, ILoggerManager logger)
     {
         _next = next;
         _logger = logger;
@@ -27,7 +28,7 @@ public class ErrorHandlingMiddleware
         {
             // Read and log request body without disposing it
             var requestBody = await GetRequestBodyAsync(httpContext);
-            _logger.LogInformation("Request Body: {RequestBody}", requestBody);
+            _logger.LogInfo($"Request Body: {requestBody}");
 
             await _next(httpContext);
         }
@@ -74,7 +75,7 @@ public class ErrorHandlingMiddleware
             InnerException = exception.InnerException?.Message,
         };
 
-        _logger.LogError("An unexpected error occurred: {@LogDetails}", logDetails);
+        _logger.LogError($"An unexpected error occurred: {logDetails}");
     }
 
     private Task HandleExceptionAsync(HttpContext context, Exception exception)
@@ -113,5 +114,4 @@ public class ErrorHandlingMiddleware
 
         return context.Response.WriteAsJsonAsync(result);
     }
-
 }

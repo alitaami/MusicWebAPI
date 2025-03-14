@@ -31,6 +31,8 @@ public static class WebApplicationBuilderExtensions
         Env.Load();
         var configuration = builder.Configuration;
 
+        #region Logging Configuration
+
         // Enable Serilog self-logging (optional for debugging Serilog itself)
         Serilog.Debugging.SelfLog.Enable(Console.Error);
 
@@ -60,6 +62,8 @@ public static class WebApplicationBuilderExtensions
         builder.Host.UseSerilog(logger);
         builder.Logging.ClearProviders();
         builder.Logging.AddSerilog(logger);
+        
+        #endregion
 
         try
         {

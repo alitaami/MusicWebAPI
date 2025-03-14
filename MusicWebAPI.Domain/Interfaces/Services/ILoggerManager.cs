@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace MusicWebAPI.Domain.Interfaces.Services
 {
-    // /Domain/Interfaces/ILoggerManager.cs
     namespace MusicWebAPI.Domain.Interfaces
     {
         public interface ILoggerManager
@@ -17,5 +16,4 @@ namespace MusicWebAPI.Domain.Interfaces.Services
             void LogDebug(string message);
         }
     }
-
 }
