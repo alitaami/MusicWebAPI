@@ -2,8 +2,8 @@
 
 services:
   postgres:
-    image: bitnami/postgresql:latest
-    container_name: postgres_container
+    image: postgres:16-alpine  # Lightweight official PostgreSQL image
+    container_name: postgres_container 
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -20,42 +20,38 @@ services:
       retries: 5
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
+    image:  bitnami/elasticsearch:7.17.13  # Stable older version
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
+      - xpack.security.enabled=false  # Disables security for easy access
     ports:
       - "${ELASTICSEARCH_PORT}:9200"
     networks:
       - musicnet
-    volumes:
-    - ./elasticsearch_data:/usr/share/elasticsearch/data  # Explicitly mount to a host directory
+    # volumes:
+      # - ./elasticsearch_data:/bitnami/elasticsearch/data  # Correct Bitnami path
     restart: always
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider ${ELASTICSEARCH_URL}/_cluster/health || exit 1"]
+      test: ["CMD-SHELL", "curl -s ${ELASTICSEARCH_URL}/_cluster/health || exit 1"]
       interval: 10s
       retries: 5
-    entrypoint: >
-      /bin/bash -c "
-        # Start Elasticsearch in the background
-        /usr/share/elasticsearch/bin/elasticsearch & 
-        # Wait for Elasticsearch to be ready
-        until curl -s ${ELASTICSEARCH_URL}; do sleep 1; done; 
-        # Create the index
-        curl -X PUT '${ELASTICSEARCH_URL}/musicwebapi-logs-2025.03.14';
-        # Update the mapping to ensure @timestamp is a date field
-        curl -X PUT '${ELASTICSEARCH_URL}/musicwebapi-logs-2025.03.14/_mapping' -H 'Content-Type: application/json' -d '{ 
-          \"properties\": { 
-            \"@timestamp\": { \"type\": \"date\" } 
-          } 
-        }';
-        # Keep Elasticsearch running in the foreground
-        wait
-      "
+    # entrypoint: >
+    #   /bin/bash -c "
+    #     # Start Elasticsearch
+    #     /opt/bitnami/scripts/elasticsearch/run.sh & 
+    #     until curl -s ${ELASTICSEARCH_URL}; do sleep 1; done;
+    #     curl -X PUT '${ELASTICSEARCH_URL}/musicwebapi-logs-2025.03.14';
+    #     curl -X PUT '${ELASTICSEARCH_URL}/musicwebapi-logs-2025.03.14/_mapping' -H 'Content-Type: application/json' -d '{ 
+    #       \"properties\": { 
+    #         \"@timestamp\": { \"type\": \"date\" } 
+    #       } 
+    #     }';
+    #     wait
+    #   "
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.7.1
+    image: bitnami/kibana:7.17.13  # Stable Kibana version
     container_name: kibana
     environment:
       - ELASTICSEARCH_URL=${ELASTICSEARCH_URL}
@@ -64,7 +60,7 @@ services:
     networks:
       - musicnet
     volumes:
-    - ./kibana_data:/usr/share/kibana/data  # Explicitly mount to a host directory
+      - kibana_data:/usr/share/kibana/data
     depends_on:
       - elasticsearch
     restart: always
@@ -96,14 +92,28 @@ services:
       interval: 10s
       retries: 5
 
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: always
+    ports:
+      - "${PORTAINER_PORT}:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - musicnet
+
 volumes:
   postgres_data:
     driver: local
   elasticsearch_data:
-    driver: local  # Persistent volume for Elasticsearch data
+    driver: local
   kibana_data:
-    driver: local  # Persistent volume for Kibana data
+    driver: local
   data_protection_keys:
+    driver: local
+  portainer_data:
     driver: local
 
 networks:

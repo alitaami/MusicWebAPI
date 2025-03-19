@@ -10,6 +10,7 @@ using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
 using System.ComponentModel.DataAnnotations;
 using ValidationException = MusicWebAPI.Domain.Base.Exceptions.CustomExceptions.ValidationException;
 using MusicWebAPI.Domain.Interfaces.Services.MusicWebAPI.Domain.Interfaces;
+using MusicWebAPI.Core.Resources;
 
 public class ErrorHandlingMiddleware
 {
@@ -107,9 +108,14 @@ public class ErrorHandlingMiddleware
         };
         #endregion
 
-        var result = new ApiResult<object>(exception.Message, statusCode)
+        // Create the default error response for unhandled 500 errors
+        string errorMessage = statusCode == StatusCodes.Status500InternalServerError
+            ? Resource.GeneralUnhandledErrorText
+            : exception.Message;
+
+        var result = new ApiResult<object>(errorMessage, statusCode)
         {
-            Errors = errors // Add the errors to the response
+            Errors = errors
         };
 
         return context.Response.WriteAsJsonAsync(result);

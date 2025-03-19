@@ -79,6 +79,15 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An unexpected error occurred. Please try again later..
+        /// </summary>
+        public static string GeneralUnhandledErrorText {
+            get {
+                return ResourceManager.GetString("GeneralUnhandledErrorText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Email or Password is not correct! Try again..
         /// </summary>
         public static string InvalidCredentials {
