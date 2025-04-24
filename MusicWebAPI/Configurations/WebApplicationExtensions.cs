@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using MusicWebAPI.API.Endpoints;
 using MusicWebAPI.API.Middlewares;
+using MusicWebAPI.Domain.Interfaces.Services;
+using MusicWebAPI.Domain.Interfaces.Services.Base;
 using MusicWebAPI.Infrastructure.Data.Context;
 using Serilog;
 
@@ -40,7 +42,7 @@ public static class WebApplicationExtensions
                 using (var scope = app.Services.CreateScope())
                 {
                     var services = scope.ServiceProvider;
-                    var dbContext = services.GetRequiredService<MusicDbContext>();
+                    var dbContext = services.GetRequiredService<MusicDbContext>(); 
                     dbContext.Database.EnsureCreated(); // Ensures tables exist
                     dbContext.Database.Migrate(); // Apply pending migrations
                     SeedData.Initialize(scope.ServiceProvider, dbContext);  // Then seed data

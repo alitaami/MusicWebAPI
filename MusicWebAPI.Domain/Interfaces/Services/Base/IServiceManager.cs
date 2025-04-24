@@ -8,6 +8,6 @@ namespace MusicWebAPI.Domain.Interfaces.Services.Base
 {
     public interface IServiceManager
     { 
-        IUserService  User { get; }
+        IUserService  User { get; } 
     }
 }

@@ -23,6 +23,10 @@ using Serilog.Sinks.Elasticsearch;
 using Serilog.Events;
 using Serilog.Formatting.Elasticsearch;
 using DotNetEnv;
+using Minio;
+using MusicWebAPI.Domain.Interfaces.Services;
+using MusicWebAPI.Infrastructure.FileService;
+using static System.Net.WebRequestMethods;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -62,7 +66,7 @@ public static class WebApplicationBuilderExtensions
         builder.Host.UseSerilog(logger);
         builder.Logging.ClearProviders();
         builder.Logging.AddSerilog(logger);
-        
+
         #endregion
 
         try
@@ -156,14 +160,37 @@ public static class WebApplicationBuilderExtensions
 
     private static void AddAppServices(WebApplicationBuilder builder)
     {
+        #region Minio
+
+        // Configure MinIO Client using environment variables
+
+        builder.Services.AddSingleton<IMinioClient>(serviceProvider =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var endpoint = configuration["MINIO:URL"] ?? "http://localhost:9000";
+            var uri = new Uri(endpoint);
+
+            return new MinioClient()
+                .WithEndpoint(uri.Host, uri.Port)
+                .WithCredentials(configuration["MINIO:ROOT_USER"] ?? "minioadmin", configuration["MINIO:ROOT_PASSWORD"] ?? "minioadmin123")
+                .WithSSL(uri.Scheme == "https")
+                .Build();
+        });
+
+        builder.Services.AddTransient<FileStorageService>();
+
+        #endregion
+
         // Register Repositories , Services and LoggerManager
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
 
+        #region Identity
         builder.Services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<MusicDbContext>()
             .AddDefaultTokenProviders();
+        #endregion
 
         // Enable API Explorer for Swagger
         builder.Services.AddEndpointsApiExplorer();

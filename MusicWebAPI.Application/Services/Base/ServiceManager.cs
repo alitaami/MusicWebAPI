@@ -7,16 +7,17 @@ using MusicWebAPI.Domain.Interfaces.Repositories;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
 using MusicWebAPI.Domain.Interfaces.Services;
 using Mappings.CustomMapping;
+using Minio;
+using MusicWebAPI.Infrastructure.FileService;
 
 public class ServiceManager : IServiceManager
 {
     private readonly IMapper _mapper;
     private readonly IRepositoryManager _repositoryManager;
     private readonly IConfiguration _configuration;
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager<User> _userManager; 
 
     private readonly Lazy<IUserService> _userService;
-
     public ServiceManager(IRepositoryManager repositoryManager, UserManager<User> userManager, IConfiguration configuration)
     {
         _repositoryManager = repositoryManager;
