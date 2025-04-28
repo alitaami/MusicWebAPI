@@ -29,27 +29,27 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories
             try
             {
                 var query = _context
-                            .Songs
-                            .Include(x => x.Artist)
-                            .Include(x => x.Album)
-                            .Include(x => x.Genre)
-                            .Where(s =>
-                                s.SearchVector.Matches(EF.Functions.PhraseToTsQuery("english", term)) ||
-                                s.Genre.Name.Contains(term) ||
-                                s.Artist.FullName.Contains(term) ||
-                                s.Title.Contains(term) ||
-                                (s.Album != null && s.Album.Title.Contains(term)))
-                            .Select(s => new
-                            {
-                                Id = s.Id,
-                                Title = s.Title,
-                                AudioUrl = s.AudioUrl,
-                                AlbumTitle = s.Album.Title,
-                                GenreName = s.Genre.Name,
-                                ArtistName = s.Artist.FullName,
-                                Rank = s.SearchVector.Rank(EF.Functions.PhraseToTsQuery("english", term)),
-                            })
-                            .OrderByDescending(s => s.Rank);
+                    .Songs
+                    .Include(x => x.Artist)
+                    .Include(x => x.Album)
+                    .Include(x => x.Genre)
+                    .Where(s =>
+                        s.SearchVector.Matches(EF.Functions.PhraseToTsQuery("english", term)) ||
+                        EF.Functions.ILike(s.Genre.Name, $"%{term}%") ||
+                        EF.Functions.ILike(s.Artist.FullName, $"%{term}%") ||
+                        EF.Functions.ILike(s.Title, $"%{term}%") ||
+                        (s.Album != null && EF.Functions.ILike(s.Album.Title, $"%{term}%")))
+                    .Select(s => new
+                    {
+                        Id = s.Id,
+                        Title = s.Title,
+                        AudioUrl = s.AudioUrl,
+                        AlbumTitle = s.Album.Title,
+                        GenreName = s.Genre.Name,
+                        ArtistName = s.Artist.FullName,
+                        Rank = s.SearchVector.Rank(EF.Functions.PhraseToTsQuery("english", term)),
+                    })
+                    .OrderByDescending(s => s.Rank);
 
                 var result = await query.ToPaginatedListAsync(pageNumber, pageSize, cancellationToken: cancellationToken);
 
