@@ -10,8 +10,6 @@ using System.Globalization;
 using Newtonsoft.Json.Serialization;
 using MusicWebAPI.Infrastructure.Data.Context;
 using Microsoft.EntityFrameworkCore;
-using MusicWebAPI.Infrastructure.Data.Repositories;
-using MusicWebAPI.Domain.Interfaces.Repositories;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -27,6 +25,8 @@ using Minio;
 using MusicWebAPI.Domain.Interfaces.Services;
 using MusicWebAPI.Infrastructure.FileService;
 using static System.Net.WebRequestMethods;
+using MusicWebAPI.Domain.Interfaces.Repositories.Base;
+using MusicWebAPI.Infrastructure.Data.Repositories.Base;
 
 public static class WebApplicationBuilderExtensions
 {

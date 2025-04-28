@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MusicWebAPI.Domain.Interfaces.Repositories
+namespace MusicWebAPI.Domain.Interfaces.Repositories.Base
 {
     public interface IRepository<TEntity> where TEntity : class
     {

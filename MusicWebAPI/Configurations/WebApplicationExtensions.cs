@@ -30,6 +30,7 @@ public static class WebApplicationExtensions
 
             // Register the Minimal API routes
             UserEndpoints.RegisterUserEndpoints(app); // Call the method that registers endpoints
+            HomePageEndpoints.RegisterHomeEndpoints(app); // Call the method that registers endpoints
 
             app.UseRateLimiter();
 

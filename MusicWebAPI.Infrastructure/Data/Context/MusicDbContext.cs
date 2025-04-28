@@ -3,6 +3,7 @@ using Entities.Base;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using MusicWebAPI.Core.Utilities;
 using MusicWebAPI.Domain.Entities;
 using System;
@@ -17,7 +18,7 @@ namespace MusicWebAPI.Infrastructure.Data.Context
     public class MusicDbContext : IdentityDbContext<User>
     {
         public MusicDbContext(DbContextOptions<MusicDbContext> options) : base(options) { }
-       public DbSet<User> Users { get; set; }
+        public DbSet<User> Users { get; set; }
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Album> Albums { get; set; }
         public DbSet<Song> Songs { get; set; }
@@ -79,7 +80,13 @@ namespace MusicWebAPI.Infrastructure.Data.Context
                 .WithMany(g => g.Songs)
                 .HasForeignKey(s => s.GenreId);
 
-
+            modelBuilder.Entity<Song>()
+                .HasGeneratedTsVectorColumn(
+                    p => p.SearchVector,
+                    "english",
+                    p => new { p.Title/* , AlbumTitle = p.Album.Title, p.Artist.FullName, p.Genre.Name*/ })
+                .HasIndex(p => p.SearchVector)
+                .HasMethod("GIN");
         }
 
         private static readonly Dictionary<string, string> IrregularPluralization = new Dictionary<string, string>

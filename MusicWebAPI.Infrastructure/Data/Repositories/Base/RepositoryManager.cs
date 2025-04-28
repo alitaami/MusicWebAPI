@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
 using MusicWebAPI.Domain.Interfaces.Repositories;
+using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 using MusicWebAPI.Infrastructure.Data.Context;
 using System;
 using System.Collections.Generic;
@@ -11,12 +12,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MusicWebAPI.Infrastructure.Data.Repositories
+namespace MusicWebAPI.Infrastructure.Data.Repositories.Base
 {
     public class RepositoryManager : IRepositoryManager
     {
         private MusicDbContext _context;
-        // private IUserRepository _userRepository;
+        private ISongRepository _songRepository;
 
         public RepositoryManager(MusicDbContext context)
         {
@@ -25,7 +26,7 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories
         #region Cross-Repository query
         public IEnumerable<T> GetListWithRawSql<T>(string procedureOrQuery, CancellationToken cancellationToken, params object[] parameters)
         {
-            cancellationToken.ThrowIfCancellationRequested(); 
+            cancellationToken.ThrowIfCancellationRequested();
             return _context.Database.SqlQueryRaw<T>(procedureOrQuery, parameters).ToList();
         }
 
@@ -59,20 +60,20 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories
         public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             await _context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-        } 
+        }
         #endregion
 
         #region Model Repositories
-        //public IUserRepository User
-        //{
-        //    get
-        //    {
-        //        if (this._userRepository == null)
-        //            this._userRepository = new UserRepository(_context);
+        public ISongRepository Song
+        {
+            get
+            {
+                if (this._songRepository == null)
+                    this._songRepository = new SongRepository(_context);
 
-        //        return this._userRepository;
-        //    }
-        //}
+                return this._songRepository;
+            }
+        }
 
         #endregion
     }

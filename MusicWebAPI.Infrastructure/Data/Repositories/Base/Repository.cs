@@ -1,4 +1,4 @@
-﻿using MusicWebAPI.Domain.Interfaces.Repositories;
+﻿using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 using MusicWebAPI.Infrastructure.Data.Context;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MusicWebAPI.Infrastructure.Data.Repositories
+namespace MusicWebAPI.Infrastructure.Data.Repositories.Base
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {

@@ -14,8 +14,6 @@ public static class JwtHelper
         var issuer = jwtSection["Issuer"];
         var audience = jwtSection["Audience"];
 
-        Console.WriteLine("Secret Key Loaded: " + secretKey); // Debugging line
-
         if (string.IsNullOrWhiteSpace(secretKey))
         {
             throw new ArgumentException("JWT Key cannot be null or empty.");

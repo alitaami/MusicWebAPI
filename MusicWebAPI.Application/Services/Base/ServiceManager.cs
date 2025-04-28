@@ -3,21 +3,22 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using MusicWebAPI.Application.Services;
 using MusicWebAPI.Domain.Entities;
-using MusicWebAPI.Domain.Interfaces.Repositories;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
 using MusicWebAPI.Domain.Interfaces.Services;
 using Mappings.CustomMapping;
 using Minio;
 using MusicWebAPI.Infrastructure.FileService;
+using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 
 public class ServiceManager : IServiceManager
 {
     private readonly IMapper _mapper;
     private readonly IRepositoryManager _repositoryManager;
     private readonly IConfiguration _configuration;
-    private readonly UserManager<User> _userManager; 
+    private readonly UserManager<User> _userManager;
 
     private readonly Lazy<IUserService> _userService;
+    private readonly Lazy<IHomeService> _homeService;
     public ServiceManager(IRepositoryManager repositoryManager, UserManager<User> userManager, IConfiguration configuration)
     {
         _repositoryManager = repositoryManager;
@@ -32,7 +33,9 @@ public class ServiceManager : IServiceManager
 
         // Lazy initialization for thread safety
         _userService = new Lazy<IUserService>(() => new UserService(_userManager, _mapper, _configuration));
+        _homeService = new Lazy<IHomeService>(() => new HomeService(_repositoryManager, _mapper));
     }
 
     public IUserService User => _userService.Value;
+    public IHomeService Home => _homeService.Value;
 }
