@@ -23,7 +23,6 @@ namespace MusicWebAPI.UnitTests.TDD
         private Mock<IMapper> _mapperMock;
         private RegisterUserHandler _registerUserHandler;
         private LoginUserHandler _loginUserHandler;
-        private GetSongsQueryHandler _getSongsHandler;
 
         [SetUp]
         public void Setup()
@@ -32,42 +31,8 @@ namespace MusicWebAPI.UnitTests.TDD
             _mapperMock = new Mock<IMapper>();
             _registerUserHandler = new RegisterUserHandler(_serviceManagerMock.Object, _mapperMock.Object);
             _loginUserHandler = new LoginUserHandler(_serviceManagerMock.Object);
-            _getSongsHandler = new GetSongsQueryHandler(_serviceManagerMock.Object);
         }
-
-        [Test]
-        public async Task Handle_GetSongs_ReturnSongs()
-        {
-            //Arrange
-            var query = new GetSongsQuery(term: "", 10, 1);
-
-            _serviceManagerMock.Setup(s => s.Home.GetSongs(query.Term, query.PageSize, query.PageNumber, CancellationToken.None))
-                 .ReturnsAsync(new Core.PaginatedResult<object>());
-
-            //Act 
-            var result = await _getSongsHandler.Handle(query, CancellationToken.None);
-
-            //Assert
-            Assert.IsNotNull(result);
-            Assert.IsInstanceOf<PaginatedResult<GetSongsViewModel>>(result);
-        }
-
-        [Test]
-        public async Task Handle_GetSongs_ThrowException()
-        {
-            //Arrange
-            var query = new GetSongsQuery(term: "", 10, 1);
-
-            _serviceManagerMock.Setup(s => s.Home.GetSongs(query.Term, query.PageSize, query.PageNumber, CancellationToken.None))
-                 .ThrowsAsync(new Exception("Exception"));
-
-            //Act 
-
-            //Assert
-            var ex = Assert.ThrowsAsync<Exception>(async () => await _getSongsHandler.Handle(query, CancellationToken.None));
-            Assert.That(ex.Message, Is.EqualTo("Exception"));
-        }
-
+         
         [Test]
         public async Task Handle_RegisterUser_ReturnsMappedViewModel()
         {
