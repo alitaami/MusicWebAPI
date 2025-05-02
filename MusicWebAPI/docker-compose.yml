@@ -63,6 +63,10 @@ services:
       - kibana_data:/usr/share/kibana/data
     depends_on:
       - elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s ${ELASTICSEARCH_URL} > /dev/null || exit 1"]
+      interval: 10s
+      retries: 5
     restart: always
 
   api:
@@ -109,7 +113,7 @@ services:
    entrypoint: >
         sh -c '
           minio server /data --console-address ":9011" &
-          until curl -s http://localhost:9000/minio/health/live; do echo "Waiting for MinIO..."; sleep 2; done;
+          until curl -s http://localhost:${MINIO_PORT}/minio/health/live; do echo "Waiting for MinIO..."; sleep 2; done;
           echo "MinIO is live. Downloading mc...";
           curl -s https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/bin/mc && chmod +x /usr/bin/mc &&
           echo "Setting mc alias...";
@@ -132,6 +136,11 @@ services:
       - portainer_data:/data
     networks:
       - musicnet
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:${PORTAINER_PORT}/api/status"]
+      interval: 10s
+      retries: 5
+ 
 
 volumes:
   postgres_data:
