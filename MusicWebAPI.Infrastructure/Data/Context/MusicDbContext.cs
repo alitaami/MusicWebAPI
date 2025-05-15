@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using MusicWebAPI.Core.Utilities;
 using MusicWebAPI.Domain.Entities;
+using MusicWebAPI.Domain.Entities.Chat_Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,9 @@ namespace MusicWebAPI.Infrastructure.Data.Context
         public DbSet<Song> Songs { get; set; }
         public DbSet<Playlist> Playlists { get; set; }
         public DbSet<PlaylistSong> PlaylistSongs { get; set; }
+        public DbSet<ChatGroup> ChatGroups { get; set; }
+        public DbSet<UserGroup> UserGroups { get; set; }
+        public DbSet<Message> Messages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -87,6 +91,12 @@ namespace MusicWebAPI.Infrastructure.Data.Context
                     p => new { p.Title/* , AlbumTitle = p.Album.Title, p.Artist.FullName, p.Genre.Name*/ })
                 .HasIndex(p => p.SearchVector)
                 .HasMethod("GIN");
+
+            modelBuilder.Entity<Message>()
+           .HasOne(m => m.ReplyTo)
+           .WithMany()
+           .HasForeignKey(m => m.ReplyToMessageId)
+           .OnDelete(DeleteBehavior.Restrict);
         }
 
         private static readonly Dictionary<string, string> IrregularPluralization = new Dictionary<string, string>

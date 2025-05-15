@@ -151,15 +151,23 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy("AllowAll", builder =>
+            options.AddPolicy("CorsPolicy", builder =>
             {
-                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                builder
+                    .WithOrigins("http://localhost:4200", "http://localhost:8080")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
             });
         });
     }
 
     private static void AddAppServices(WebApplicationBuilder builder)
     {
+        #region Swagger
+        builder.Services.AddSignalR();
+        #endregion
+
         #region Minio
 
         // Configure MinIO Client using environment variables

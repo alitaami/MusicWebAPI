@@ -21,11 +21,13 @@ public static class WebApplicationExtensions
             app.UseHttpsRedirection();
             app.UseHsts();
 
-            app.UseCors("AllowAll");
+            app.UseCors("CorsPolicy");
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
+            app.MapHub<ChatHub>("/chathub");
+
             app.MapControllers();
 
             // Register the Minimal API routes

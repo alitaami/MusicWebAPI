@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using MusicWebAPI.Domain.Entities;
+using MusicWebAPI.Domain.Entities.Chat_Models;
 using MusicWebAPI.Domain.Interfaces.Services;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
 using MusicWebAPI.Infrastructure.Data.Context;
@@ -14,7 +15,7 @@ public static class SeedData
     {
         try
         {
-              var fileStorageService = serviceProvider.GetRequiredService<FileStorageService>();
+            var fileStorageService = serviceProvider.GetRequiredService<FileStorageService>();
 
             // Create a new instance of PasswordHasher
             var passwordHasher = new PasswordHasher<User>();
@@ -329,6 +330,21 @@ public static class SeedData
 
             #endregion
 
+            #region ChatGroup
+            if (!context.ChatGroups.Any(s => s.Name == "Songs"))
+            {
+                var chatGroup = new ChatGroup
+                {
+                    Name = "Songs",
+                };
+
+                context.ChatGroups.Add(chatGroup);
+            }
+
+            // Save all changes
+            context.SaveChanges();
+
+            #endregion
         }
         catch (Exception ex)
         {
