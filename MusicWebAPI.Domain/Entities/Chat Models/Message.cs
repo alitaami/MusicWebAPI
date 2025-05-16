@@ -15,6 +15,7 @@ namespace MusicWebAPI.Domain.Entities.Chat_Models
         public string Content { get; set; }
         public int? ReplyToMessageId { get; set; }
         public DateTime SentAt { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         [ForeignKey(nameof(GroupId))]
         public ChatGroup Group { get; set; }

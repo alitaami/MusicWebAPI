@@ -56,6 +56,20 @@ public class ChatHub : Hub
         await Clients.Group(groupName).SendAsync("UserLeft", userId);
     }
 
+    public async Task DeleteMessage(string groupName, int messageId)
+    {
+        var group = await _context.ChatGroups.FirstOrDefaultAsync(g => g.Name == groupName);
+        if (group == null) return;
+
+        var message = await _context.Messages.Where(m => m.Id == messageId && m.GroupId == group.Id).FirstOrDefaultAsync();
+        if (message != null)
+        {
+            message.IsDeleted = true;
+            await _context.SaveChangesAsync();
+            await Clients.Group(message.Group.Name).SendAsync("MessageDeleted", messageId);
+        }
+    }
+
     public async Task SendMessage(string groupName, string senderId, string content, int? replyToMessageId = null)
     {
         Console.WriteLine("SendMessage started");
@@ -134,7 +148,7 @@ public class ChatHub : Hub
         }
 
         var messages = await _context.Messages
-            .Where(m => m.GroupId == group.Id)
+            .Where(m => m.GroupId == group.Id && !m.IsDeleted)
             .OrderByDescending(m => m.SentAt)
             .Skip(skip)
             .Take(take)

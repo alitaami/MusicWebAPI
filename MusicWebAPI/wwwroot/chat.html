@@ -75,10 +75,23 @@
                     justify-content: flex-end; /* align right */
                 }
 
+                #messagesList li.system-message {
+                    justify-content: center !important;
+                    display: block;
+                    text-align: center;
+                    font-style: italic;
+                    font-size: 13px;
+                    color: #888;
+                    margin: 8px 0;
+                }
+
         .system-message {
-            color: gray;
+            font-size: 13px;
+            color: #666;
+            margin: 12px 0;
             font-style: italic;
         }
+
 
         .message-input {
             display: flex;
@@ -132,12 +145,12 @@
             max-width: 70%;
             padding: 10px 14px;
             border-radius: 12px;
-            word-break: break-word; /* Correct property to break long words */
-            overflow-wrap: break-word; /* Ensures compatibility across browsers */
-            white-space: pre-wrap; /* Preserves line breaks and wraps long lines */
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
             display: inline-block;
             font-size: 15px;
-            flex-shrink: 1; /* Prevents stretching in flex containers */
+            flex-shrink: 1;
         }
 
             .message.own {
@@ -159,7 +172,6 @@
                 border-bottom-left-radius: 0;
                 margin-right: auto;
             }
-
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@latest/dist/browser/signalr.min.js"></script>
 </head>
@@ -215,14 +227,14 @@
         let replyToSenderUsername = null;
 
         function setReplyContext(message) {
-            replyToMessageId = message.id; 
+            replyToMessageId = message.id;
             replyToContent = message.content;
             replyToSenderUsername = message.senderUsername;
 
             if (replyToContent.length > 10) {
                 replyToContent = replyToContent.substring(0, 10) + "...";
             }
-             
+
             // Set innerHTML to style the username part
             document.getElementById("replyToText").innerHTML =
                 `<strong style="color: #1a73e8;">${replyToSenderUsername}</strong>: ${replyToContent}`;
@@ -277,7 +289,7 @@
                 console.error("Connection failed: ", err.toString());
             }
         }
-         
+
         function registerEventHandlers() {
 
             connection.off("ReceiveMessage");
@@ -288,6 +300,8 @@
 
             connection.on("ReceiveMessage", (message) => {
                 const li = document.createElement("li");
+                li.id = `message-${message.id}`; // Important: assign an ID for future reference
+
                 const isOwn = message.senderUsername === username;
 
                 const msgContainer = document.createElement("div");
@@ -295,7 +309,7 @@
 
                 const meta = document.createElement("div");
                 meta.style.fontSize = "12px";
-                meta.style.color = "#666";
+                meta.style.color = "#555";
                 meta.style.marginBottom = "4px";
                 meta.textContent = `${message.senderUsername} • ${new Date(message.sentAt).toLocaleTimeString()}`;
                 msgContainer.appendChild(meta);
@@ -356,24 +370,55 @@
                 replyBtn.style.background = "transparent";
                 replyBtn.style.border = "none";
                 replyBtn.style.cursor = "pointer";
-                replyBtn.style.color = "#007bff";
+                replyBtn.style.color = isOwn ? "#555" : "#007bff";
                 replyBtn.onclick = () => {
                     setReplyContext(message);
                 };
                 msgContainer.appendChild(replyBtn);
+
+                // ✅ Delete button (only for own messages)
+                if (isOwn) {
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.textContent = "Delete";
+                    deleteBtn.style.fontSize = "11px";
+                    deleteBtn.style.marginLeft = "10px";
+                    deleteBtn.style.background = "transparent";
+                    deleteBtn.style.border = "none";
+                    deleteBtn.style.cursor = "pointer";
+                    deleteBtn.style.color = "#EE4B2B";
+                    deleteBtn.onmouseenter = () => deleteBtn.style.color = "#B22222"; // Darker red
+                    deleteBtn.onmouseleave = () => deleteBtn.style.color = "#EE4B2B";
+
+                    deleteBtn.onclick = async () => {
+                        await connection.invoke("DeleteMessage", groupName, message.id);
+                    };
+
+                    msgContainer.appendChild(deleteBtn);
+                }
 
                 li.appendChild(msgContainer);
                 messagesList.appendChild(li);
                 messagesList.scrollTop = messagesList.scrollHeight;
             });
 
+            connection.on("MessageDeleted", (messageId) => {
+                const msgElement = document.getElementById(`message-${messageId}`);
+                if (msgElement) {
+                    msgElement.style.transition = "opacity 1s";
+                    msgElement.style.opacity = "0.3";
+
+                    setTimeout(() => {
+                        msgElement.remove();
+                    }, 1000);
+                }
+            });
+
             connection.on("UserJoined", async (userId) => {
                 try {
                     const joinedUsername = await connection.invoke("GetUsernameByUserId", userId);
-                    console.log("joinedUsername in UserJoined" + joinedUsername);
 
                     const li = document.createElement("li");
-                    li.textContent = `${joinedUsername ?? userId} joined the group.`;
+                    li.textContent = `${joinedUsername ?? userId} joined the group`;
                     li.className = "system-message";
 
                     if (!chatHistoryLoaded) {
@@ -422,7 +467,7 @@
                     // Meta info (username and time)
                     const meta = document.createElement("div");
                     meta.style.fontSize = "12px";
-                    meta.style.color = "#666";
+                    meta.style.color = "#555";
                     meta.style.marginBottom = "4px";
                     meta.textContent = `${msg.senderUsername} • ${new Date(msg.sentAt).toLocaleTimeString()}`;
                     msgContainer.appendChild(meta);
@@ -470,7 +515,7 @@
 
                         msgContainer.appendChild(replyBox);
                     }
-                     
+
                     // Message content
                     const content = document.createElement("div");
                     content.textContent = msg.content;
@@ -484,11 +529,31 @@
                     replyBtn.style.background = "transparent";
                     replyBtn.style.border = "none";
                     replyBtn.style.cursor = "pointer";
-                    replyBtn.style.color = "#007bff";
+                    replyBtn.style.color = isOwn ? "#555" : "#007bff";
                     replyBtn.onclick = () => {
                         setReplyContext(msg);
                     };
                     msgContainer.appendChild(replyBtn);
+
+                    // ✅ Delete button (only for own messages)
+                    if (isOwn) {
+                        const deleteBtn = document.createElement("button");
+                        deleteBtn.textContent = "Delete";
+                        deleteBtn.style.fontSize = "11px";
+                        deleteBtn.style.marginLeft = "10px";
+                        deleteBtn.style.background = "transparent";
+                        deleteBtn.style.border = "none";
+                        deleteBtn.style.cursor = "EE4B2B";
+                        deleteBtn.style.color = "#FF3131";
+                        deleteBtn.onmouseenter = () => deleteBtn.style.color = "#B22222"; // Darker red
+                        deleteBtn.onmouseleave = () => deleteBtn.style.color = "#EE4B2B";
+
+                        deleteBtn.onclick = async () => {
+                            await connection.invoke("DeleteMessage", groupName, message.id);
+                        };
+
+                        msgContainer.appendChild(deleteBtn);
+                    }
 
                     li.appendChild(msgContainer);
                     messagesList.appendChild(li);
@@ -510,7 +575,7 @@
             userId = document.getElementById("userId").value.trim();
             username = await connection.invoke("GetUsernameByUserId", userId);
             groupName = document.getElementById("groupName").value;
-             
+
             if (isJoined) {
                 alert("You have already joined this group.");
                 return;
