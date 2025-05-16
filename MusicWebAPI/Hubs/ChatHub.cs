@@ -60,6 +60,7 @@ public class ChatHub : Hub
     {
         Console.WriteLine("SendMessage started");
         Console.WriteLine($"GroupName: {groupName}, SenderId: {senderId}, Content: {content}, ReplyToMessageId: {replyToMessageId}");
+        var parentMessage = new Message();
         var group = await _context.ChatGroups.FirstOrDefaultAsync(g => g.Name == groupName);
         if (group == null) return;
 
@@ -81,6 +82,11 @@ public class ChatHub : Hub
         _context.Messages.Add(message);
         await _context.SaveChangesAsync();
 
+        if (replyToMessageId != null)
+        {
+            parentMessage = await _context.Messages.Where(m => m.Id == replyToMessageId).Include(m => m.User).FirstOrDefaultAsync();
+        }
+
         await Clients.Group(groupName).SendAsync("ReceiveMessage", new
         {
             message.Id,
@@ -88,7 +94,10 @@ public class ChatHub : Hub
             message.SenderId,
             SenderUsername = user.UserName,  // Add username here
             message.SentAt,
-            message.ReplyToMessageId
+            message.ReplyToMessageId,
+            ReplyToContent = message.ReplyTo != null ? message.ReplyTo.Content : null,
+            ReplytoSenderId = message.ReplyTo != null ? message.ReplyTo?.User.Id : null,
+            ReplyToSenderUsername = message.ReplyTo != null ? message.ReplyTo?.User.UserName : null
         });
     }
     public async Task GetGroupMembers(string groupName)
@@ -138,7 +147,9 @@ public class ChatHub : Hub
                 SenderUsername = m.User.UserName,
                 SenderFullName = m.User.FullName,
                 ReplyToMessageId = m.ReplyToMessageId,
-                ReplyToContent = m.ReplyTo != null ? m.ReplyTo.Content : null
+                ReplyToContent = m.ReplyTo != null ? m.ReplyTo.Content : null,
+                ReplytoSenderId = m.ReplyTo != null ? m.ReplyTo.User.Id : null,
+                ReplyToSenderUsername = m.ReplyTo != null ? m.ReplyTo.User.UserName : null
             })
             .ToListAsync();
 

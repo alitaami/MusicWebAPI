@@ -16,6 +16,8 @@ namespace MusicWebAPI.Application.ViewModels
         public string SenderFullName { get; set; }
         public int? ReplyToMessageId { get; set; }
         public string ReplyToContent { get; set; }
+        public string ReplytoSenderId { get; set; }
+        public string ReplyToSenderUsername { get; set; }
     }
 
     public class GroupMembersViewModel
@@ -28,6 +30,6 @@ namespace MusicWebAPI.Application.ViewModels
     public class GetChatGroupsViewModel
     {
         public int Id { get; set; }
-        public string Name { get; set; } 
+        public string Name { get; set; }
     }
 }

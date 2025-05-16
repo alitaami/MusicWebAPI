@@ -67,7 +67,13 @@
             #messagesList li {
                 margin-bottom: 10px;
                 line-height: 1.4;
+                display: flex;
+                justify-content: flex-start; /* default align left */
             }
+
+                #messagesList li.own {
+                    justify-content: flex-end; /* align right */
+                }
 
         .system-message {
             color: gray;
@@ -115,6 +121,45 @@
             border-radius: 4px;
             border: 1px solid #ddd;
         }
+
+        #messagesList {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            word-break: break-word; /* Correct property to break long words */
+            overflow-wrap: break-word; /* Ensures compatibility across browsers */
+            white-space: pre-wrap; /* Preserves line breaks and wraps long lines */
+            display: inline-block;
+            font-size: 15px;
+            flex-shrink: 1; /* Prevents stretching in flex containers */
+        }
+
+            .message.own {
+                background-color: #007bff;
+                color: white;
+                align-self: flex-end;
+                text-align: right;
+                border-radius: 12px;
+                border-bottom-right-radius: 0;
+                margin-left: auto;
+            }
+
+            .message.other {
+                background-color: #e2e3e5;
+                color: black;
+                align-self: flex-start;
+                text-align: left;
+                border-radius: 12px;
+                border-bottom-left-radius: 0;
+                margin-right: auto;
+            }
+
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@latest/dist/browser/signalr.min.js"></script>
 </head>
@@ -123,7 +168,7 @@
         <!-- Chat Section -->
         <div class="chat-section">
             <div class="header">
-                <input type="text" id="username" placeholder="Username" />
+                <input type="text" id="userId" placeholder="UserId" />
                 <select id="groupName">
                     <option value="">Select Group</option>
                 </select>
@@ -133,6 +178,11 @@
 
             <div class="chat-box">
                 <ul id="messagesList"></ul>
+            </div>
+
+            <div id="replyContext" style="margin-bottom: 5px; color: #555; font-size: 14px; display: none;">
+                Replying to <span id="replyToText"></span>
+                <button onclick="clearReply()" style="margin-left: 10px; font-size: 12px;">✖ Cancel</button>
             </div>
 
             <div class="message-input">
@@ -156,9 +206,36 @@
         let connection = null;
         let groupName = '';
         let username = '';
+        let userId = '';
         let isJoined = false;
         const deferredSystemMessages = [];
         let chatHistoryLoaded = false;
+        let replyToMessageId = null;
+        let replyToContent = null;
+        let replyToSenderUsername = null;
+
+        function setReplyContext(message) {
+            replyToMessageId = message.id; 
+            replyToContent = message.content;
+            replyToSenderUsername = message.senderUsername;
+
+            if (replyToContent.length > 10) {
+                replyToContent = replyToContent.substring(0, 10) + "...";
+            }
+             
+            // Set innerHTML to style the username part
+            document.getElementById("replyToText").innerHTML =
+                `<strong style="color: #1a73e8;">${replyToSenderUsername}</strong>: ${replyToContent}`;
+            document.getElementById("replyContext").style.display = "block";
+        }
+
+        function clearReply() {
+            replyToMessageId = null;
+            replyToContent = null;
+            replyToSenderUsername = null;
+
+            document.getElementById("replyContext").style.display = "none";
+        }
 
         const joinBtn = document.getElementById("joinGroup");
         const leaveBtn = document.getElementById("leaveGroup");
@@ -200,8 +277,7 @@
                 console.error("Connection failed: ", err.toString());
             }
         }
-
-
+         
         function registerEventHandlers() {
 
             connection.off("ReceiveMessage");
@@ -212,16 +288,92 @@
 
             connection.on("ReceiveMessage", (message) => {
                 const li = document.createElement("li");
-                li.textContent = `${message.senderUsername || message.senderId}: ${message.content}`;
+                const isOwn = message.senderUsername === username;
+
+                const msgContainer = document.createElement("div");
+                msgContainer.className = `message ${isOwn ? 'own' : 'other'}`;
+
+                const meta = document.createElement("div");
+                meta.style.fontSize = "12px";
+                meta.style.color = "#666";
+                meta.style.marginBottom = "4px";
+                meta.textContent = `${message.senderUsername} • ${new Date(message.sentAt).toLocaleTimeString()}`;
+                msgContainer.appendChild(meta);
+
+                // Improved reply preview box (if this message is a reply)
+                if (message.replyToContent) {
+                    const replyBox = document.createElement("div");
+                    replyBox.style.fontSize = "13px";
+                    replyBox.style.color = "#444";
+                    replyBox.style.background = "#e8f0fe";
+                    replyBox.style.borderLeft = "4px solid #4285f4";
+                    replyBox.style.padding = "8px 12px";
+                    replyBox.style.marginBottom = "6px";
+                    replyBox.style.borderRadius = "6px";
+                    replyBox.style.cursor = "pointer";
+                    replyBox.style.userSelect = "none";
+                    replyBox.style.maxWidth = "80%";
+
+                    replyBox.title = `Replying to ${message.replyToSenderUsername}: ${message.replyToContent}`;
+
+                    const replyUsername = document.createElement("span");
+                    replyUsername.style.fontWeight = "600";
+                    replyUsername.style.color = "#1a73e8";
+                    replyUsername.textContent = message.replyToSenderUsername;
+
+                    // Manually trim content if needed
+                    let trimmedReplyContent = message.replyToContent;
+                    if (trimmedReplyContent.length > 20) {
+                        trimmedReplyContent = trimmedReplyContent.substring(0, 20) + "...";
+                    }
+
+                    const replyContent = document.createElement("span");
+                    replyContent.style.fontStyle = "italic";
+                    replyContent.style.marginLeft = "6px";
+                    replyContent.textContent = trimmedReplyContent;
+
+                    replyBox.appendChild(replyUsername);
+                    replyBox.appendChild(document.createTextNode(" "));
+                    replyBox.appendChild(replyContent);
+
+                    replyBox.onclick = () => {
+                        console.log(`Clicked reply preview for message ID: ${message.replyToMessageId}`);
+                        // scrollToMessage(message.replyToMessageId);
+                    };
+
+                    msgContainer.appendChild(replyBox);
+                }
+
+                const content = document.createElement("div");
+                content.textContent = message.content;
+                msgContainer.appendChild(content);
+
+                // 🔁 Add "Reply" button
+                const replyBtn = document.createElement("button");
+                replyBtn.textContent = "Reply";
+                replyBtn.style.fontSize = "11px";
+                replyBtn.style.marginTop = "4px";
+                replyBtn.style.background = "transparent";
+                replyBtn.style.border = "none";
+                replyBtn.style.cursor = "pointer";
+                replyBtn.style.color = "#007bff";
+                replyBtn.onclick = () => {
+                    setReplyContext(message);
+                };
+                msgContainer.appendChild(replyBtn);
+
+                li.appendChild(msgContainer);
                 messagesList.appendChild(li);
                 messagesList.scrollTop = messagesList.scrollHeight;
             });
 
             connection.on("UserJoined", async (userId) => {
                 try {
-                    const username = await connection.invoke("GetUsernameByUserId", userId);
+                    const joinedUsername = await connection.invoke("GetUsernameByUserId", userId);
+                    console.log("joinedUsername in UserJoined" + joinedUsername);
+
                     const li = document.createElement("li");
-                    li.textContent = `${username ?? userId} joined the group.`;
+                    li.textContent = `${joinedUsername ?? userId} joined the group.`;
                     li.className = "system-message";
 
                     if (!chatHistoryLoaded) {
@@ -238,9 +390,9 @@
 
             connection.on("UserLeft", async (userId) => {
                 try {
-                    const username = await connection.invoke("GetUsernameByUserId", userId);
+                    const leftUsername = await connection.invoke("GetUsernameByUserId", userId);
                     const li = document.createElement("li");
-                    li.textContent = `${username ?? userId} left the group.`;
+                    li.textContent = `${leftUsername ?? userId} left the group.`;
                     li.className = "system-message";
 
                     if (!chatHistoryLoaded) {
@@ -262,13 +414,88 @@
             connection.on("ChatHistory", (messages) => {
                 messages.reverse().forEach(msg => {
                     const li = document.createElement("li");
-                    li.textContent = `${msg.senderUsername || msg.senderId}: ${msg.content}`;
+                    const isOwn = msg.senderUsername === username;
+
+                    const msgContainer = document.createElement("div");
+                    msgContainer.className = `message ${isOwn ? 'own' : 'other'}`;
+
+                    // Meta info (username and time)
+                    const meta = document.createElement("div");
+                    meta.style.fontSize = "12px";
+                    meta.style.color = "#666";
+                    meta.style.marginBottom = "4px";
+                    meta.textContent = `${msg.senderUsername} • ${new Date(msg.sentAt).toLocaleTimeString()}`;
+                    msgContainer.appendChild(meta);
+
+                    // If this message is a reply, show the replied message context
+                    if (msg.replyToContent) {
+                        const replyBox = document.createElement("div");
+                        replyBox.style.fontSize = "13px";
+                        replyBox.style.color = "#444";
+                        replyBox.style.background = "#e8f0fe";
+                        replyBox.style.borderLeft = "4px solid #4285f4";
+                        replyBox.style.padding = "8px 12px";
+                        replyBox.style.marginBottom = "6px";
+                        replyBox.style.borderRadius = "6px";
+                        replyBox.style.cursor = "pointer";
+                        replyBox.style.userSelect = "none";
+                        replyBox.style.maxWidth = "80%";
+
+                        // Removed nowrap, overflow, and textOverflow since we handle trimming manually
+                        replyBox.title = `Replying to ${msg.replyToSenderUsername}: ${msg.replyToContent}`;
+
+                        const replyUsername = document.createElement("span");
+                        replyUsername.style.fontWeight = "600";
+                        replyUsername.style.color = "#1a73e8";
+                        replyUsername.textContent = msg.replyToSenderUsername;
+
+                        // Manually trim content to max 20 characters
+                        let trimmedContent = msg.replyToContent;
+                        if (trimmedContent.length > 20) {
+                            trimmedContent = trimmedContent.substring(0, 20) + "...";
+                        }
+
+                        const replyContent = document.createElement("span");
+                        replyContent.style.fontStyle = "italic";
+                        replyContent.style.marginLeft = "6px";
+                        replyContent.textContent = trimmedContent;
+
+                        replyBox.appendChild(replyUsername);
+                        replyBox.appendChild(document.createTextNode(" "));
+                        replyBox.appendChild(replyContent);
+
+                        replyBox.onclick = () => {
+                            console.log(`Clicked reply preview for message ID: ${msg.replyToMessageId}`);
+                        };
+
+                        msgContainer.appendChild(replyBox);
+                    }
+                     
+                    // Message content
+                    const content = document.createElement("div");
+                    content.textContent = msg.content;
+                    msgContainer.appendChild(content);
+
+                    // Add Reply button to enable replying to this message from history
+                    const replyBtn = document.createElement("button");
+                    replyBtn.textContent = "Reply";
+                    replyBtn.style.fontSize = "11px";
+                    replyBtn.style.marginTop = "4px";
+                    replyBtn.style.background = "transparent";
+                    replyBtn.style.border = "none";
+                    replyBtn.style.cursor = "pointer";
+                    replyBtn.style.color = "#007bff";
+                    replyBtn.onclick = () => {
+                        setReplyContext(msg);
+                    };
+                    msgContainer.appendChild(replyBtn);
+
+                    li.appendChild(msgContainer);
                     messagesList.appendChild(li);
                 });
 
                 chatHistoryLoaded = true;
 
-                // 🔥 Append any deferred system messages
                 deferredSystemMessages.forEach(msg => {
                     messagesList.appendChild(msg);
                 });
@@ -280,9 +507,10 @@
         joinBtn.addEventListener("click", async () => {
             chatHistoryLoaded = false; // Reset before fetching
 
-            username = document.getElementById("username").value.trim();
+            userId = document.getElementById("userId").value.trim();
+            username = await connection.invoke("GetUsernameByUserId", userId);
             groupName = document.getElementById("groupName").value;
-
+             
             if (isJoined) {
                 alert("You have already joined this group.");
                 return;
@@ -296,7 +524,7 @@
             await initializeConnection();
 
             try {
-                await connection.invoke("JoinGroup", groupName, username);
+                await connection.invoke("JoinGroup", groupName, userId);
                 await connection.invoke("GetGroupMembers", groupName);
                 await connection.invoke("GetChats", groupName, 0, 50);
                 isJoined = true;
@@ -309,8 +537,8 @@
             if (!isJoined || !connection || connection.state !== signalR.HubConnectionState.Connected) return;
 
             try {
-                await connection.invoke("LeaveGroup", groupName, username);
-                 
+                await connection.invoke("LeaveGroup", groupName, userId);
+
                 messagesList.innerHTML = "";
                 membersList.innerHTML = "";
                 isJoined = false;
@@ -334,8 +562,11 @@
             }
 
             try {
-                await connection.invoke("SendMessage", groupName, username, message, null);
+                console.log("send btn replyToMessageId: " + replyToMessageId)
+                await connection.invoke("SendMessage", groupName, userId, message, replyToMessageId);
                 messageInput.value = '';
+                clearReply(); // reset reply context
+
             } catch (err) {
                 console.error("Failed to send message:", err.toString());
             }
