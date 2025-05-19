@@ -19,11 +19,11 @@
 
         // Constructor for error responses
         public ApiResult(string errorMessage, int statusCode)
-        {
+        { 
             ErrorMessage = errorMessage;
             IsSuccess = false;
             StatusCode = statusCode;
             Errors = new List<string>(); // Initialize as empty list
-        } 
+        }
     }
 }

@@ -4,6 +4,8 @@ using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.API.Base;
 using System.Web.WebPages.Html;
 using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
+using MusicWebAPI.Application.Features.Properties.Commands.Handlers;
+using MusicWebAPI.Application.Features.Properties.Commands;
 namespace MusicWebAPI.API.Endpoints
 {
     public class UserEndpoints : ApiResponseBase
@@ -12,9 +14,9 @@ namespace MusicWebAPI.API.Endpoints
         {
             // Register user endpoint
             app.MapPost("/api/register", async (IMediator mediator, RegisterUserCommand command) =>
-            { 
+            {
                 var user = await mediator.Send(command);
-             
+
                 return Ok(user);
             })
             .WithName("RegisterUser")
@@ -39,6 +41,22 @@ namespace MusicWebAPI.API.Endpoints
             .WithTags("User")
             .RequireRateLimiting("main")
             .WithOpenApi(); // This enables Swagger for Minimal API
+
+            //TODO: Add [Authorize]
+            // AddToPlayList endpoint
+            app.MapPost("/api/playlists", async (IMediator mediator, AddToPlaylistCommand command) =>
+            {
+                await mediator.Send(command);
+
+                return Ok();
+            })
+            .WithName("AddToPlaylist")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status400BadRequest)
+            .WithTags("User-AddToPlayList")
+            .RequireRateLimiting("main")
+            .WithOpenApi();
+
         }
     }
 }

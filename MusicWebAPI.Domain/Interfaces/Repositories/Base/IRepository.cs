@@ -16,6 +16,7 @@ namespace MusicWebAPI.Domain.Interfaces.Repositories.Base
         #region Async Methods
 
         Task AddAsync(TEntity entity, CancellationToken cancellationToken, bool saveNow = true);
+        Task<TEntity> AddAndGetAsync(TEntity entity, CancellationToken cancellationToken, bool saveNow = true);
         Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken, bool saveNow = true);
 
         Task<TEntity> GetByIdAsync(CancellationToken cancellationToken, params object[] ids);

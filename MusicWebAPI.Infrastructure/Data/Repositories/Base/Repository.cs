@@ -35,6 +35,17 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories.Base
                 await _context.SaveChangesAsync(cancellationToken);
             }
         }
+        
+        public async Task<TEntity> AddAndGetAsync(TEntity entity, CancellationToken cancellationToken, bool saveNow = true)
+        {
+            await _context.Set<TEntity>().AddAsync(entity, cancellationToken);
+            if (saveNow)
+            {
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+
+            return entity;
+        }
 
         public async Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken, bool saveNow = true)
         {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using MusicWebAPI.Core.Resources;
 using MusicWebAPI.Domain.Entities;
+using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 using MusicWebAPI.Domain.Interfaces.Services;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
@@ -15,14 +16,17 @@ namespace MusicWebAPI.Application.Services
         private readonly UserManager<User> _userManager;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
+        private readonly IRepositoryManager _repositoryManager;
 
-        public UserService(UserManager<User> userManager, IMapper mapper, IConfiguration configuration)
+        public UserService(UserManager<User> userManager, IRepositoryManager repositoryManager, IMapper mapper, IConfiguration configuration)
         {
+            _repositoryManager = repositoryManager;
             _configuration = configuration;
             _userManager = userManager;
             _mapper = mapper;
         }
 
+        #region Authorization & Authentication
         public async Task<User> RegisterUser(User user, string password)
         {
             if (await IsUserExists(user.Email, user.UserName))
@@ -49,6 +53,34 @@ namespace MusicWebAPI.Application.Services
                 throw new UnauthorizedException(Resource.InvalidCredentials);
 
             return JwtHelper.GenerateToken(user, _configuration);
+        }
+        #endregion
+
+        public async Task AddToPlaylist(Guid songId, Guid userId, Guid? playlistId, string playlistName, CancellationToken cancellationToken)
+        {
+            var playList = new Playlist();
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+
+            if (user == null)
+                throw new NotFoundException(Resource.UserNotFound);
+
+            if (playlistId.HasValue)
+            {
+                playList = await _repositoryManager.PlayList.GetPlayList((Guid)playlistId, cancellationToken);
+            }
+            else
+            {
+                playList = new Playlist
+                {
+                    Name = playlistName,
+                    UserId = userId,
+                    CreatedByUserId = userId,
+                };
+
+                playList = await _repositoryManager.PlayList.CreatePlaylist(playList, cancellationToken);
+            }
+
+            await _repositoryManager.PlayListSongs.AddSongsToPlayList(songId, playList.Id, cancellationToken);
         }
 
         #region Common

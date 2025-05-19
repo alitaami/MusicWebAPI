@@ -18,6 +18,11 @@ namespace MusicWebAPI.API.Base
             return Results.Ok(new ApiResult<T>(data, StatusCodes.Status200OK));
         }
 
+        protected static IResult Ok()
+        {
+            return Results.Ok(new ApiResult<string>("", StatusCodes.Status200OK));
+        }
+
         /// <summary>
         /// Standard error response for bad requests.
         /// </summary>

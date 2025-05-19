@@ -35,6 +35,8 @@ namespace MusicWebAPI.Domain.Interfaces.Repositories.Base
 
         #region Repositories
         ISongRepository Song { get; }
+        IPlayListRepository PlayList { get; }
+        IPlayListSongsRepository PlayListSongs { get; }
 
         #endregion
     }

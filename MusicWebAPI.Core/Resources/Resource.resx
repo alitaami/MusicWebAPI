@@ -138,6 +138,9 @@
   <data name="PasswordUnique" xml:space="preserve">
     <value>Password should contain special characters!</value>
   </data>
+  <data name="UserNotFound" xml:space="preserve">
+    <value>User has not found!</value>
+  </data>
   <data name="UserRegistrationError" xml:space="preserve">
     <value>User registration failed!</value>
   </data>

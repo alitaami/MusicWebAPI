@@ -32,7 +32,7 @@ public class ServiceManager : IServiceManager
         _mapper = mapperConfig.CreateMapper();
 
         // Lazy initialization for thread safety
-        _userService = new Lazy<IUserService>(() => new UserService(_userManager, _mapper, _configuration));
+        _userService = new Lazy<IUserService>(() => new UserService(_userManager, repositoryManager, _mapper, _configuration));
         _homeService = new Lazy<IHomeService>(() => new HomeService(_repositoryManager, _mapper));
     }
 

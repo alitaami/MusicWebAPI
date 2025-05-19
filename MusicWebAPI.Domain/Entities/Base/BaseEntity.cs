@@ -24,7 +24,7 @@ namespace Entities.Base
     {
         [Key]
         public TKey Id { get; set; }
-        
+
         /// <inheritdoc/>
         public DateTime? CreatedDate { get; set; } = DateTime.UtcNow;
 
@@ -32,10 +32,10 @@ namespace Entities.Base
         public DateTime? ModifiedDate { get; set; } = DateTime.UtcNow;
 
         /// <inheritdoc/>
-        public int? CreatedByUserId { get; set; } = -1;
+        public Guid? CreatedByUserId { get; set; } = null;
 
         /// <inheritdoc/>
-        public int? ModifiedByUserId { get; set; } = -1;
+        public Guid? ModifiedByUserId { get; set; } = null;
 
     }
 

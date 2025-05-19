@@ -18,6 +18,8 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories.Base
     {
         private MusicDbContext _context;
         private ISongRepository _songRepository;
+        private IPlayListRepository _playListRepository;
+        private IPlayListSongsRepository _playListSongsRepository;
 
         public RepositoryManager(MusicDbContext context)
         {
@@ -72,6 +74,28 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories.Base
                     this._songRepository = new SongRepository(_context);
 
                 return this._songRepository;
+            }
+        }
+
+        public IPlayListRepository PlayList
+        {
+            get
+            {
+                if (this._playListRepository == null)
+                    this._playListRepository = new PlayListRepository(_context);
+
+                return this._playListRepository;
+            }
+        }
+
+        public IPlayListSongsRepository PlayListSongs
+        {
+            get
+            {
+                if (this._playListSongsRepository == null)
+                    this._playListSongsRepository = new PlayListSongsRepository(_context);
+
+                return this._playListSongsRepository;
             }
         }
 
