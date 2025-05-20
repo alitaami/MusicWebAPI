@@ -40,5 +40,22 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories
                   .FirstOrDefaultAsync(x => x.Id == playListId, cancellationToken);
         }
 
+        public async Task<List<object>> GetUserPlaylist(Guid userId, CancellationToken cancellationToken)
+        {
+            return
+                await Table
+                .AsNoTracking()
+                .Where(p => p.UserId == userId)
+                .Include(p => p.PlaylistSongs)
+                .Select(p => (object)new
+                {
+                    PlayListId = p.Id,
+                    Name = p.Name,
+                    UserId = p.UserId,
+                    CreatedByUserId = p.CreatedByUserId,
+                    Songs = p.PlaylistSongs.Select(pp => pp.SongId).ToList()
+                })
+                .ToListAsync(cancellationToken);
+        }
     }
 }

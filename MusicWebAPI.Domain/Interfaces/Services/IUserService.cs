@@ -12,5 +12,6 @@ namespace MusicWebAPI.Domain.Interfaces.Services
         Task<User> RegisterUser(User user, string password);
         Task<string> LoginUser(string email, string password);
         Task AddToPlaylist(Guid songId, Guid userId, Guid? playlistId, string playlistName, CancellationToken cancellationToken);
+        Task<List<object>> GetPlaylists(Guid userId, CancellationToken cancellationToken);
     }
 }

@@ -15,6 +15,6 @@ namespace MusicWebAPI.Application.DTOs
             public Guid? PlaylistId { get; set; }
             public string? PlaylistName { get; set; } // optional if PlaylistId exists
         }
-
+        
     }
 }

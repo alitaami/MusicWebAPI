@@ -13,6 +13,7 @@ namespace MusicWebAPI.Domain.Interfaces.Repositories
     public interface IPlayListRepository : IRepository<Playlist>
     {
         Task<Playlist> CreatePlaylist(Playlist playList, CancellationToken cancellationToken);
-        public Task<Playlist> GetPlayList(Guid playListId, CancellationToken cancellationToken);
+        Task<Playlist> GetPlayList(Guid playListId, CancellationToken cancellationToken);
+        Task<List<object>> GetUserPlaylist(Guid userId, CancellationToken cancellationToken);
     }
 }

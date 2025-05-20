@@ -83,6 +83,11 @@ namespace MusicWebAPI.Application.Services
             await _repositoryManager.PlayListSongs.AddSongsToPlayList(songId, playList.Id, cancellationToken);
         }
 
+        public async Task<List<object>> GetPlaylists(Guid userId, CancellationToken cancellationToken)
+        {
+            return await _repositoryManager.PlayList.GetUserPlaylist(userId, cancellationToken);
+        }
+
         #region Common
         private async Task<bool> IsUserExists(string email, string username)
         {

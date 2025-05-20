@@ -6,6 +6,10 @@ using System.Web.WebPages.Html;
 using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
 using MusicWebAPI.Application.Features.Properties.Commands.Handlers;
 using MusicWebAPI.Application.Features.Properties.Commands;
+using Microsoft.AspNetCore.Authorization;
+using MusicWebAPI.Application.Features.Properties.Queries;
+using Microsoft.AspNetCore.Http;
+using static MusicWebAPI.Application.ViewModels.SongsViewModel;
 namespace MusicWebAPI.API.Endpoints
 {
     public class UserEndpoints : ApiResponseBase
@@ -42,9 +46,9 @@ namespace MusicWebAPI.API.Endpoints
             .RequireRateLimiting("main")
             .WithOpenApi(); // This enables Swagger for Minimal API
 
-            //TODO: Add [Authorize]
-            // AddToPlayList endpoint
-            app.MapPost("/api/playlists", async (IMediator mediator, AddToPlaylistCommand command) =>
+            // AddToPlayList endpoint 
+            app.MapPost("/api/playlists", [Authorize(Roles = "User")]
+            async (IMediator mediator, AddToPlaylistCommand command) =>
             {
                 await mediator.Send(command);
 
@@ -57,6 +61,30 @@ namespace MusicWebAPI.API.Endpoints
             .RequireRateLimiting("main")
             .WithOpenApi();
 
+            // GetPlayLists endpoint 
+            app.MapGet("/api/playlists",
+            [Authorize(Roles = "User")]
+            async (IMediator mediator,
+            HttpContext httpContext) =>
+            {
+                // Extract user id or info from ClaimsPrincipal (httpContext.User)
+                var userIdClaim = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+                {
+                    return Unauthorized("");
+                }
+
+                var query = new GetPlaylistsQuery(userId);
+                var result = await mediator.Send(query);
+
+                return Ok(result);
+            })
+            .WithName("GetPlaylists")
+            .Produces<List<PlaylistViewModel>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .WithTags("User-GetPlaylists")
+            .RequireRateLimiting("main")
+            .WithOpenApi();
         }
     }
 }
