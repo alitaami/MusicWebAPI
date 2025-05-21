@@ -416,6 +416,33 @@ public static class WebApplicationBuilderExtensions
             //        }
             //    }
             //});
+
+
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer"
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+{
+    {
+        new OpenApiSecurityScheme
+        {
+            Reference = new OpenApiReference
+            {
+                Type = ReferenceType.SecurityScheme,
+                Id = "Bearer"
+            }
+        },
+        Array.Empty<string>()
+    }
+});
+
+
             #endregion
 
             #region Versioning
@@ -443,8 +470,7 @@ public static class WebApplicationBuilderExtensions
 
         });
     }
-
-
+     
     private static void ConfigLogging(WebApplicationBuilder builder)
     {
         builder.Host.UseSerilog(); // Use Serilog as the global logging provider

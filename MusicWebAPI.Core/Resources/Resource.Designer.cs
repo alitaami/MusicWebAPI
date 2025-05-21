@@ -70,6 +70,15 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Song already exists in the playlist..
+        /// </summary>
+        public static string DuplicateSongInPlaylist {
+            get {
+                return ResourceManager.GetString("DuplicateSongInPlaylist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User with this email or username already exists!.
         /// </summary>
         public static string DuplicateUserError {

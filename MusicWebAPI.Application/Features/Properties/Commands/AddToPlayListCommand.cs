@@ -13,5 +13,13 @@ namespace MusicWebAPI.Application.Features.Properties.Commands
         public Guid UserId { get; set; }
         public Guid? PlaylistId { get; set; } = null;
         public string PlaylistName { get; set; }
+
+        public AddToPlaylistCommand(Guid songId, Guid userId, string playlistName, Guid? playlistId = null)
+        {
+            PlaylistId = playlistId;
+            SongId = songId;
+            UserId = userId;
+            PlaylistName = playlistName;
+        }
     }
 }

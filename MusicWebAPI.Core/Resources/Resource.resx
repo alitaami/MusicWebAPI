@@ -120,6 +120,9 @@
   <data name="ArtistRole" xml:space="preserve">
     <value>Artist</value>
   </data>
+  <data name="DuplicateSongInPlaylist" xml:space="preserve">
+    <value>Song already exists in the playlist.</value>
+  </data>
   <data name="DuplicateUserError" xml:space="preserve">
     <value>User with this email or username already exists!</value>
   </data>

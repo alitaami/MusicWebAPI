@@ -6,15 +6,13 @@ using System.Threading.Tasks;
 
 namespace MusicWebAPI.Application.DTOs
 {
-   public class UserSongsDTO
+    public class UserSongsDTO
     {
-        public class AddToPlaylistDto
+        public class AddToPlaylistDTO
         {
             public Guid SongId { get; set; }
-            public Guid UserId { get; set; }
             public Guid? PlaylistId { get; set; }
             public string? PlaylistName { get; set; } // optional if PlaylistId exists
         }
-        
     }
 }

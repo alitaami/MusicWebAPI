@@ -64,8 +64,11 @@ namespace MusicWebAPI.Application.Services
             if (user == null)
                 throw new NotFoundException(Resource.UserNotFound);
 
+            Console.WriteLine("playlistId:"+ playlistId);
+
             if (playlistId.HasValue)
             {
+                Console.WriteLine("            if (playlistId.HasValue)\r\n");
                 playList = await _repositoryManager.PlayList.GetPlayList((Guid)playlistId, cancellationToken);
             }
             else
@@ -73,7 +76,7 @@ namespace MusicWebAPI.Application.Services
                 playList = new Playlist
                 {
                     Name = playlistName,
-                    UserId = userId,
+                    UserId = userId.ToString(),
                     CreatedByUserId = userId,
                 };
 

@@ -55,7 +55,7 @@ namespace MusicWebAPI.Application.Features.Properties.Queries.Handlers
                 PlayListId = (Guid)(type.GetProperty("PlayListId")?.GetValue(item) ?? Guid.Empty),
                 Name = type.GetProperty("Name")?.GetValue(item)?.ToString(),
                 CreatedByUserId = (Guid)(type.GetProperty("CreatedByUserId")?.GetValue(item) ?? Guid.Empty),
-                UserId = (Guid)(type.GetProperty("UserId")?.GetValue(item) ?? Guid.Empty),
+                UserId = type.GetProperty("UserId")?.GetValue(item)?.ToString(),
                 Songs = (type.GetProperty("Songs")?.GetValue(item) as List<Guid>) ?? new List<Guid>()
             };
         }

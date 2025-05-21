@@ -4,7 +4,7 @@ using MusicWebAPI.Infrastructure.Data.Context;
 using MusicWebAPI.Infrastructure.Data.Repositories.Base;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,7 +45,7 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories
             return
                 await Table
                 .AsNoTracking()
-                .Where(p => p.UserId == userId)
+                .Where(p => p.UserId == userId.ToString())
                 .Include(p => p.PlaylistSongs)
                 .Select(p => (object)new
                 {

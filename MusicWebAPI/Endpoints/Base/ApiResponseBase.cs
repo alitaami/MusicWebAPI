@@ -18,9 +18,9 @@ namespace MusicWebAPI.API.Base
             return Results.Ok(new ApiResult<T>(data, StatusCodes.Status200OK));
         }
 
-        protected static IResult Ok()
+        protected static IResult NoContent()
         {
-            return Results.Ok(new ApiResult<string>("", StatusCodes.Status200OK));
+            return Results.Ok(new ApiResult<string?>(null, StatusCodes.Status204NoContent, isSuccess: true));
         }
 
         /// <summary>

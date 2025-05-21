@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using MusicWebAPI.Application.Features.Properties.Queries;
 using Microsoft.AspNetCore.Http;
 using static MusicWebAPI.Application.ViewModels.SongsViewModel;
+using static MusicWebAPI.Application.DTOs.UserSongsDTO;
 namespace MusicWebAPI.API.Endpoints
 {
     public class UserEndpoints : ApiResponseBase
@@ -48,16 +49,19 @@ namespace MusicWebAPI.API.Endpoints
 
             // AddToPlayList endpoint 
             app.MapPost("/api/playlists", [Authorize(Roles = "User")]
-            async (IMediator mediator, AddToPlaylistCommand command) =>
+            async (IMediator mediator, AddToPlaylistDTO dto, HttpContext httpContext) =>
             {
+                Guid? userId = (Guid?)GetUserId(httpContext);
+                var command = new AddToPlaylistCommand(dto.SongId, (Guid)userId, dto.PlaylistName, dto.PlaylistId);
+
                 await mediator.Send(command);
 
-                return Ok();
+                return NoContent();
             })
             .WithName("AddToPlaylist")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithTags("User-AddToPlayList")
+            .WithTags("Playlists")
             .RequireRateLimiting("main")
             .WithOpenApi();
 
@@ -68,13 +72,9 @@ namespace MusicWebAPI.API.Endpoints
             HttpContext httpContext) =>
             {
                 // Extract user id or info from ClaimsPrincipal (httpContext.User)
-                var userIdClaim = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-                if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-                {
-                    return Unauthorized("");
-                }
+                var userId = GetUserId(httpContext);
 
-                var query = new GetPlaylistsQuery(userId);
+                var query = new GetPlaylistsQuery((Guid)userId);
                 var result = await mediator.Send(query);
 
                 return Ok(result);
@@ -82,9 +82,19 @@ namespace MusicWebAPI.API.Endpoints
             .WithName("GetPlaylists")
             .Produces<List<PlaylistViewModel>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
-            .WithTags("User-GetPlaylists")
+            .WithTags("Playlists")
             .RequireRateLimiting("main")
             .WithOpenApi();
+        }
+
+        private static object GetUserId(HttpContext httpContext)
+        {
+            var userIdClaim = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Unauthorized("");
+            }
+            return userId;
         }
     }
 }

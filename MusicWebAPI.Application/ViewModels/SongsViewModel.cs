@@ -12,7 +12,7 @@ namespace MusicWebAPI.Application.ViewModels
         {
             public Guid PlayListId { get; set; }
             public string Name { get; set; } = null!;
-            public Guid? UserId { get; set; }
+            public string? UserId { get; set; }
             public Guid? CreatedByUserId { get; set; } = null;
             public List<Guid> Songs { get; set; } = new();
         }

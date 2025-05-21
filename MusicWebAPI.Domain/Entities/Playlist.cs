@@ -8,7 +8,7 @@ namespace MusicWebAPI.Domain.Entities
     public class Playlist : BaseEntity<Guid>
     {
         public string Name { get; set; }
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
 
         [ForeignKey("UserId")]
         public User User { get; set; }
