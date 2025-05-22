@@ -15,5 +15,6 @@ namespace MusicWebAPI.Domain.Interfaces.Repositories
         Task<Playlist> CreatePlaylist(Playlist playList, CancellationToken cancellationToken);
         Task<Playlist> GetPlayList(Guid playListId, CancellationToken cancellationToken);
         Task<List<object>> GetUserPlaylist(Guid userId, CancellationToken cancellationToken);
+        Task DeletePlayList(Guid playListId, CancellationToken cancellationToken);
     }
 }

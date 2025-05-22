@@ -64,11 +64,8 @@ namespace MusicWebAPI.Application.Services
             if (user == null)
                 throw new NotFoundException(Resource.UserNotFound);
 
-            Console.WriteLine("playlistId:"+ playlistId);
-
             if (playlistId.HasValue)
             {
-                Console.WriteLine("            if (playlistId.HasValue)\r\n");
                 playList = await _repositoryManager.PlayList.GetPlayList((Guid)playlistId, cancellationToken);
             }
             else
@@ -91,6 +88,15 @@ namespace MusicWebAPI.Application.Services
             return await _repositoryManager.PlayList.GetUserPlaylist(userId, cancellationToken);
         }
 
+        public async Task DeletePlayList(Guid playListId, CancellationToken cancellationToken)
+        {
+            await _repositoryManager.PlayList.DeletePlayList(playListId, cancellationToken);
+        }
+
+        public async Task DeleteSongFromPlayList(Guid songId, Guid playListId, CancellationToken cancellationToken)
+        {
+            await _repositoryManager.PlayListSongs.DeleteSongFromPlayList(songId, playListId, cancellationToken);
+        }
         #region Common
         private async Task<bool> IsUserExists(string email, string username)
         {

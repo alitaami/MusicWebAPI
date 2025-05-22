@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MusicWebAPI.Core.Resources;
+using MusicWebAPI.Domain.Interfaces.Repositories.Base;
+using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
 
 namespace MusicWebAPI.Infrastructure.Data.Repositories
 {
@@ -30,14 +33,26 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories
                 },
                    cancellationToken,
                    saveNow: true);
-
             return playlist;
+        }
+
+        public async Task DeletePlayList(Guid playListId, CancellationToken cancellationToken)
+        {
+            // Check if the playlist exists
+            var playList = await GetPlayList(playListId, cancellationToken);
+
+            if (playList == null)
+                throw new NotFoundException(Resource.PlaylistNotFound);
+
+            playList.IsDeleted = true;
+
+            await this.UpdateAsync(playList, cancellationToken, saveNow: true);
         }
 
         public async Task<Playlist> GetPlayList(Guid playListId, CancellationToken cancellationToken)
         {
             return await Table
-                  .FirstOrDefaultAsync(x => x.Id == playListId, cancellationToken);
+                  .FirstOrDefaultAsync(x => x.Id == playListId && !x.IsDeleted, cancellationToken);
         }
 
         public async Task<List<object>> GetUserPlaylist(Guid userId, CancellationToken cancellationToken)
@@ -45,7 +60,7 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories
             return
                 await Table
                 .AsNoTracking()
-                .Where(p => p.UserId == userId.ToString())
+                .Where(p => p.UserId == userId.ToString() && !p.IsDeleted)
                 .Include(p => p.PlaylistSongs)
                 .Select(p => (object)new
                 {

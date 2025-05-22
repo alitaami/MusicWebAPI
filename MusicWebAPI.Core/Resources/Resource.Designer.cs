@@ -133,6 +133,24 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is no PlatList with this Id!.
+        /// </summary>
+        public static string PlaylistNotFound {
+            get {
+                return ResourceManager.GetString("PlaylistNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is no song in related Playlist with that SongName!.
+        /// </summary>
+        public static string PlaylistSongNotFound {
+            get {
+                return ResourceManager.GetString("PlaylistSongNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User has not found!.
         /// </summary>
         public static string UserNotFound {
