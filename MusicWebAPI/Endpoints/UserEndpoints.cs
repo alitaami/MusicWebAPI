@@ -11,6 +11,9 @@ using MusicWebAPI.Application.Features.Properties.Queries;
 using Microsoft.AspNetCore.Http;
 using static MusicWebAPI.Application.ViewModels.SongsViewModel;
 using static MusicWebAPI.Application.DTOs.UserSongsDTO;
+using static MusicWebAPI.Application.ViewModels.UserViewModel;
+using MusicWebAPI.Core.Base;
+using System.Net.Http;
 namespace MusicWebAPI.API.Endpoints
 {
     public class UserEndpoints : ApiResponseBase
@@ -25,23 +28,25 @@ namespace MusicWebAPI.API.Endpoints
                 return Ok(user);
             })
             .WithName("RegisterUser")
-            .Produces<User>(StatusCodes.Status200OK)
+            .Produces<RegisterUserViewModel>(StatusCodes.Status200OK)
             .Produces<string>(StatusCodes.Status400BadRequest)
             .WithTags("User")
             .RequireRateLimiting("main")
             .WithOpenApi(); // This enables Swagger for Minimal API
 
             // Login user endpoint
-            app.MapPost("/api/login", async (IMediator mediator, LoginUserCommand command) =>
+            app.MapPost("/api/login", async (IMediator mediator, LoginUserCommand command, HttpContext httpContext) =>
             {
                 // getting JWT token
                 var token = await mediator.Send(command);
+
+                await AppendTokenToCookies(httpContext, token.Token);
 
                 return Ok(token);
 
             })
             .WithName("LoginUser")
-            .Produces<string>(StatusCodes.Status200OK)
+            .Produces<LoginUserViewModel>(StatusCodes.Status200OK)
             .Produces<string>(StatusCodes.Status400BadRequest)
             .WithTags("User")
             .RequireRateLimiting("main")
@@ -118,7 +123,20 @@ namespace MusicWebAPI.API.Endpoints
             .WithOpenApi();
 
         }
-         
+
+        public static async Task AppendTokenToCookies(HttpContext httpContext, string token)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = false,
+                Secure = true, // Set to true in production (requires HTTPS)
+                SameSite = SameSiteMode.Strict,
+                Path = "/",
+                Expires = DateTime.UtcNow.AddHours(2) // Match token expiration
+            };
+            httpContext.Response.Cookies.Append("access_token", token, cookieOptions);
+        }
+
         private static object GetUserId(HttpContext httpContext)
         {
             var userIdClaim = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);

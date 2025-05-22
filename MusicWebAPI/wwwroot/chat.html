@@ -14,6 +14,24 @@
             background-color: #e8ebf0;
         }
 
+        #groupName {
+            width: 250px;
+            height: 40px;
+            padding: 5px 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            #groupName:focus {
+                border-color: #4a90e2;
+                box-shadow: 0 0 8px rgba(74, 144, 226, 0.4);
+                outline: none;
+            }
+
         .main-container {
             display: flex;
             height: 100vh;
@@ -180,7 +198,7 @@
         <!-- Chat Section -->
         <div class="chat-section">
             <div class="header">
-                <input type="text" id="userId" placeholder="UserId" />
+                <!--<input type="text" id="userId" placeholder="UserId" />-->
                 <select id="groupName">
                     <option value="">Select Group</option>
                 </select>
@@ -239,6 +257,52 @@
             document.getElementById("replyToText").innerHTML =
                 `<strong style="color: #1a73e8;">${replyToSenderUsername}</strong>: ${replyToContent}`;
             document.getElementById("replyContext").style.display = "block";
+
+            messageInput.focus();
+        }
+
+        function getUserIdentifierFromToken() {
+            // Helper to get a cookie by name
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return null;
+            }
+
+            const token = getCookie('access_token');
+            if (!token) return null;
+
+            // JWT is "header.payload.signature"
+            const payloadBase64 = token.split('.')[1];
+            if (!payloadBase64) return null;
+
+            // JWT payload is base64Url encoded — convert to base64 first
+            const base64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
+
+            try {
+                // Decode base64 string
+                const jsonPayload = decodeURIComponent(
+                    atob(base64)
+                        .split('')
+                        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                        .join('')
+                );
+
+                const payload = JSON.parse(jsonPayload);
+
+                // Return the user identifier claim
+                return payload["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || null;
+            } catch (e) {
+                console.error('Failed to parse token payload', e);
+                return null;
+            }
+        }
+
+        function getCookie(name) {
+            const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+            if (match) return decodeURIComponent(match[2]);
+            return null;
         }
 
         function clearReply() {
@@ -572,7 +636,14 @@
         joinBtn.addEventListener("click", async () => {
             chatHistoryLoaded = false; // Reset before fetching
 
-            userId = document.getElementById("userId").value.trim();
+            //userId = document.getElementById("userId").value.trim();
+            userId = getUserIdentifierFromToken();
+
+            if (!userId) {
+                alert("You should login first!");
+                return;
+            }
+
             username = await connection.invoke("GetUsernameByUserId", userId);
             groupName = document.getElementById("groupName").value;
 
@@ -582,7 +653,7 @@
             }
 
             if (!username || !groupName) {
-                alert("Please enter a username and select a group.");
+                alert("You should be logged in and have selected a group to join in!");
                 return;
             }
 
@@ -627,13 +698,19 @@
             }
 
             try {
-                console.log("send btn replyToMessageId: " + replyToMessageId)
                 await connection.invoke("SendMessage", groupName, userId, message, replyToMessageId);
                 messageInput.value = '';
                 clearReply(); // reset reply context
 
             } catch (err) {
                 console.error("Failed to send message:", err.toString());
+            }
+        });
+         
+        messageInput.addEventListener("keydown", async (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendBtn.click();
             }
         });
 
