@@ -9,6 +9,7 @@ namespace MusicWebAPI.Domain.Entities
     {
         public string Name { get; set; }
         public string UserId { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
         [ForeignKey("UserId")]
         public User User { get; set; }

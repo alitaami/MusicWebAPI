@@ -85,8 +85,40 @@ namespace MusicWebAPI.API.Endpoints
             .WithTags("Playlists")
             .RequireRateLimiting("main")
             .WithOpenApi();
-        }
 
+            // DeletePlaylist endpoint
+            app.MapDelete("/api/playlists/{playlistId}",
+            [Authorize(Roles = "User")]
+            async (IMediator mediator, Guid playlistId) =>
+            {
+                await mediator.Send(new DeletePlayListCommand(playlistId));
+                return NoContent();
+            })
+            .WithName("DeletePlaylist")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithTags("Playlists")
+            .RequireRateLimiting("main")
+            .WithOpenApi();
+
+
+            // DeleteSongFromPlaylist endpoint
+            app.MapDelete("/api/playlists/{playlistId}/songs/{songId}",
+            [Authorize(Roles = "User")]
+            async (IMediator mediator, Guid playlistId, Guid songId) =>
+            {
+                await mediator.Send(new DeletePlayListSongCommand(songId, playlistId));
+                return NoContent();
+            })
+            .WithName("DeleteSongFromPlaylist")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithTags("Playlists")
+            .RequireRateLimiting("main")
+            .WithOpenApi();
+
+        }
+         
         private static object GetUserId(HttpContext httpContext)
         {
             var userIdClaim = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);

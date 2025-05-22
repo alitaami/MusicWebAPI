@@ -8,6 +8,7 @@ namespace MusicWebAPI.Domain.Entities
     {
         public Guid SongId { get; set; }
         public Guid PlayListId { get; set; }
+        public bool IsDeleted { get; set; } = false;    
 
         [ForeignKey("PlayListId")]
         public Playlist Playlist { get; set; }
