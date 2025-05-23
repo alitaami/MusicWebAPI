@@ -1,8 +1,11 @@
 // Initialize Serilog with basic configuration
+using DotNetEnv;
 using Serilog;
  
 try
 {
+    DotNetEnv.Env.Load();
+
     WebApplication
         .CreateBuilder(args)
         .ConfigureServices()

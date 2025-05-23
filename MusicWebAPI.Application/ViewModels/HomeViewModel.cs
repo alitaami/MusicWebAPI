@@ -10,13 +10,14 @@ namespace MusicWebAPI.Application.ViewModels
     {
         public class GetSongsViewModel
         {
-            public Guid Id { get; set; }
-            public string Title { get; set; }
-            public string AudioUrl { get; set; }
-            public string AlbumTitle { get; set; }
-            public string GenreName { get; set; }
-            public string ArtistName { get; set; }
-            public float? Rank { get; set; }
+            public Guid? Id { get; set; }
+            public string? Title { get; set; }
+            public string? AudioUrl { get; set; }
+            public string? AlbumTitle { get; set; }
+            public string? GenreName { get; set; }
+            public string? ArtistName { get; set; }
+            public long? Listens { get; set; } = 0;
+            public float Rank { get; set; }
         } 
     }
 }

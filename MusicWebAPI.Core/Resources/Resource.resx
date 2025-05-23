@@ -129,6 +129,12 @@
   <data name="GeneralUnhandledErrorText" xml:space="preserve">
     <value>An unexpected error occurred. Please try again later.</value>
   </data>
+  <data name="GetPopularSongs_CacheKey" xml:space="preserve">
+    <value>popular_songs_</value>
+  </data>
+  <data name="GetSongsByTerm_CacheKey" xml:space="preserve">
+    <value>search_songs_</value>
+  </data>
   <data name="InvalidCredentials" xml:space="preserve">
     <value>Email or Password is not correct! Try again.</value>
   </data>

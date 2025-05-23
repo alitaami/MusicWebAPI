@@ -97,6 +97,24 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to popular_songs_.
+        /// </summary>
+        public static string GetPopularSongs_CacheKey {
+            get {
+                return ResourceManager.GetString("GetPopularSongs_CacheKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to search_songs_.
+        /// </summary>
+        public static string GetSongsByTerm_CacheKey {
+            get {
+                return ResourceManager.GetString("GetSongsByTerm_CacheKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Email or Password is not correct! Try again..
         /// </summary>
         public static string InvalidCredentials {

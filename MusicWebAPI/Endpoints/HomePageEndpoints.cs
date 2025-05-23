@@ -1,10 +1,14 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using MusicWebAPI.API.Base;
 using MusicWebAPI.Application.Commands;
 using MusicWebAPI.Application.Features.Properties.Queries;
 using MusicWebAPI.Core;
 using MusicWebAPI.Domain.Entities;
+using MusicWebAPI.Infrastructure.Caching.Base;
+using Serilog;
+using System.Threading.Tasks;
 using static MusicWebAPI.Application.ViewModels.HomeViewModel;
 
 namespace MusicWebAPI.API.Endpoints
@@ -13,7 +17,7 @@ namespace MusicWebAPI.API.Endpoints
     {
         public static void RegisterHomeEndpoints(WebApplication app)
         {
-            app.MapGet("/api/home/songs", async (IMediator mediator, [FromQuery] string? term = null, [FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1) =>
+            app.MapGet("/api/home/songs", async (IMediator mediator, [FromQuery] string? term = " ", [FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1) =>
             {
                 var query = new GetSongsQuery(term, pageSize, pageNumber);
 
@@ -22,6 +26,21 @@ namespace MusicWebAPI.API.Endpoints
                 return Ok(songs);
             })
             .WithName("GetSongs")
+            .Produces<PaginatedResult<GetSongsViewModel>>(StatusCodes.Status200OK)
+            .Produces<string>(StatusCodes.Status400BadRequest)
+            .WithTags("Home")
+            .RequireRateLimiting("main")
+            .WithOpenApi();
+
+            app.MapGet("/api/home/popular-songs", async (IMediator mediator, [FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1) =>
+            { 
+                var query = new GetPopularSongsQuery(pageSize, pageNumber);
+
+                var songs = await mediator.Send(query);
+
+                return Ok(songs);
+            })
+            .WithName("GetPopularSongs")
             .Produces<PaginatedResult<GetSongsViewModel>>(StatusCodes.Status200OK)
             .Produces<string>(StatusCodes.Status400BadRequest)
             .WithTags("Home")

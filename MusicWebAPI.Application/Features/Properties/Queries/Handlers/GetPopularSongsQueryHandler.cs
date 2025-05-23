@@ -15,20 +15,20 @@ using static MusicWebAPI.Application.ViewModels.UserViewModel;
 
 namespace MusicWebAPI.Application.Features.Properties.Queries.Handlers
 {
-    public class GetSongsQueryHandler : IRequestHandler<GetSongsQuery, PaginatedResult<GetSongsViewModel>>
+    public class GetPopularSongsQueryHandler : IRequestHandler<GetPopularSongsQuery, PaginatedResult<GetSongsViewModel>>
     {
         private readonly IServiceManager _serviceManager;
         private readonly ICacheService _cacheService;
 
-        public GetSongsQueryHandler(IServiceManager serviceManager, ICacheService cacheService)
+        public GetPopularSongsQueryHandler(IServiceManager serviceManager, ICacheService cacheService)
         {
             _serviceManager = serviceManager;
             _cacheService = cacheService;
         }
 
-        public async Task<PaginatedResult<GetSongsViewModel>> Handle(GetSongsQuery request, CancellationToken cancellationToken)
-        {
-            var cacheKey = $"{Resource.GetSongsByTerm_CacheKey}{request.Term}_{request.PageNumber}_{request.PageSize}";
+        public async Task<PaginatedResult<GetSongsViewModel>> Handle(GetPopularSongsQuery request, CancellationToken cancellationToken)
+        { 
+            var cacheKey = $"{Resource.GetPopularSongs_CacheKey}{request.PageNumber}_{request.PageSize}";
 
             // Try getting cached view models directly
             var cachedData = await _cacheService.GetAsync<PaginatedResult<GetSongsViewModel>>(cacheKey);
@@ -38,8 +38,10 @@ namespace MusicWebAPI.Application.Features.Properties.Queries.Handlers
                 return cachedData;
             }
 
-            var songs = await _serviceManager.Home.GetSongs(request.Term, request.PageSize, request.PageNumber, cancellationToken);
+            // Get data from service
+            var songs = await _serviceManager.Home.GetPopularSongs(request.PageSize, request.PageNumber, cancellationToken);
 
+            // Map to view models
             var mappedSongs = new List<GetSongsViewModel>();
             foreach (var item in songs.Items)
             {
@@ -60,6 +62,7 @@ namespace MusicWebAPI.Application.Features.Properties.Queries.Handlers
                 }
             }
 
+            // Create result
             var result = new PaginatedResult<GetSongsViewModel>
             {
                 Items = mappedSongs,
@@ -84,7 +87,7 @@ namespace MusicWebAPI.Application.Features.Properties.Queries.Handlers
 
             return new GetSongsViewModel
             {
-                Id = (Guid)(type.GetProperty("Id")?.GetValue(item) ?? Guid.Empty),
+                Id = (Guid)(type.GetProperty("Id")?.GetValue(item) ?? Guid.Empty), 
                 Title = type.GetProperty("Title")?.GetValue(item)?.ToString(),
                 AudioUrl = type.GetProperty("AudioUrl")?.GetValue(item)?.ToString(),
                 AlbumTitle = type.GetProperty("AlbumTitle")?.GetValue(item)?.ToString(),

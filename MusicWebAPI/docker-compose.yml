@@ -18,6 +18,8 @@ services:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 10s
       retries: 5
+    env_file:
+      - .env
 
   elasticsearch:
     image:  bitnami/elasticsearch:7.17.13  # Stable older version
@@ -49,6 +51,8 @@ services:
     #     }';
     #     wait
     #   "
+    env_file:
+      - .env
 
   kibana:
     image: bitnami/kibana:7.17.13  # Stable Kibana version
@@ -68,6 +72,8 @@ services:
       interval: 10s
       retries: 5
     restart: always
+    env_file:
+      - .env
 
   api:
     build:
@@ -95,7 +101,9 @@ services:
       test: ["CMD", "curl", "--fail", "${API_URL}/health"]
       interval: 10s
       retries: 5
-  
+    env_file:
+      - .env
+
   minio:
    image: minio/minio:latest
    container_name: minio
@@ -124,6 +132,9 @@ services:
           mc anonymous set download myminio/${MINIO_BUCKET_NAME};
           wait
         '
+   env_file:
+      - .env
+
   
   portainer:
     image: portainer/portainer-ce:latest
@@ -140,7 +151,28 @@ services:
       test: ["CMD", "curl", "--fail", "http://localhost:${PORTAINER_PORT}/api/status"]
       interval: 10s
       retries: 5
- 
+    env_file:
+      - .env
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - musicnet
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"] 
+    environment:
+      REDIS_CONNECTION_STRING: ${REDIS_CONNECTION_STRING}
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      retries: 5
+    env_file:
+      - .env
+
 
 volumes:
   postgres_data:
@@ -154,6 +186,8 @@ volumes:
   portainer_data:
     driver: local
   minio_data:
+    driver: local
+  redis_data:
     driver: local
 
 networks:

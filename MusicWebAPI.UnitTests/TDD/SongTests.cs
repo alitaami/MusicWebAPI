@@ -5,6 +5,7 @@ using MusicWebAPI.Application.Features.Properties.Queries;
 using MusicWebAPI.Application.Features.Properties.Queries.Handlers;
 using MusicWebAPI.Core;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
+using MusicWebAPI.Infrastructure.Caching.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace MusicWebAPI.UnitTests.TDD
 {
     public class SongTests
     {
+        private Mock<ICacheService> _cacheServiceMock;
         private Mock<IServiceManager> _serviceManagerMock;
         private Mock<IMapper> _mapperMock; 
         private GetSongsQueryHandler _getSongsHandler;
@@ -25,7 +27,7 @@ namespace MusicWebAPI.UnitTests.TDD
         {
             _serviceManagerMock = new Mock<IServiceManager>();
             _mapperMock = new Mock<IMapper>(); 
-            _getSongsHandler = new GetSongsQueryHandler(_serviceManagerMock.Object);
+            _getSongsHandler = new GetSongsQueryHandler(_serviceManagerMock.Object, _cacheServiceMock.Object);
         }
         [Test]
         public async Task Handle_GetSongs_ReturnSongs()

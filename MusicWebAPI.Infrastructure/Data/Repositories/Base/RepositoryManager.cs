@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
 using MusicWebAPI.Domain.Interfaces.Repositories;
 using MusicWebAPI.Domain.Interfaces.Repositories.Base;
+using MusicWebAPI.Infrastructure.Caching.Base;
 using MusicWebAPI.Infrastructure.Data.Context;
 using System;
 using System.Collections.Generic;
@@ -17,15 +18,28 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories.Base
     public class RepositoryManager : IRepositoryManager
     {
         private MusicDbContext _context;
+        private ICacheService _cacheService;
+
         private ISongRepository _songRepository;
         private IPlayListRepository _playListRepository;
         private IPlayListSongsRepository _playListSongsRepository;
 
-        public RepositoryManager(MusicDbContext context)
+        public RepositoryManager(MusicDbContext context, ICacheService cacheService)
         {
             _context = context;
+            _cacheService = cacheService;
         }
+
         #region Cross-Repository query
+        public async Task<DbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            return (DbContextTransaction)await _context.Database.BeginTransactionAsync(cancellationToken);
+        }
+        public DbContextTransaction BeginTransaction()
+        {
+            return (DbContextTransaction)_context.Database.BeginTransaction();
+        }
         public IEnumerable<T> GetListWithRawSql<T>(string procedureOrQuery, CancellationToken cancellationToken, params object[] parameters)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -38,16 +52,6 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories.Base
             return _context.Database.SqlQueryRaw<T>(procedureOrQuery, parameters).FirstOrDefault();
         }
         #endregion
-
-        public async Task<DbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            return (DbContextTransaction)await _context.Database.BeginTransactionAsync(cancellationToken);
-        }
-        public DbContextTransaction BeginTransaction()
-        {
-            return (DbContextTransaction)_context.Database.BeginTransaction();
-        }
 
         #region Save Changes
         public void SaveChanges()
@@ -71,7 +75,7 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories.Base
             get
             {
                 if (this._songRepository == null)
-                    this._songRepository = new SongRepository(_context);
+                    this._songRepository = new SongRepository(_context, _cacheService);
 
                 return this._songRepository;
             }

@@ -12,6 +12,7 @@ namespace MusicWebAPI.Domain.Interfaces.Repositories
 {
     public interface ISongRepository : IRepository<Song>
     {
-        public Task<PaginatedResult<object>> GetSongsByTerm(string term, int pageSize, int pageNumber, CancellationToken cancellationToken);
+        Task<PaginatedResult<object>> GetSongsByTerm(string term, int pageSize, int pageNumber, CancellationToken cancellationToken);
+        Task<PaginatedResult<object>> GetPopularSongs(int pageSize, int pageNumber, CancellationToken cancellationToken);
     }
 }

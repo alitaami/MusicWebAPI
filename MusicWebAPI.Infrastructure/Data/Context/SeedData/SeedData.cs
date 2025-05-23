@@ -201,6 +201,7 @@ public static class SeedData
                     AlbumId = context.Albums.FirstOrDefault(a => a.Title == "Album Two")?.Id ?? Guid.NewGuid(),
                     GenreId = rockGenre?.Id ?? Guid.NewGuid(), // Rock
                     Duration = TimeSpan.FromMinutes(3),
+                    Listens = 100,
                     AudioUrl = UploadSongToMinIO(fileStorageService, $"DariushCheshmeMan", sampleAudio)
                 };
                 context.Songs.Add(song1);
@@ -215,6 +216,7 @@ public static class SeedData
                     AlbumId = context.Albums.FirstOrDefault(a => a.Title == "Album One")?.Id ?? Guid.NewGuid(),
                     GenreId = popGenre?.Id ?? Guid.NewGuid(), // Pop
                     Duration = TimeSpan.FromMinutes(4),
+                    Listens = 1000,
                     AudioUrl = UploadSongToMinIO(fileStorageService, $"DariushDeleMan", sampleAudio)
                 };
                 context.Songs.Add(song2);
@@ -229,6 +231,7 @@ public static class SeedData
                     AlbumId = context.Albums.FirstOrDefault(a => a.Title == "Album One")?.Id ?? Guid.NewGuid(),
                     GenreId = popGenre?.Id ?? Guid.NewGuid(), // Pop
                     Duration = TimeSpan.FromMinutes(4),
+                    Listens = 10000,
                     AudioUrl = UploadSongToMinIO(fileStorageService, $"DariushNamaz", sampleAudio)
                 };
                 context.Songs.Add(song3);
@@ -246,6 +249,7 @@ public static class SeedData
                         UserId = nirvana.Id,
                         GenreId = rockGenre?.Id ?? Guid.NewGuid(),
                         Duration = TimeSpan.FromMinutes(5),
+                        Listens = 200,
                         AudioUrl = UploadSongToMinIO(fileStorageService, $"NirvanaSmellsLikeTeenSpirit", sampleAudio)
                     };
 
@@ -259,6 +263,7 @@ public static class SeedData
                         UserId = nirvana.Id,
                         GenreId = rockGenre?.Id ?? Guid.NewGuid(),
                         Duration = TimeSpan.FromMinutes(4),
+                        Listens = 300,
                         AudioUrl = UploadSongToMinIO(fileStorageService, $"NirvanaComeAsYouAre", sampleAudio)
                     };
                     context.Songs.Add(song2);
@@ -277,6 +282,7 @@ public static class SeedData
                         UserId = fooFighters.Id,
                         GenreId = rockGenre?.Id ?? Guid.NewGuid(),
                         Duration = TimeSpan.FromMinutes(4),
+                        Listens = 10000,
                         AudioUrl = UploadSongToMinIO(fileStorageService, $"FooFightersEverlong", sampleAudio)
                     };
                     context.Songs.Add(song3);
@@ -289,6 +295,7 @@ public static class SeedData
                         UserId = fooFighters.Id,
                         GenreId = rockGenre?.Id ?? Guid.NewGuid(),
                         Duration = TimeSpan.FromMinutes(4),
+                        Listens = 10,
                         AudioUrl = UploadSongToMinIO(fileStorageService, $"FooFightersThe_Pretender", sampleAudio)
                     };
                     context.Songs.Add(song4);

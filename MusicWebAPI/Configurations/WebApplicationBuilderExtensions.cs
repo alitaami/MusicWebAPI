@@ -27,12 +27,18 @@ using MusicWebAPI.Infrastructure.FileService;
 using static System.Net.WebRequestMethods;
 using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 using MusicWebAPI.Infrastructure.Data.Repositories.Base;
+using StackExchange.Redis;
+using MusicWebAPI.Core.Utilities;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using MusicWebAPI.Infrastructure.Caching;
+using MusicWebAPI.Infrastructure.Caching.Base;
+using System.Configuration;
 
 public static class WebApplicationBuilderExtensions
 {
     public static WebApplicationBuilder ConfigureServices(this WebApplicationBuilder builder)
     {
-        Env.Load();
         var configuration = builder.Configuration;
 
         #region Logging Configuration
@@ -82,6 +88,8 @@ public static class WebApplicationBuilderExtensions
 
             AddAppServices(builder);
 
+            AddRedis(builder, configuration);
+
             AddCors(builder);
 
             AddJwtAuthentication(builder, configuration);
@@ -100,12 +108,27 @@ public static class WebApplicationBuilderExtensions
             throw;
         }
     }
+    public static void AddRedis(WebApplicationBuilder builder, IConfiguration configuration)
+    {
+        var redisConnectionString = Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING");
+
+        if (string.IsNullOrWhiteSpace(redisConnectionString))
+        {
+            throw new InvalidOperationException("REDIS_CONNECTION_STRING environment variable is not set.");
+        }
+
+        builder.Services.AddStackExchangeRedisCache(options =>
+        {        
+            options.Configuration = redisConnectionString;
+            options.InstanceName = "MusicWebAPI";
+        });
+    }
 
     private static void HandleElasticsearchFailure(LogEvent logEvent, Exception ex)
     {
         Console.WriteLine($"Unable to log event: {ex.Message} | Log: {logEvent.RenderMessage()}");
     }
-
+     
     private static void AddJwtAuthentication(WebApplicationBuilder builder, IConfiguration configuration)
     {
         // Read JWT settings from configuration
@@ -164,7 +187,7 @@ public static class WebApplicationBuilderExtensions
 
     private static void AddAppServices(WebApplicationBuilder builder)
     {
-        #region Swagger
+        #region SignalR
         builder.Services.AddSignalR();
         #endregion
 
@@ -190,6 +213,8 @@ public static class WebApplicationBuilderExtensions
         #endregion
 
         // Register Repositories , Services and LoggerManager
+        builder.Services.AddScoped<ICacheService, CacheService>();
+
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
         builder.Services.AddScoped<IServiceManager, ServiceManager>();
@@ -470,7 +495,7 @@ public static class WebApplicationBuilderExtensions
 
         });
     }
-     
+
     private static void ConfigLogging(WebApplicationBuilder builder)
     {
         builder.Host.UseSerilog(); // Use Serilog as the global logging provider
