@@ -27,7 +27,7 @@ namespace MusicWebAPI.Application.Features.Properties.Queries.Handlers
         }
 
         public async Task<PaginatedResult<GetSongsViewModel>> Handle(GetPopularSongsQuery request, CancellationToken cancellationToken)
-        { 
+        {
             var cacheKey = $"{Resource.GetPopularSongs_CacheKey}{request.PageNumber}_{request.PageSize}";
 
             // Try getting cached view models directly
@@ -43,6 +43,10 @@ namespace MusicWebAPI.Application.Features.Properties.Queries.Handlers
 
             // Map to view models
             var mappedSongs = new List<GetSongsViewModel>();
+
+            if (songs.Items is null)
+                return new PaginatedResult<GetSongsViewModel>();
+
             foreach (var item in songs.Items)
             {
                 try
@@ -87,7 +91,7 @@ namespace MusicWebAPI.Application.Features.Properties.Queries.Handlers
 
             return new GetSongsViewModel
             {
-                Id = (Guid)(type.GetProperty("Id")?.GetValue(item) ?? Guid.Empty), 
+                Id = (Guid)(type.GetProperty("Id")?.GetValue(item) ?? Guid.Empty),
                 Title = type.GetProperty("Title")?.GetValue(item)?.ToString(),
                 AudioUrl = type.GetProperty("AudioUrl")?.GetValue(item)?.ToString(),
                 AlbumTitle = type.GetProperty("AlbumTitle")?.GetValue(item)?.ToString(),

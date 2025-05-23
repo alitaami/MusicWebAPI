@@ -41,6 +41,10 @@ namespace MusicWebAPI.Application.Features.Properties.Queries.Handlers
             var songs = await _serviceManager.Home.GetSongs(request.Term, request.PageSize, request.PageNumber, cancellationToken);
 
             var mappedSongs = new List<GetSongsViewModel>();
+
+            if (songs.Items is null)
+                return new PaginatedResult<GetSongsViewModel>();
+
             foreach (var item in songs.Items)
             {
                 try
