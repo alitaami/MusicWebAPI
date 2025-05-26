@@ -34,6 +34,8 @@ using Microsoft.Extensions.Options;
 using MusicWebAPI.Infrastructure.Caching;
 using MusicWebAPI.Infrastructure.Caching.Base;
 using System.Configuration;
+using Hangfire;
+using Hangfire.PostgreSql;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -88,6 +90,8 @@ public static class WebApplicationBuilderExtensions
 
             AddAppServices(builder);
 
+            AddHangfire(builder, configuration);
+
             AddRedis(builder, configuration);
 
             AddCors(builder);
@@ -108,6 +112,15 @@ public static class WebApplicationBuilderExtensions
             throw;
         }
     }
+    public static void AddHangfire(WebApplicationBuilder builder, IConfiguration configuration)
+    {
+        // Add Hangfire services
+        builder.Services.AddHangfire(config =>
+            config.UsePostgreSqlStorage(configuration.GetConnectionString("MusicDbConnection")));
+
+        builder.Services.AddHangfireServer();
+    }
+
     public static void AddRedis(WebApplicationBuilder builder, IConfiguration configuration)
     {
         var redisConnectionString = Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING");
@@ -118,7 +131,7 @@ public static class WebApplicationBuilderExtensions
         }
 
         builder.Services.AddStackExchangeRedisCache(options =>
-        {        
+        {
             options.Configuration = redisConnectionString;
             options.InstanceName = "MusicWebAPI";
         });
@@ -128,7 +141,7 @@ public static class WebApplicationBuilderExtensions
     {
         Console.WriteLine($"Unable to log event: {ex.Message} | Log: {logEvent.RenderMessage()}");
     }
-     
+
     private static void AddJwtAuthentication(WebApplicationBuilder builder, IConfiguration configuration)
     {
         // Read JWT settings from configuration

@@ -1,10 +1,12 @@
 ﻿using Configuration.Swagger;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using MusicWebAPI.API.Endpoints;
 using MusicWebAPI.API.Middlewares;
 using MusicWebAPI.Core.Utilities;
+using MusicWebAPI.Domain.Interfaces;
 using MusicWebAPI.Domain.Interfaces.Services;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
 using MusicWebAPI.Infrastructure.Caching;
@@ -31,6 +33,19 @@ public static class WebApplicationExtensions
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapHub<ChatHub>("/chathub");
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new Hangfire.Dashboard.LocalRequestsOnlyAuthorizationFilter() }
+            });
+
+            #region Scheduling Jobs
+            RecurringJob.AddOrUpdate<IRecommendationService>(
+                "daily-ml-training",                                 // job id
+                x => x.TrainAsync(CancellationToken.None),           // method to run
+                "0 */12 * * *",                                       // every 12 hours
+                TimeZoneInfo.Local                                   // use local server time
+            );
+            #endregion
 
             app.MapControllers();
 
@@ -49,13 +64,13 @@ public static class WebApplicationExtensions
                 using (var scope = app.Services.CreateScope())
                 {
                     var services = scope.ServiceProvider;
-                  
+
                     //#region Redis Initialization
                     //var cache = services.GetRequiredService<IDistributedCache>();
                     //var settings = services.GetRequiredService<IOptions<RedisSettings>>();
                     //CacheService.Initialize(cache, settings);
                     //#endregion
-                    
+
                     #region SeedData Initialization
                     var dbContext = services.GetRequiredService<MusicDbContext>();
                     dbContext.Database.EnsureCreated(); // Ensures tables exist
