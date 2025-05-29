@@ -109,15 +109,22 @@ namespace MusicWebAPI.Application.Services
             return false;
         }
 
-        private async Task AssignRole(User user, bool isArtist)
+        private async Task AssignRole(User user, bool? isArtist = false)
         {
-            if (isArtist)
+            if (isArtist == null)
             {
-                await _userManager.AddToRoleAsync(user, Resource.ArtistRole);
+                await _userManager.AddToRoleAsync(user, Resource.SuperUserRole);
             }
             else
             {
-                await _userManager.AddToRoleAsync(user, Resource.UserRole);
+                if (isArtist.Value)
+                {
+                    await _userManager.AddToRoleAsync(user, Resource.ArtistRole);
+                }
+                else
+                {
+                    await _userManager.AddToRoleAsync(user, Resource.UserRole);
+                }
             }
         }
         #endregion

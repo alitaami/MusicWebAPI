@@ -22,7 +22,7 @@ namespace MusicWebAPI.API.Endpoints
     {
         public static void RegisterHomeEndpoints(WebApplication app)
         {
-            app.MapGet("/api/home/songs", async (IMediator mediator, [FromQuery] string? term = null, [FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1) =>
+            app.MapGet("/api/home/songs", async (IMediator mediator, [FromQuery] string? term = " ", [FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1) =>
             {
                 var query = new GetSongsQuery(term, pageSize, pageNumber);
 

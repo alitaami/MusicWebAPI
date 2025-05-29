@@ -61,7 +61,7 @@ public static class WebApplicationExtensions
             app.MapControllers();
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
-                Authorization = new[] { new AllowAllDashboardAuthorizationFilter() }
+                Authorization = new[] { new RoleBasedAuthorizationFilter("SuperUser") }
             });
 
             #region Scheduling Jobs

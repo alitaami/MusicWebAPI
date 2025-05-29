@@ -9,7 +9,7 @@ namespace MusicWebAPI.Domain.Entities
     {
         public string FullName { get; set; }
         public string Bio { get; set; } = string.Empty; // Artist Bio (Optional)
-        public bool IsArtist { get; set; } // True if the user is an artist
+        public bool? IsArtist { get; set; } = false; // True if the user is an artist  & Null if the user is SuperUser
 
         // Navigation Properties
         public ICollection<Playlist> Playlists { get; set; }

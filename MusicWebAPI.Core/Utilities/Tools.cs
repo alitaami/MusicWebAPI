@@ -1,7 +1,9 @@
 ﻿using Hangfire.Dashboard;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -54,6 +56,27 @@ namespace MusicWebAPI.Core.Utilities
             public bool Authorize(DashboardContext context)
             {
                 return true; // ⚠️ Allow all users – safe only for development!
+            }
+        }
+
+        public class RoleBasedAuthorizationFilter : IDashboardAuthorizationFilter
+        {
+            private readonly string _requiredRole;
+
+            public RoleBasedAuthorizationFilter(string requiredRole)
+            {
+                _requiredRole = requiredRole;
+            }
+
+            public bool Authorize([NotNull] DashboardContext context)
+            {
+                // Replace the problematic line with the following:
+                var httpContext = (HttpContext)context.GetType()
+                    .GetProperty("HttpContext", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance)
+                    ?.GetValue(context);
+
+                return httpContext?.User.Identity?.IsAuthenticated == true &&
+                       httpContext.User.IsInRole(_requiredRole);
             }
         }
     }

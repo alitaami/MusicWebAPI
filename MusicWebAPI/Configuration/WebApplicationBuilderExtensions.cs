@@ -175,7 +175,21 @@ public static class WebApplicationBuilderExtensions
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
             };
+            // enables reading token from Cookie named "access_token"
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var token = context.Request.Cookies["access_token"];
+                    if (!string.IsNullOrEmpty(token))
+                    {
+                        context.Token = token;
+                    }
+                    return Task.CompletedTask;
+                }
+            };
         });
+
         builder.Services.AddAuthorization();
     }
     private static void AddAppDbContext(WebApplicationBuilder builder, IConfiguration configuration)
