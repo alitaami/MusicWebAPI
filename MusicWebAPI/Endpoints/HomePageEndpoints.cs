@@ -9,7 +9,8 @@ using MusicWebAPI.Application.Features.Properties.Queries;
 using MusicWebAPI.Core;
 using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Domain.Interfaces;
-using MusicWebAPI.Infrastructure.Caching.Base;
+using MusicWebAPI.Infrastructure.Data.Context;
+using MusicWebAPI.Infrastructure.FileService;
 using Serilog;
 using System.Drawing.Printing;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace MusicWebAPI.API.Endpoints
     {
         public static void RegisterHomeEndpoints(WebApplication app)
         {
-            app.MapGet("/api/home/songs", async (IMediator mediator, [FromQuery] string? term = " ", [FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1) =>
+            app.MapGet("/api/home/songs", async (IMediator mediator, [FromQuery] string? term = null, [FromQuery] int pageSize = 10, [FromQuery] int pageNumber = 1) =>
             {
                 var query = new GetSongsQuery(term, pageSize, pageNumber);
 
@@ -53,19 +54,12 @@ namespace MusicWebAPI.API.Endpoints
 
             app.MapGet("/api/home/recommended-songs", async (IMediator mediator, HttpContext httpContext, int count, CancellationToken ct) =>
             {
-                try
-                {
-                    var userId = GetUserId(httpContext);
-                    var query = new GetRecommendedSongsQuery(userId.ToString(), count);
+                var userId = GetUserId(httpContext);
+                var query = new GetRecommendedSongsQuery(userId.ToString(), count);
 
-                    var songs = await mediator.Send(query);
+                var songs = await mediator.Send(query);
 
-                    return Ok(songs);
-                }
-                catch (Exception ex)
-                {
-                    return Results.Problem($"❌ Recommendation failed: {ex.Message}");
-                }
+                return Ok(songs);
             })
             .WithName("RecommnededSongs")
             .Produces<List<GetSongsViewModel>>(StatusCodes.Status200OK)

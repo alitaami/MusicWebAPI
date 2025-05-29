@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
+using MusicWebAPI.Domain.External.Caching;
 using MusicWebAPI.Domain.Interfaces.Repositories;
 using MusicWebAPI.Domain.Interfaces.Repositories.Base;
-using MusicWebAPI.Infrastructure.Caching.Base;
 using MusicWebAPI.Infrastructure.Data.Context;
 using System;
 using System.Collections.Generic;

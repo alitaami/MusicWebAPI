@@ -1,5 +1,6 @@
 ﻿using Configuration.Swagger;
 using Hangfire;
+using Hangfire.Dashboard;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
@@ -12,6 +13,8 @@ using MusicWebAPI.Domain.Interfaces.Services.Base;
 using MusicWebAPI.Infrastructure.Caching;
 using MusicWebAPI.Infrastructure.Data.Context;
 using Serilog;
+using System.Net;
+using static MusicWebAPI.Core.Utilities.Tools;
 
 public static class WebApplicationExtensions
 {
@@ -19,72 +22,62 @@ public static class WebApplicationExtensions
     {
         try
         {
-            app.UseMiddleware<ErrorHandlingMiddleware>();
-            app.UseMiddleware<LoggingMiddleware>();
+            #region Middlewares
+            UseMiddlewares(app);
+            #endregion
 
             app.MapGet("/", () => Results.Redirect("/swagger/index.html"));
 
             app.UseHttpsRedirection();
             app.UseHsts();
-
             app.UseCors("CorsPolicy");
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.MapHub<ChatHub>("/chathub");
-            app.UseHangfireDashboard("/hangfire", new DashboardOptions
-            {
-                Authorization = new[] { new Hangfire.Dashboard.LocalRequestsOnlyAuthorizationFilter() }
-            });
 
-            #region Scheduling Jobs
-            RecurringJob.AddOrUpdate<IRecommendationService>(
-                "daily-ml-training",                                 // job id
-                x => x.TrainAsync(CancellationToken.None),           // method to run
-                "0 */12 * * *",                                       // every 12 hours
-                TimeZoneInfo.Local                                   // use local server time
-            );
-            #endregion
-
-            app.MapControllers();
-
-            // Register the Minimal API routes
-            UserEndpoints.RegisterUserEndpoints(app); // Call the method that registers UserEndpoints
-            HomePageEndpoints.RegisterHomeEndpoints(app); // Call the method that registers HomeEndpoints
-
-            app.UseRateLimiter();
-
-            app.UseSwaggerAndUI(); // Use Swagger and Swagger UI 
-
-            app.MapHealthChecks("/health");
-
+            #region SeedData
             try
             {
                 using (var scope = app.Services.CreateScope())
                 {
                     var services = scope.ServiceProvider;
 
-                    //#region Redis Initialization
-                    //var cache = services.GetRequiredService<IDistributedCache>();
-                    //var settings = services.GetRequiredService<IOptions<RedisSettings>>();
-                    //CacheService.Initialize(cache, settings);
-                    //#endregion
-
                     #region SeedData Initialization
                     var dbContext = services.GetRequiredService<MusicDbContext>();
                     dbContext.Database.EnsureCreated(); // Ensures tables exist
                     dbContext.Database.Migrate(); // Apply pending migrations
                     SeedData.Initialize(scope.ServiceProvider, dbContext);  // Then seed data
-                    #endregion
-
-
+                    #endregion 
                 }
             }
             catch (Exception ex)
             {
                 Log.Fatal(ex, "Database migration failed. Application will now exit.");
             }
+            #endregion
+
+            app.MapHub<ChatHub>("/chathub");
+            app.MapControllers();
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new AllowAllDashboardAuthorizationFilter() }
+            });
+
+            #region Scheduling Jobs
+            JobScheduler.ScheduleJobs();
+            #endregion
+
+            // Register the Minimal API routes
+            #region MinimalApi`s
+            RegisterMinimalApis(app);
+            #endregion
+
+            app.UseRateLimiter();
+
+            app.UseSwaggerAndUI(); // Use Swagger and Swagger UI 
+
+            app.MapHealthChecks("/health");
 
             return app;
         }
@@ -94,4 +87,31 @@ public static class WebApplicationExtensions
             throw;
         }
     }
+
+    #region ExtensionMethods
+    private static class JobScheduler
+    {
+        public static void ScheduleJobs()
+        {
+            RecurringJob.AddOrUpdate<IRecommendationService>(
+                "daily-ml-training",
+                x => x.TrainAsync(CancellationToken.None),
+                "0 */12 * * *",
+                TimeZoneInfo.Local
+            );
+        }
+    }
+    private static void UseMiddlewares(this WebApplication app)
+    {
+        app.UseMiddleware<ErrorHandlingMiddleware>();
+        app.UseMiddleware<LoggingMiddleware>();
+    }
+
+    private static void RegisterMinimalApis(this WebApplication app)
+    {
+        UserEndpoints.RegisterUserEndpoints(app); // Call the method that registers UserEndpoints
+        HomePageEndpoints.RegisterHomeEndpoints(app); // Call the method that registers HomeEndpoints
+    }
+
+    #endregion
 }

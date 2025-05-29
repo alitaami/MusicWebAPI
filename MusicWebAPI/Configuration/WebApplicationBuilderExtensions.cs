@@ -32,10 +32,10 @@ using MusicWebAPI.Core.Utilities;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using MusicWebAPI.Infrastructure.Caching;
-using MusicWebAPI.Infrastructure.Caching.Base;
 using System.Configuration;
 using Hangfire;
 using Hangfire.PostgreSql;
+using MusicWebAPI.Domain.External.Caching;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -100,7 +100,7 @@ public static class WebApplicationBuilderExtensions
 
             AddSwagger(builder);
 
-            ApiRateLimiter(builder);
+            AddRateLimiter(builder);
 
             builder.Services.AddApplicationServices(); //Adding configuration of 'Application layer'
 
@@ -114,9 +114,13 @@ public static class WebApplicationBuilderExtensions
     }
     public static void AddHangfire(WebApplicationBuilder builder, IConfiguration configuration)
     {
-        // Add Hangfire services
+        var connectionString = configuration.GetConnectionString("MusicDbConnection");
+
         builder.Services.AddHangfire(config =>
-            config.UsePostgreSqlStorage(configuration.GetConnectionString("MusicDbConnection")));
+            config.UsePostgreSqlStorage(options =>
+            {
+                options.UseNpgsqlConnection(connectionString);
+            }));
 
         builder.Services.AddHangfireServer();
     }
@@ -208,25 +212,21 @@ public static class WebApplicationBuilderExtensions
 
         // Configure MinIO Client using environment variables
 
-        builder.Services.AddSingleton<IMinioClient>(serviceProvider =>
-        {
-            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-            var endpoint = configuration["MINIO:URL"] ?? "http://localhost:9000";
-            var uri = new Uri(endpoint);
-
-            return new MinioClient()
-                .WithEndpoint(uri.Host, uri.Port)
-                .WithCredentials(configuration["MINIO:ROOT_USER"] ?? "minioadmin", configuration["MINIO:ROOT_PASSWORD"] ?? "minioadmin123")
-                .WithSSL(uri.Scheme == "https")
-                .Build();
-        });
-
-        builder.Services.AddTransient<FileStorageService>();
+        builder.Services.AddSingleton(
+    new MinioClient()
+        .WithEndpoint(Environment.GetEnvironmentVariable("MINIO_ENDPOINT"))
+        .WithCredentials(
+            Environment.GetEnvironmentVariable("MINIO_ROOT_USER"),
+            Environment.GetEnvironmentVariable("MINIO_ROOT_PASSWORD")
+        )
+        .Build()
+        );
+        builder.Services.AddSingleton<FileStorageService>();
 
         #endregion
 
         // Register Repositories , Services and LoggerManager
-        builder.Services.AddScoped<ICacheService, CacheService>();
+        builder.Services.AddSingleton<ICacheService, CacheService>();
 
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
@@ -513,7 +513,7 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Host.UseSerilog(); // Use Serilog as the global logging provider
     }
-    private static void ApiRateLimiter(WebApplicationBuilder builder)
+    private static void AddRateLimiter(WebApplicationBuilder builder)
     {
         builder.Services.AddRateLimiter(options =>
         {

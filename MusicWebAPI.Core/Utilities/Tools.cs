@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Hangfire.Dashboard;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,6 +47,14 @@ namespace MusicWebAPI.Core.Utilities
 
             // Return a PaginatedList object
             return new PaginatedResult<T>(itemsOnPage, totalItems, pageNumber, pageSize);
+        }
+
+        public class AllowAllDashboardAuthorizationFilter : IDashboardAuthorizationFilter
+        {
+            public bool Authorize(DashboardContext context)
+            {
+                return true; // ⚠️ Allow all users – safe only for development!
+            }
         }
     }
 }

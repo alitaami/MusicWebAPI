@@ -4,6 +4,7 @@ services:
   postgres:
     image: postgres:16-alpine  # Lightweight official PostgreSQL image
     container_name: postgres_container 
+    restart: on-failure
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -33,7 +34,7 @@ services:
       - musicnet
     # volumes:
       # - ./elasticsearch_data:/bitnami/elasticsearch/data  # Correct Bitnami path
-    restart: always
+    restart: on-failure
     healthcheck:
       test: ["CMD-SHELL", "curl -s ${ELASTICSEARCH_URL}/_cluster/health || exit 1"]
       interval: 10s
@@ -71,7 +72,7 @@ services:
       test: ["CMD-SHELL", "curl -s ${ELASTICSEARCH_URL} > /dev/null || exit 1"]
       interval: 10s
       retries: 5
-    restart: always
+    restart: on-failure
     env_file:
       - .env
 
@@ -80,6 +81,7 @@ services:
       context: ..
       dockerfile: MusicWebAPI/Dockerfile
     container_name: musicwebapi_container
+    restart: on-failure
     ports:
       - "${API_PORT}:8080"
     networks:
@@ -95,6 +97,8 @@ services:
       - INDEX_FORMAT=${INDEX_FORMAT}  
       - API_URL=${API_URL} 
     depends_on:
+      minio-init:
+        condition: service_completed_successfully
       postgres:
         condition: service_healthy
     healthcheck:
@@ -103,43 +107,45 @@ services:
       retries: 5
     env_file:
       - .env
-
+       
   minio:
-   image: minio/minio:latest
-   container_name: minio
-   ports:
-     - "${MINIO_PORT}:9000"
-     - "${MINIO_CONSOLE_PORT}:9011"
-   environment:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+     - ${MINIO_PORT} 
+    environment:
      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD} 
-   volumes:
-     - minio_data:/data
-   networks:
-     - musicnet
-   command: server /data --console-address ":9011"
-   entrypoint: >
-        sh -c '
-          minio server /data --console-address ":9011" &
-          until curl -s http://localhost:${MINIO_PORT}/minio/health/live; do echo "Waiting for MinIO..."; sleep 2; done;
-          echo "MinIO is live. Downloading mc...";
-          curl -s https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/bin/mc && chmod +x /usr/bin/mc &&
-          echo "Setting mc alias...";
-          mc alias set myminio ${MINIO_URL} ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD} &&
-          echo "Creating bucket if not exists...";
-          mc ls myminio/${MINIO_BUCKET_NAME} || mc mb myminio/${MINIO_BUCKET_NAME} &&
-          echo "Setting bucket policy to allow public read access...";
-          mc anonymous set download myminio/${MINIO_BUCKET_NAME};
-          wait
-        '
-   env_file:
-      - .env
-
+     FILE_SERVER_DOWNLOAD_URL: ${FILE_SERVER_DOWNLOAD_URL}
+     MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+    restart: on-failure
+    command: server /data
+    volumes:
+      - minio_data:/data
+    env_file: .env
+    networks:
+      - musicnet
+  
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+        sleep 5 &&
+        mc alias set local http://minio:9000 $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD} &&
+        mc mb local/$${MINIO_BUCKET_NAME} &&
+        mc anonymous set download local/$${MINIO_BUCKET_NAME} &&
+        echo '✅ Public access granted to music-files bucket'
+      "
+    env_file: .env
+    networks:
+      - musicnet
   
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
-    restart: always
+    restart: on-failure
     ports:
       - "${PORTAINER_PORT}:9300"
     volumes:
@@ -157,6 +163,7 @@ services:
   redis:
     image: redis:7.2-alpine
     container_name: redis
+    restart: on-failure
     ports:
       - "${REDIS_PORT}:6379"
     volumes:

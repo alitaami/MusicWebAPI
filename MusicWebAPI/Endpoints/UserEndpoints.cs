@@ -124,7 +124,7 @@ namespace MusicWebAPI.API.Endpoints
 
         }
 
-        public static async Task AppendTokenToCookies(HttpContext httpContext, string token)
+        private static async Task AppendTokenToCookies(HttpContext httpContext, string token)
         {
             var cookieOptions = new CookieOptions
             {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using MusicWebAPI.Core.Utilities;
-using MusicWebAPI.Infrastructure.Caching.Base;
+using MusicWebAPI.Domain.External.Caching;
 using System;
 using System.Collections.Generic;
 using System.Linq;

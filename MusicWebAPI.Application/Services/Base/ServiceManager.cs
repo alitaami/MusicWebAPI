@@ -9,8 +9,7 @@ using Mappings.CustomMapping;
 using Minio;
 using MusicWebAPI.Infrastructure.FileService;
 using MusicWebAPI.Domain.Interfaces.Repositories.Base;
-using MusicWebAPI.Domain.Interfaces;
-using MusicWebAPI.Infrastructure.Caching.Base;
+using MusicWebAPI.Domain.External.Caching;
 
 public class ServiceManager : IServiceManager
 {
@@ -23,7 +22,7 @@ public class ServiceManager : IServiceManager
     private readonly Lazy<IUserService> _userService;
     private readonly Lazy<IHomeService> _homeService;
     private readonly Lazy<IRecommendationService> _recommendService;
-    public ServiceManager(IRepositoryManager repositoryManager,ICacheService cacheService, UserManager<User> userManager, IConfiguration configuration)
+    public ServiceManager(IRepositoryManager repositoryManager, ICacheService cacheService, UserManager<User> userManager, IConfiguration configuration)
     {
         _cacheService = cacheService;
         _repositoryManager = repositoryManager;

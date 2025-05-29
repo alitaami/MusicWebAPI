@@ -1,6 +1,7 @@
 ﻿using Entities.Base;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MusicWebAPI.Domain.Entities
 {
@@ -12,6 +13,7 @@ namespace MusicWebAPI.Domain.Entities
         public DateTime ReleaseDate { get; set; }
 
         // Navigation Properties
+        [ForeignKey("UserId")]
         public User Artist { get; set; }
         public ICollection<Song> Songs { get; set; }
     }

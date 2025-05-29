@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MusicWebAPI.Infrastructure.Caching.Base
+namespace MusicWebAPI.Domain.External.Caching
 {
     public interface ICacheService
     {

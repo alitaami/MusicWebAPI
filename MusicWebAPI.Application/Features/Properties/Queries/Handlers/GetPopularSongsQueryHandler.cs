@@ -2,8 +2,8 @@
 using MusicWebAPI.Application.Commands;
 using MusicWebAPI.Core;
 using MusicWebAPI.Core.Resources;
+using MusicWebAPI.Domain.External.Caching;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
-using MusicWebAPI.Infrastructure.Caching.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;

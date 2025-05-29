@@ -1,17 +1,7 @@
 ﻿using MediatR;
-using MusicWebAPI.Application.Commands;
-using MusicWebAPI.Core;
-using MusicWebAPI.Core.Resources;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
-using MusicWebAPI.Infrastructure.Caching.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using static MusicWebAPI.Application.ViewModels.HomeViewModel;
-using static MusicWebAPI.Application.ViewModels.UserViewModel;
 
 namespace MusicWebAPI.Application.Features.Properties.Queries.Handlers
 {
