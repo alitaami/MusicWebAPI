@@ -133,7 +133,7 @@ docker-compose up --build -d
   The <code>.env</code> file is not included in the repository. Developers who want to test the app can download it from the following Google Drive link:
 </p>
 <p>
-  <a href="https://docs.google.com/document/d/1ysQWdMN3I2koneb0sOkb0dh_oU01MePLkf0-RU7mAEY/edit?usp=sharing" target="_blank">
+  <a href="https://drive.google.com/file/d/1PISHbiUgCH54-B5mt7jEKzO2ubvsgrvK/view?usp=drive_link" target="_blank">
     👉 Access .env file
   </a>
 </p>
