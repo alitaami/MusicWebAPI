@@ -133,6 +133,19 @@ docker-compose up --build -d
   <li><strong>Default Database:</strong> MusicDb</li>
 </ul>
 
+<h3>📄 Environment Variables</h3>
+<p>
+  The <code>.env</code> file is not included in the repository. Developers who want to test the app can download it from the following Google Drive link:
+</p>
+<p>
+  <a href="https://docs.google.com/document/d/1ysQWdMN3I2koneb0sOkb0dh_oU01MePLkf0-RU7mAEY/edit?usp=sharing" target="_blank">
+    👉 Access .env file
+  </a>
+</p>
+<p>
+  After downloading, place the <code>.env</code> file in the root of the <code>MusicWebApi.API</code> layer.
+</p>
+
 <h2>📜 License</h2>
 <p>This project is licensed under the <strong>MIT License</strong>.</p>
 
