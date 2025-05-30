@@ -97,8 +97,8 @@ services:
       - INDEX_FORMAT=${INDEX_FORMAT}  
       - API_URL=${API_URL} 
     depends_on:
-      minio-init:
-        condition: service_completed_successfully
+      # minio-init:
+        # condition: service_completed_successfully
       postgres:
         condition: service_healthy
     healthcheck:
