@@ -48,7 +48,7 @@
   </a>
 </p>
 <p>
-  After downloading, place the<code>.env & AppSettings.json</code> files in the root of the <code>MusicWebApi.API</code> layer.
+  After downloading, place the<code>.env & appsettings.json</code> files in the root of the <code>MusicWebApi.API</code> layer.
 </p>
 
 <h2>🐳 Running the Project</h2>
@@ -64,13 +64,17 @@ docker-compose up --build -d
 </code></pre>
 
 <h2>📂 Project Structure (Clean Architecture)</h2>
-<pre><code>/src
-  ├── MusicWebApi.API                  → Web entry point
-  ├── MusicWebApi.Application          → Business logic and use cases
-  ├── MusicWebApi.Domain               → Core domain models/entities
-  ├── MusicWebApi.Infrastructure       → EF Core, external services, logging
-  └── MusicWebApi.Core                 → Shared constants, utilities, resources
-</code></pre>
+<pre><code>/tests
+  ├── MusicWebAPI.UnitTests            → Unit Tests
+  </code> 
+<code>/src
+  ├── MusicWebAPI.API                  → Web entry point
+  ├── MusicWebAPI.Application          → Business logic and use cases
+  ├── MusicWebAPI.Domain               → Core domain models/entities
+  ├── MusicWebAPI.Infrastructure       → EF Core, external services, logging
+  └── MusicWebAPI.Core                 → Shared constants, utilities, resources
+</code>
+</pre>
 
 <h2>🔐 Authentication</h2>
 <p>JWT Bearer Authentication is enabled. Use your token in Swagger via the <code>Authorize</code> button.</p>
