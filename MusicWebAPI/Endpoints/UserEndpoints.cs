@@ -21,11 +21,11 @@ namespace MusicWebAPI.API.Endpoints
         public static void RegisterUserEndpoints(WebApplication app)
         {
             // Register user endpoint
-            app.MapPost("/api/register", async (IMediator mediator, RegisterUserCommand command) =>
+            app.MapPost("/api/register", async (IMediator mediator, RegisterUserCommand command, HttpContext httpContext) =>
             {
-                var user = await mediator.Send(command);
+                var token = await mediator.Send(command);
 
-                return Ok(user);
+                return Ok(token);
             })
             .WithName("RegisterUser")
             .Produces<RegisterUserViewModel>(StatusCodes.Status200OK)
@@ -39,8 +39,6 @@ namespace MusicWebAPI.API.Endpoints
             {
                 // getting JWT token
                 var token = await mediator.Send(command);
-
-                await AppendTokenToCookies(httpContext, token.Token);
 
                 return Ok(token);
 

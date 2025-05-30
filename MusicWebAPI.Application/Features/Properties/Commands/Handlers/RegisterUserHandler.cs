@@ -25,7 +25,7 @@ namespace MusicWebAPI.Application.Commands.Handlers
         public async Task<RegisterUserViewModel> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
             // Call the UserService to register the user
-            var registeredUser = await _serviceManager.User.RegisterUser(new User
+            var token = await _serviceManager.User.RegisterUser(new User
             {
                 UserName = request.UserName,
                 Email = request.Email,
@@ -33,9 +33,10 @@ namespace MusicWebAPI.Application.Commands.Handlers
                 IsArtist = request.IsArtist
             }, request.Password);
 
-            var result = _mapper.Map<RegisterUserViewModel>(registeredUser);
-
-            return result;
+            return new RegisterUserViewModel
+            {
+                Token = token
+            };
         }
     }
 }

@@ -34,6 +34,7 @@ public static class SeedData
                     NormalizedEmail = "SUPERUSER@GMAIL.COM",
                     NormalizedUserName = "SUPERUSER",
                     Bio = "SuperUser..",
+                    IsApproved = true,
                     IsArtist = null, // SuperUser must get a null value for IsArtist
                     SecurityStamp = Guid.NewGuid().ToString(),  
                     ConcurrencyStamp = Guid.NewGuid().ToString()  
@@ -61,6 +62,7 @@ public static class SeedData
                     NormalizedUserName = "DARIUSH",
                     Bio = "Artist bio",
                     IsArtist = true,
+                    IsApproved = true,
                     SecurityStamp = Guid.NewGuid().ToString(),  // Required field for Identity
                     ConcurrencyStamp = Guid.NewGuid().ToString()  
                 };
@@ -85,6 +87,7 @@ public static class SeedData
                     Bio = "User bio",
                     IsArtist = false,
                     NormalizedEmail = "ALITAAMI@GMAIL.COM",
+                    IsApproved = true,
                     SecurityStamp = Guid.NewGuid().ToString(),  // Required field for Identity
                     ConcurrencyStamp = Guid.NewGuid().ToString()  
                 };
@@ -112,6 +115,7 @@ public static class SeedData
                         NormalizedUserName = artistName.ToUpper(),
                         Bio = $"{artistName} bio",
                         IsArtist = true,
+                        IsApproved = true,
                         SecurityStamp = Guid.NewGuid().ToString(),
                         ConcurrencyStamp = Guid.NewGuid().ToString()
                     };

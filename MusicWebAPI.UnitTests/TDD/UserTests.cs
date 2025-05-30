@@ -56,27 +56,18 @@ namespace MusicWebAPI.UnitTests.TDD
                 Bio = "test"
             };
 
-            var expectedViewModel = new RegisterUserViewModel
-            {
-                Id = "123",
-                FullName = "Test User",
-                IsArtist = false,
-                Bio = "test"
-            };
-
+            var expectedToken = "some-jwt-token";
+             
             _serviceManagerMock.Setup(s => s.User.RegisterUser(It.IsAny<User>(), It.IsAny<string>()))
-                .ReturnsAsync(userEntity);
-
-            _mapperMock.Setup(m => m.Map<RegisterUserViewModel>(It.IsAny<User>()))
-                .Returns(expectedViewModel);
-
+                .ReturnsAsync(expectedToken);
+             
             // Act
             var result = await _registerUserHandler.Handle(command, CancellationToken.None);
 
             // Assert
             Assert.IsNotNull(result);
-            Assert.AreEqual(expectedViewModel.Id, result.Id);
-            Assert.AreEqual(expectedViewModel.FullName, result.FullName);
+            Assert.AreEqual(expectedToken, result.Token);
+            _serviceManagerMock.Verify(service => service.User.LoginUser(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Test]

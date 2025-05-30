@@ -27,7 +27,7 @@ namespace MusicWebAPI.Application.Services
         }
 
         #region Authorization & Authentication
-        public async Task<User> RegisterUser(User user, string password)
+        public async Task<string> RegisterUser(User user, string password)
         {
             if (await IsUserExists(user.Email, user.UserName))
                 throw new LogicException(Resource.DuplicateUserError);
@@ -39,7 +39,9 @@ namespace MusicWebAPI.Application.Services
 
             await AssignRole(user, user.IsArtist);
 
-            return user;
+            var token = JwtHelper.GenerateToken(user, _configuration);
+
+            return token;
         }
 
         public async Task<string> LoginUser(string email, string password)

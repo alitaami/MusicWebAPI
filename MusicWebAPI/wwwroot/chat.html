@@ -76,10 +76,19 @@
             border-radius: 4px;
         }
 
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 550px;
+            overflow: hidden; /* no scroll here */
+        }
+
         #messagesList {
             list-style: none;
             padding: 0;
             margin: 0;
+            max-height: 550px; /* same or less than parent height */
+            overflow-y: auto; /* scroll only here */
         }
 
             #messagesList li {
@@ -109,7 +118,6 @@
             margin: 12px 0;
             font-style: italic;
         }
-
 
         .message-input {
             display: flex;
@@ -153,12 +161,6 @@
             border: 1px solid #ddd;
         }
 
-        #messagesList {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
         .message {
             max-width: 70%;
             padding: 10px 14px;
@@ -190,59 +192,200 @@
                 border-bottom-left-radius: 0;
                 margin-right: auto;
             }
+
+        .auth-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            background: #ffffff;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease-in-out;
+        }
+
+            .auth-container h2 {
+                text-align: center;
+                margin-bottom: 20px;
+                color: #333;
+                font-weight: 600;
+            }
+
+            .auth-container input[type="text"],
+            .auth-container input[type="email"],
+            .auth-container input[type="password"] {
+                width: 100%;
+                padding: 12px;
+                margin-bottom: 14px;
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                font-size: 14px;
+                transition: border-color 0.2s ease-in-out;
+            }
+
+            .auth-container input:focus {
+                outline: none;
+                border-color: #4285f4;
+                box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+            }
+
+            .auth-container button {
+                width: 100%;
+                padding: 12px;
+                background: #4285f4;
+                color: white;
+                border: none;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background 0.3s ease-in-out;
+            }
+
+                .auth-container button:hover {
+                    background: #2c6cd4;
+                }
+
+            .auth-container p {
+                text-align: center;
+                font-size: 13px;
+                margin-top: 15px;
+            }
+
+            .auth-container a {
+                color: #4285f4;
+                text-decoration: none;
+            }
+
+                .auth-container a:hover {
+                    text-decoration: underline;
+                }
+
+        .checkbox-container {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            user-select: none;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+            .checkbox-label input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+                accent-color: #4285f4;
+                cursor: pointer;
+            }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@latest/dist/browser/signalr.min.js"></script>
 </head>
 <body>
-    <div class="main-container">
-        <!-- Chat Section -->
-        <div class="chat-section">
-            <div class="header">
-                <!--<input type="text" id="userId" placeholder="UserId" />-->
-                <select id="groupName">
-                    <option value="">Select Group</option>
-                </select>
-                <button id="joinGroup">Join</button>
-                <button id="leaveGroup">Leave</button>
-            </div>
+    <div class="auth-container auth-overlay" id="authWrapper">
+        <div class="auth-container">
+            <div id="authForms">
+                <div id="loginForm">
+                    <h2>Login</h2>
+                    <input type="text" id="loginUsername" placeholder="Username" />
+                    <input type="password" id="loginPassword" placeholder="Password" />
+                    <button onclick="login()">Login</button>
+                    <p>No account? <a href="#" onclick="toggleForm('register')">Register here</a></p>
+                </div>
 
-            <div class="chat-box">
-                <ul id="messagesList"></ul>
-            </div>
+                <div id="registerForm" style="display: none;">
+                    <h2>Register</h2>
+                    <input type="text" id="registerUsername" placeholder="Username" />
+                    <input type="email" id="registerEmail" placeholder="Email" />
+                    <input type="password" id="registerPassword" placeholder="Password" />
 
-            <div id="replyContext" style="margin-bottom: 5px; color: #555; font-size: 14px; display: none;">
-                Replying to <span id="replyToText"></span>
-                <button onclick="clearReply()" style="margin-left: 10px; font-size: 12px;">✖ Cancel</button>
-            </div>
+                    <div class="checkbox-container">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="isArtistCheckbox" />
+                            I am an artist
+                        </label>
+                    </div>
 
-            <div class="message-input">
-                <input type="text" id="messageInput" placeholder="Type your message..." />
-                <button id="sendButton">Send</button>
-            </div>
-        </div>
-
-        <!-- Members Section -->
-        <div class="sidebar">
-            <h3>Group Members</h3>
-            <div id="membersList">
-                <!-- Dynamic user list -->
+                    <button onclick="register()">Register</button>
+                    <p>Already have an account? <a href="#" onclick="toggleForm('login')">Login here</a></p>
+                </div>
             </div>
         </div>
     </div>
 
+    <div id="chatContainer" style="display: none;">
+        <div class="main-container">
+            <!-- Chat Section -->
+            <div class="chat-section">
+                <div class="header">
+                    <select id="groupName">
+                        <option value="">Select Group</option>
+                    </select>
+                    <button id="joinGroup">Join</button>
+                    <button id="leaveGroup">Leave</button>
+                    <button id="logoutBtn" onclick="deleteCookie('access_token')" style="margin-left: auto; background-color: #EE4B2B; color: white; border: none; padding: 5px 10px; cursor: pointer;">
+                        Logout
+                    </button>
+                </div>
+                <div class="chat-box">
+                    <ul id="messagesList"></ul>
+                </div>
+
+                <div id="replyContext" style="margin-bottom: 5px; color: #555; font-size: 14px; display: none;">
+                    Replying to <span id="replyToText"></span>
+                    <button onclick="clearReply()" style="margin-left: 10px; font-size: 12px;">✖ Cancel</button>
+                </div>
+
+                <div class="message-input">
+                    <input type="text" id="messageInput" placeholder="Type your message..." />
+                    <button id="sendButton">Send</button>
+                </div>
+            </div>
+
+            <!-- Members Section -->
+            <div class="sidebar">
+                <h3>Group Members</h3>
+                <div id="membersList">
+                    <!-- Dynamic user list -->
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         "use strict";
 
+        const registerUrl = 'http://localhost:8080/api/register';
+        const loginUrl = 'http://localhost:8080/api/login';
+        const deferredSystemMessages = [];
         let connection = null;
         let groupName = '';
         let username = '';
         let userId = '';
         let isJoined = false;
-        const deferredSystemMessages = [];
         let chatHistoryLoaded = false;
         let replyToMessageId = null;
         let replyToContent = null;
         let replyToSenderUsername = null;
+
+        function scrollToBottom() {
+            setTimeout(() => {
+                messagesList.scrollTop = messagesList.scrollHeight;
+            }, 0); // Delay ensures DOM updates are rendered
+        }
 
         function setReplyContext(message) {
             replyToMessageId = message.id;
@@ -299,11 +442,21 @@
             }
         }
 
+        function setCookie(name, value, days = 1) {
+            const expires = new Date(Date.now() + days * 864e5).toUTCString(); 
+            document.cookie = `${name}=${value}; expires=${expires}; path=/`;
+        }
+
         function getCookie(name) {
             const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
             if (match) return decodeURIComponent(match[2]);
             return null;
         }
+
+        function deleteCookie(name) {
+            document.cookie = name + '=; Max-Age=0; path=/;';
+            location.reload();
+        } 
 
         function clearReply() {
             replyToMessageId = null;
@@ -415,8 +568,8 @@
                     replyBox.appendChild(replyContent);
 
                     replyBox.onclick = () => {
-                        console.log(`Clicked reply preview for message ID: ${message.replyToMessageId}`);
-                        // scrollToMessage(message.replyToMessageId);
+                        //console.log(`Clicked reply preview for message ID: ${message.replyToMessageId}`);
+                        //scrollToMessage(message.replyToMessageId);
                     };
 
                     msgContainer.appendChild(replyBox);
@@ -462,7 +615,7 @@
 
                 li.appendChild(msgContainer);
                 messagesList.appendChild(li);
-                messagesList.scrollTop = messagesList.scrollHeight;
+                scrollToBottom();
             });
 
             connection.on("MessageDeleted", (messageId) => {
@@ -489,6 +642,7 @@
                         deferredSystemMessages.push(li);
                     } else {
                         messagesList.appendChild(li);
+                        scrollToBottom();
                     }
 
                     await connection.invoke("GetGroupMembers", groupName);
@@ -508,6 +662,7 @@
                         deferredSystemMessages.push(li);
                     } else {
                         messagesList.appendChild(li);
+                        scrollToBottom();
                     }
 
                     await connection.invoke("GetGroupMembers", groupName);
@@ -598,7 +753,7 @@
                         setReplyContext(msg);
                     };
                     msgContainer.appendChild(replyBtn);
-
+ 
                     // ✅ Delete button (only for own messages)
                     if (isOwn) {
                         const deleteBtn = document.createElement("button");
@@ -628,6 +783,8 @@
                 deferredSystemMessages.forEach(msg => {
                     messagesList.appendChild(msg);
                 });
+                scrollToBottom();
+
                 deferredSystemMessages.length = 0;
             });
 
@@ -664,6 +821,9 @@
                 await connection.invoke("GetGroupMembers", groupName);
                 await connection.invoke("GetChats", groupName, 0, 50);
                 isJoined = true;
+                scrollToBottom();
+                messageInput.focus();
+
             } catch (err) {
                 console.error("Join failed:", err.toString());
             }
@@ -686,7 +846,6 @@
             }
         });
 
-
         sendBtn.addEventListener("click", async () => {
             const message = messageInput.value.trim();
 
@@ -701,12 +860,13 @@
                 await connection.invoke("SendMessage", groupName, userId, message, replyToMessageId);
                 messageInput.value = '';
                 clearReply(); // reset reply context
+                scrollToBottom();
 
             } catch (err) {
                 console.error("Failed to send message:", err.toString());
             }
         });
-         
+
         messageInput.addEventListener("keydown", async (e) => {
             if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -731,6 +891,117 @@
                 console.error("Error loading groups:", error);
             }
         });
+
+        function toggleForm(form) {
+            document.getElementById('loginForm').style.display = form === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = form === 'register' ? 'block' : 'none';
+        }
+
+        async function login() {
+            const email = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                alert('Please enter username and password.');
+                return;
+            }
+
+            try {
+                const response = await fetch(loginUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                const data = await response.json();
+
+                if (response.status === 422 || response.status === 401) {
+                    alert(data.errorMessage || 'Validation error occurred');
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.errorMessage || 'Login failed');
+                }
+
+                console.log('Login successful:', data);
+
+                //Save token to cookie
+                setCookie('access_token', data.data.token);
+
+                //show chat section after login
+                document.querySelector('.auth-container').style.display = 'none';
+                document.getElementById('chatContainer').style.display = 'block';
+
+            } catch (error) {
+                console.error('Login error:', error.message);
+                alert(error.message);
+            }
+        }
+
+        async function register() {
+            const userName = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const isArtist = document.getElementById('isArtistCheckbox').checked;
+
+            if (!userName || !email || !password) {
+                alert('Please fill in all fields.');
+                return;
+            }
+
+            try {
+                const response = await fetch(registerUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userName,       // username
+                        email,
+                        password,
+                        fullName: userName,  // assuming fullName = userName here, adjust if you want separate input
+                        isArtist
+                    }),
+                });
+
+                const data = await response.json();
+                 
+                if (response.status === 422 || response.status === 401) {
+                    alert(data.errorMessage || 'Validation error occurred');
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(data.errorMessage || 'Registration failed');
+                }
+
+                // Save token to cookie
+                setCookie('access_token', data.data.token);
+
+                //show chat section after registration
+                document.querySelector('.auth-container').style.display = 'none';
+                document.getElementById('chatContainer').style.display = 'block';
+            } catch (error) {
+                console.error('Register error:', error.message);
+                alert(error.message);
+            }
+        }
+
+        window.onload = function () {
+            const accessToken = getCookie('access_token');
+
+            if (accessToken) {
+                // Token found — show chat, hide login/register
+                document.getElementById('chatContainer').style.display = 'block';
+                document.getElementById('authWrapper').style.display = 'none';
+            } else {
+                // No token — show login form, hide chat and register
+                document.getElementById('chatContainer').style.display = 'none';
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('registerForm').style.display = 'none';
+            }
+        };
     </script>
 
 </body>
