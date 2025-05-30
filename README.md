@@ -51,7 +51,7 @@ docker-compose up --build -d
   ├── MusicWebApi.Application          → Business logic and use cases
   ├── MusicWebApi.Domain               → Core domain models/entities
   ├── MusicWebApi.Infrastructure       → EF Core, external services, logging
-  └── MusicWebApi.Core                 → Shared constants, utilities
+  └── MusicWebApi.Core                 → Shared constants, utilities, resources
 </code></pre>
 
 <h2>🔐 Authentication</h2>
@@ -126,7 +126,6 @@ docker-compose up --build -d
   <li><strong>Password:</strong> sa123</li>
   <li><strong>Default Database:</strong> MusicDb</li>
 </ul>
-
 
 <h2>📄 Environment Variables</h2>
 <p>
