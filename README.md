@@ -27,7 +27,7 @@
   <tr><td><strong>Auth</strong></td><td>JWT Bearer Token</td></tr>
   <tr><td><strong>Docs</strong></td><td>Swagger / OpenAPI</td></tr>
   <tr><td><strong>Containerization</strong></td><td>Docker, Docker Compose</td></tr>
-  <tr><td><strong>Database</strong></td><td>SQL Server (customizable)</td></tr>
+  <tr><td><strong>Database</strong></td><td>PostgreSQL</td></tr>
 </table>
 
 <h2>📦 Getting Started</h2>
@@ -62,7 +62,28 @@ docker-compose up --build -d
 
 <h2>🔐 Authentication</h2>
 <p>JWT Bearer Authentication is enabled. Use your token in Swagger via the <code>Authorize</code> button.</p>
-<p>Roles (e.g., <code>SuperUser</code>, <code>Artist</code>) are embedded in the JWT claims.</p>
+<p>Roles (<code>User</code>, <code>SuperUser</code>, <code>Artist</code>) are embedded in the JWT claims.</p>
+<h3>🧪 Test Accounts</h3>
+<ul>
+  <li><strong>SuperUser</strong>
+    <pre><code>{
+  "email": "SuperUser@gmail.com",
+  "password": "superUser123"
+}</code></pre>
+  </li>
+  <li><strong>User</strong>
+    <pre><code>{
+  "email": "alitaami@gmail.com",
+  "password": "19851381"
+}</code></pre>
+  </li>
+  <li><strong>Artist</strong>
+    <pre><code>{
+  "email": "dariush@gmail.com",
+  "password": "19851381"
+}</code></pre>
+  </li>
+</ul>
 
 <h2>📘 Swagger UI</h2>
 <p><strong>URL:</strong> <a href="http://localhost:8080/swagger/index.html">http://localhost:8080/swagger/index.html</a></p>
@@ -99,6 +120,17 @@ docker-compose up --build -d
   <li>Follows Clean Architecture principles</li>
   <li>SOLID principles applied</li>
   <li>Centralized logging via Serilog</li>
+</ul>
+
+<h2>🛢️ Database Access</h2>
+<p>If you want to connect to the database locally using <a href="https://www.beekeeperstudio.io/">Beekeeper Studio</a> or any PostgreSQL client, use the following credentials:</p>
+<ul>
+  <li><strong>Connection Type:</strong> PostgreSQL</li>
+  <li><strong>Host:</strong> localhost</li>
+  <li><strong>Port:</strong> 5432</li>
+  <li><strong>User:</strong> sa</li>
+  <li><strong>Password:</strong> sa123</li>
+  <li><strong>Default Database:</strong> MusicDb</li>
 </ul>
 
 <h2>📜 License</h2>
