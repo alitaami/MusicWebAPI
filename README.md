@@ -33,9 +33,9 @@
   <li><a href="https://docs.docker.com/compose/">Docker Compose</a></li>
 </ul>
 
-<h2>📄 Environment(.env) & AppSettings(AppSettings.json) files </h2>
+<h2>📄 Environment(.env) & AppSettings(appsettings.json) files </h2>
 <p>
-  The<code>.env & AppSettings.json</code> files are not included in the repository. Developers who want to test the app can download it from the following Google Drive link:
+  The<code>.env & appsettings.json</code> files are not included in the repository. Developers who want to test the app can download it from the following Google Drive link:
 </p>
 <p>
   <a href="https://drive.google.com/file/d/1PISHbiUgCH54-B5mt7jEKzO2ubvsgrvK/view?usp=drive_link" target="_blank">
@@ -44,7 +44,7 @@
   </p>
   <p>
     <a href="https://drive.google.com/file/d/1iysuL5EzC4rUrbHnlBEka4qJZUSlayZE/view?usp=drive_link" target="_blank">
-    👉 Access AppSettings.json file
+    👉 Access appsettings.json file
   </a>
 </p>
 <p>
@@ -74,7 +74,7 @@ docker-compose up --build -d
 
 <h2>🔐 Authentication</h2>
 <p>JWT Bearer Authentication is enabled. Use your token in Swagger via the <code>Authorize</code> button.</p>
-<p>Roles (<code>User</code>, <code>SuperUser</code>, <code>Artist</code>) are embedded in the JWT claims.</p>
+<p>Roles (<code>SuperUser</code>, <code>Artist</code>, <code>User</code>) are embedded in the JWT claims.</p>
 <h3>🧪 Test Accounts</h3>
 <ul>
   <li><strong>SuperUser</strong>
