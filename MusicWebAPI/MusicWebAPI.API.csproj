@@ -46,7 +46,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="wwwroot\chat.html" />
+	  <None Include="wwwroot\Content\Views\chat.html" />
 	</ItemGroup>
 
 </Project>

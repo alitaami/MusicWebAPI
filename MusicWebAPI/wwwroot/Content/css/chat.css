@@ -1,0 +1,297 @@
+﻿* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #e8ebf0;
+}
+
+#groupName {
+    width: 250px;
+    height: 40px;
+    padding: 5px 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+    #groupName:focus {
+        border-color: #4a90e2;
+        box-shadow: 0 0 8px rgba(74, 144, 226, 0.4);
+        outline: none;
+    }
+
+.main-container {
+    display: flex;
+    height: 100vh;
+}
+
+.chat-section {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background-color: #ffffff;
+    border-right: 1px solid #ccc;
+}
+
+.header {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+    .header input {
+        padding: 8px;
+        flex: 1;
+    }
+
+    .header button {
+        padding: 8px 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+.chat-box {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: #f7f7f7;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 550px;
+    overflow: hidden; /* no scroll here */
+}
+
+#messagesList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 550px; /* same or less than parent height */
+    overflow-y: auto; /* scroll only here */
+}
+
+    #messagesList li {
+        margin-bottom: 10px;
+        line-height: 1.4;
+        display: flex;
+        justify-content: flex-start; /* default align left */
+    }
+
+        #messagesList li.own {
+            justify-content: flex-end; /* align right */
+        }
+
+        #messagesList li.system-message {
+            justify-content: center !important;
+            display: block;
+            text-align: center;
+            font-style: italic;
+            font-size: 13px;
+            color: #888;
+            margin: 8px 0;
+        }
+
+.system-message {
+    font-size: 13px;
+    color: #666;
+    margin: 12px 0;
+    font-style: italic;
+}
+
+.message-input {
+    display: flex;
+    gap: 10px;
+}
+
+    .message-input input {
+        flex: 1;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+
+    .message-input button {
+        padding: 10px 16px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+.sidebar {
+    flex: 1;
+    background-color: #f1f5f9;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+    .sidebar h3 {
+        margin-top: 0;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+.member-item {
+    padding: 6px 10px;
+    background-color: #fff;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.message {
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    display: inline-block;
+    font-size: 15px;
+    flex-shrink: 1;
+}
+
+    .message.own {
+        background-color: #007bff;
+        color: white;
+        align-self: flex-end;
+        text-align: right;
+        border-radius: 12px;
+        border-bottom-right-radius: 0;
+        margin-left: auto;
+    }
+
+    .message.other {
+        background-color: #e2e3e5;
+        color: black;
+        align-self: flex-start;
+        text-align: left;
+        border-radius: 12px;
+        border-bottom-left-radius: 0;
+        margin-right: auto;
+    }
+
+.auth-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+}
+
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    padding: 30px;
+    background: #ffffff;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    transition: all 0.3s ease-in-out;
+}
+
+    .auth-container h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .auth-container input[type="text"],
+    .auth-container input[type="email"],
+    .auth-container input[type="password"] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 14px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: border-color 0.2s ease-in-out;
+    }
+
+    .auth-container input:focus {
+        outline: none;
+        border-color: #4285f4;
+        box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+    }
+
+    .auth-container button {
+        width: 100%;
+        padding: 12px;
+        background: #4285f4;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s ease-in-out;
+    }
+
+        .auth-container button:hover {
+            background: #2c6cd4;
+        }
+
+    .auth-container p {
+        text-align: center;
+        font-size: 13px;
+        margin-top: 15px;
+    }
+
+    .auth-container a {
+        color: #4285f4;
+        text-decoration: none;
+    }
+
+        .auth-container a:hover {
+            text-decoration: underline;
+        }
+
+.checkbox-container {
+    margin: 15px 0;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    user-select: none;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+    .checkbox-label input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #4285f4;
+        cursor: pointer;
+    }
+
+.logout-btn {
+    background-color: #EE4B2B !important;
+    color: white !important;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-left: auto;
+}

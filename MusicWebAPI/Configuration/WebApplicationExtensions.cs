@@ -27,6 +27,7 @@ public static class WebApplicationExtensions
             #endregion
 
             app.MapGet("/", () => Results.Redirect("/swagger/index.html"));
+            app.MapGet("/chat", () => Results.Redirect("/Content/Views/chat.html"));
 
             app.UseHttpsRedirection();
             app.UseHsts();
