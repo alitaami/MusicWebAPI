@@ -1,10 +1,4 @@
-<h1>🎵 Music Web API</h1>
-
-<p>
-  A powerful, containerized .NET Web API project with built-in support for <strong>Hangfire scheduling</strong>,
-  <strong>JWT-based authentication</strong>, <strong>Swagger for API documentation</strong>,
-  <strong>SignalR real-time chat</strong>, and <strong>Kibana log monitoring</strong>.
-</p>
+<h1>🎵 Music Web API</h1> <p> A powerful, containerized .NET Web API project inspired by <strong>Spotify</strong>, featuring built-in support for <strong>Hangfire scheduling</strong>, <strong>JWT-based authentication</strong>, <strong>Swagger for API documentation</strong>, <strong>SignalR real-time chat</strong>, and <strong>Kibana log monitoring</strong>. </p>
 
 <h2>🚀 Project Features</h2>
 <ul>
