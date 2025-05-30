@@ -133,7 +133,8 @@ docker-compose up --build -d
   <li><strong>Default Database:</strong> MusicDb</li>
 </ul>
 
-<h3>📄 Environment Variables</h3>
+
+<h2>📄 Environment Variables</h2>
 <p>
   The <code>.env</code> file is not included in the repository. Developers who want to test the app can download it from the following Google Drive link:
 </p>
