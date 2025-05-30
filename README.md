@@ -33,6 +33,24 @@
   <li><a href="https://docs.docker.com/compose/">Docker Compose</a></li>
 </ul>
 
+<h2>📄 Environment(.env) & AppSettings(AppSettings.json) files </h2>
+<p>
+  The<code>.env & AppSettings.json</code> files are not included in the repository. Developers who want to test the app can download it from the following Google Drive link:
+</p>
+<p>
+  <a href="https://drive.google.com/file/d/1PISHbiUgCH54-B5mt7jEKzO2ubvsgrvK/view?usp=drive_link" target="_blank">
+    👉 Access .env file
+  </a>
+  </p>
+  <p>
+    <a href="https://drive.google.com/file/d/1iysuL5EzC4rUrbHnlBEka4qJZUSlayZE/view?usp=drive_link" target="_blank">
+    👉 Access AppSettings.json file
+  </a>
+</p>
+<p>
+  After downloading, place the<code>.env & AppSettings.json</code> files in the root of the <code>MusicWebApi.API</code> layer.
+</p>
+
 <h2>🐳 Running the Project</h2>
 
 <h3>First-Time Setup or After Major DB/Data Changes:</h3>
@@ -126,19 +144,6 @@ docker-compose up --build -d
   <li><strong>Password:</strong> sa123</li>
   <li><strong>Default Database:</strong> MusicDb</li>
 </ul>
-
-<h2>📄 Environment Variables</h2>
-<p>
-  The <code>.env</code> file is not included in the repository. Developers who want to test the app can download it from the following Google Drive link:
-</p>
-<p>
-  <a href="https://drive.google.com/file/d/1PISHbiUgCH54-B5mt7jEKzO2ubvsgrvK/view?usp=drive_link" target="_blank">
-    👉 Access .env file
-  </a>
-</p>
-<p>
-  After downloading, place the <code>.env</code> file in the root of the <code>MusicWebApi.API</code> layer.
-</p>
 
 <h2>📜 License</h2>
 <p>This project is licensed under the <strong>MIT License</strong>.</p>
