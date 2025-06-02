@@ -147,7 +147,7 @@ function registerEventHandlers() {
 
     connection.on("ReceiveMessage", (message) => {
         const li = document.createElement("li");
-        li.id = `message-${message.id}`; // Important: assign an ID for future reference
+        li.id = `message-${message.id}`;
 
         const isOwn = message.senderUsername === username;
 
@@ -155,42 +155,26 @@ function registerEventHandlers() {
         msgContainer.className = `message ${isOwn ? 'own' : 'other'}`;
 
         const meta = document.createElement("div");
-        meta.style.fontSize = "12px";
-        meta.style.color = "#555";
-        meta.style.marginBottom = "4px";
+        meta.className = "message-meta";
         meta.textContent = `${message.senderUsername} • ${new Date(message.sentAt).toLocaleTimeString()}`;
         msgContainer.appendChild(meta);
 
-        // Improved reply preview box (if this message is a reply)
         if (message.replyToContent && !message.replyToDeleted) {
             const replyBox = document.createElement("div");
-            replyBox.style.fontSize = "13px";
-            replyBox.style.color = "#444";
-            replyBox.style.background = "#e8f0fe";
-            replyBox.style.borderLeft = "4px solid #4285f4";
-            replyBox.style.padding = "8px 12px";
-            replyBox.style.marginBottom = "6px";
-            replyBox.style.borderRadius = "6px";
-            replyBox.style.cursor = "pointer";
-            replyBox.style.userSelect = "none";
-            replyBox.style.maxWidth = "80%";
-
+            replyBox.className = "reply-box";
             replyBox.title = `Replying to ${message.replyToSenderUsername}: ${message.replyToContent}`;
 
             const replyUsername = document.createElement("span");
-            replyUsername.style.fontWeight = "600";
-            replyUsername.style.color = "#1a73e8";
+            replyUsername.className = "reply-username";
             replyUsername.textContent = message.replyToSenderUsername;
 
-            // Manually trim content if needed
             let trimmedReplyContent = message.replyToContent;
             if (trimmedReplyContent.length > 20) {
                 trimmedReplyContent = trimmedReplyContent.substring(0, 20) + "...";
             }
 
             const replyContent = document.createElement("span");
-            replyContent.style.fontStyle = "italic";
-            replyContent.style.marginLeft = "6px";
+            replyContent.className = "reply-content";
             replyContent.textContent = trimmedReplyContent;
 
             replyBox.appendChild(replyUsername);
@@ -198,8 +182,7 @@ function registerEventHandlers() {
             replyBox.appendChild(replyContent);
 
             replyBox.onclick = () => {
-                //console.log(`Clicked reply preview for message ID: ${message.replyToMessageId}`);
-                //scrollToMessage(message.replyToMessageId);
+                // Implement scrollToMessage or relevant function
             };
 
             msgContainer.appendChild(replyBox);
@@ -209,37 +192,26 @@ function registerEventHandlers() {
         content.textContent = message.content;
         msgContainer.appendChild(content);
 
-        // 🔁 Add "Reply" button
+        // Always allow replying
         const replyBtn = document.createElement("button");
+        replyBtn.classList.add("reply-button");
+        if (isOwn) {
+            replyBtn.classList.add("own");
+        }
         replyBtn.textContent = "Reply";
-        replyBtn.style.fontSize = "11px";
-        replyBtn.style.marginTop = "4px";
-        replyBtn.style.background = "transparent";
-        replyBtn.style.border = "none";
-        replyBtn.style.cursor = "pointer";
-        replyBtn.style.color = isOwn ? "#555" : "#007bff";
         replyBtn.onclick = () => {
             setReplyContext(message);
         };
         msgContainer.appendChild(replyBtn);
 
-        // ✅ Delete button (only for own messages)
+        // Only allow delete on own messages
         if (isOwn) {
             const deleteBtn = document.createElement("button");
+            deleteBtn.className = "delete-button";
             deleteBtn.textContent = "Delete";
-            deleteBtn.style.fontSize = "11px";
-            deleteBtn.style.marginLeft = "10px";
-            deleteBtn.style.background = "transparent";
-            deleteBtn.style.border = "none";
-            deleteBtn.style.cursor = "pointer";
-            deleteBtn.style.color = "#EE4B2B";
-            deleteBtn.onmouseenter = () => deleteBtn.style.color = "#B22222"; // Darker red
-            deleteBtn.onmouseleave = () => deleteBtn.style.color = "#EE4B2B";
-
             deleteBtn.onclick = async () => {
                 await connection.invoke("DeleteMessage", groupName, message.id);
             };
-
             msgContainer.appendChild(deleteBtn);
         }
 
@@ -309,15 +281,9 @@ function registerEventHandlers() {
         replyMessageIds.forEach(id => {
             const msgElement = document.getElementById(`message-${id}`);
             if (msgElement) {
-                const msgContainer = msgElement.querySelector(".message");
-                if (msgContainer) {
-                    const divs = msgContainer.querySelectorAll("div");
-                    // replyBox should be second div child
-                    const replyBox = divs[1];
-
-                    if (replyBox && replyBox.style && replyBox.style.borderLeft === "4px solid rgb(66, 133, 244)") {
-                        replyBox.remove();
-                    }
+                const replyBox = msgElement.querySelector(".reply-box");
+                if (replyBox) {
+                    replyBox.remove();
                 }
             }
         });
@@ -326,6 +292,8 @@ function registerEventHandlers() {
     connection.on("ChatHistory", (messages) => {
         messages.reverse().forEach(msg => {
             const li = document.createElement("li");
+            li.id = `message-${msg.id}`;
+
             const isOwn = msg.senderUsername === username;
 
             const msgContainer = document.createElement("div");
@@ -333,43 +301,28 @@ function registerEventHandlers() {
 
             // Meta info (username and time)
             const meta = document.createElement("div");
-            meta.style.fontSize = "12px";
-            meta.style.color = "#555";
-            meta.style.marginBottom = "4px";
+            meta.className = "message-meta";
             meta.textContent = `${msg.senderUsername} • ${new Date(msg.sentAt).toLocaleTimeString()}`;
             msgContainer.appendChild(meta);
 
-            // If this message is a reply, show the replied message context
+            // Reply box if applicable
             if (msg.replyToContent && !msg.replyToDeleted) {
                 const replyBox = document.createElement("div");
-                replyBox.style.fontSize = "13px";
-                replyBox.style.color = "#444";
-                replyBox.style.background = "#e8f0fe";
-                replyBox.style.borderLeft = "4px solid #4285f4";
-                replyBox.style.padding = "8px 12px";
-                replyBox.style.marginBottom = "6px";
-                replyBox.style.borderRadius = "6px";
-                replyBox.style.cursor = "pointer";
-                replyBox.style.userSelect = "none";
-                replyBox.style.maxWidth = "80%";
-
-                // Removed nowrap, overflow, and textOverflow since we handle trimming manually
+                replyBox.className = "reply-box";
                 replyBox.title = `Replying to ${msg.replyToSenderUsername}: ${msg.replyToContent}`;
 
                 const replyUsername = document.createElement("span");
-                replyUsername.style.fontWeight = "600";
-                replyUsername.style.color = "#1a73e8";
+                replyUsername.className = "reply-username";
                 replyUsername.textContent = msg.replyToSenderUsername;
 
-                // Manually trim content to max 20 characters
+                // Trim reply content manually
                 let trimmedContent = msg.replyToContent;
                 if (trimmedContent.length > 20) {
                     trimmedContent = trimmedContent.substring(0, 20) + "...";
                 }
 
                 const replyContent = document.createElement("span");
-                replyContent.style.fontStyle = "italic";
-                replyContent.style.marginLeft = "6px";
+                replyContent.className = "reply-content";
                 replyContent.textContent = trimmedContent;
 
                 replyBox.appendChild(replyUsername);
@@ -378,6 +331,7 @@ function registerEventHandlers() {
 
                 replyBox.onclick = () => {
                     console.log(`Clicked reply preview for message ID: ${msg.replyToMessageId}`);
+                    // You can implement scroll or other UI logic here
                 };
 
                 msgContainer.appendChild(replyBox);
@@ -388,35 +342,26 @@ function registerEventHandlers() {
             content.textContent = msg.content;
             msgContainer.appendChild(content);
 
-            // Add Reply button to enable replying to this message from history
+            // Reply button
             const replyBtn = document.createElement("button");
+            replyBtn.classList.add("reply-button");
+            if (isOwn) {
+                replyBtn.classList.add("own");
+            }
             replyBtn.textContent = "Reply";
-            replyBtn.style.fontSize = "11px";
-            replyBtn.style.marginTop = "4px";
-            replyBtn.style.background = "transparent";
-            replyBtn.style.border = "none";
-            replyBtn.style.cursor = "pointer";
-            replyBtn.style.color = isOwn ? "#555" : "#007bff";
             replyBtn.onclick = () => {
                 setReplyContext(msg);
             };
             msgContainer.appendChild(replyBtn);
 
-            // ✅ Delete button (only for own messages)
+            // Delete button (only own messages)
             if (isOwn) {
                 const deleteBtn = document.createElement("button");
+                deleteBtn.className = "delete-button";
                 deleteBtn.textContent = "Delete";
-                deleteBtn.style.fontSize = "11px";
-                deleteBtn.style.marginLeft = "10px";
-                deleteBtn.style.background = "transparent";
-                deleteBtn.style.border = "none";
-                deleteBtn.style.cursor = "EE4B2B";
-                deleteBtn.style.color = "#FF3131";
-                deleteBtn.onmouseenter = () => deleteBtn.style.color = "#B22222"; // Darker red
-                deleteBtn.onmouseleave = () => deleteBtn.style.color = "#EE4B2B";
 
                 deleteBtn.onclick = async () => {
-                    await connection.invoke("DeleteMessage", groupName, message.id);
+                    await connection.invoke("DeleteMessage", groupName, msg.id);
                 };
 
                 msgContainer.appendChild(deleteBtn);
