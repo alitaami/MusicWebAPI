@@ -160,9 +160,6 @@ docker-compose up --build -d
 </ul>
 <img src="https://github.com/user-attachments/assets/d682a25f-df28-48c1-bfc4-d94817662ae5" alt="Beekeeper Screenshot" />
 
-<h2>📜 License</h2>
-<p>This project is licensed under the <strong>MIT License</strong>.</p>
-
 <h2>🙋‍♂️ Author</h2>
 <p><strong>Ali</strong> – .NET Core Developer in Iran 🇮🇷<br>
 Contact via GitHub or LinkedIn.<br>
