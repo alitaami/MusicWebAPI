@@ -62,11 +62,18 @@ public class ChatHub : Hub
         if (group == null) return;
 
         var message = await _context.Messages.Where(m => m.Id == messageId && m.GroupId == group.Id).FirstOrDefaultAsync();
+        var repliedMessages = await _context.Messages.Where(m => m.ReplyToMessageId == messageId).Select(r=>r.Id).ToListAsync();
         if (message != null)
         {
             message.IsDeleted = true;
             await _context.SaveChangesAsync();
             await Clients.Group(message.Group.Name).SendAsync("MessageDeleted", messageId);
+
+            // Notify clients to refresh replies referencing the deleted message
+            if (repliedMessages.Any())
+            {
+                await Clients.Group(message.Group.Name).SendAsync("RefreshReplies", repliedMessages);
+            }
         }
     }
 
@@ -106,12 +113,13 @@ public class ChatHub : Hub
             message.Id,
             message.Content,
             message.SenderId,
-            SenderUsername = user.UserName,  // Add username here
+            SenderUsername = user.UserName, 
             message.SentAt,
             message.ReplyToMessageId,
             ReplyToContent = message.ReplyTo != null ? message.ReplyTo.Content : null,
             ReplytoSenderId = message.ReplyTo != null ? message.ReplyTo?.User.Id : null,
-            ReplyToSenderUsername = message.ReplyTo != null ? message.ReplyTo?.User.UserName : null
+            ReplyToSenderUsername = message.ReplyTo != null ? message.ReplyTo?.User.UserName : null,
+            ReplyToDeleted = message.ReplyTo?.IsDeleted != null ? message.ReplyTo.IsDeleted : false
         });
     }
     public async Task GetGroupMembers(string groupName)
@@ -163,7 +171,8 @@ public class ChatHub : Hub
                 ReplyToMessageId = m.ReplyToMessageId,
                 ReplyToContent = m.ReplyTo != null ? m.ReplyTo.Content : null,
                 ReplytoSenderId = m.ReplyTo != null ? m.ReplyTo.User.Id : null,
-                ReplyToSenderUsername = m.ReplyTo != null ? m.ReplyTo.User.UserName : null
+                ReplyToSenderUsername = m.ReplyTo != null ? m.ReplyTo.User.UserName : null,
+                ReplyToDeleted = m.ReplyTo.IsDeleted  != null ? m.ReplyTo.IsDeleted : false
             })
             .ToListAsync();
 

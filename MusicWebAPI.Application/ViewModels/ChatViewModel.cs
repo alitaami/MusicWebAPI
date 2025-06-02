@@ -18,6 +18,7 @@ namespace MusicWebAPI.Application.ViewModels
         public string ReplyToContent { get; set; }
         public string ReplytoSenderId { get; set; }
         public string ReplyToSenderUsername { get; set; }
+        public bool ReplyToDeleted { get; set; }
     }
 
     public class GroupMembersViewModel

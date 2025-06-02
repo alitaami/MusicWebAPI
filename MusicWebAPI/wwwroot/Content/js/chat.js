@@ -1,5 +1,4 @@
-﻿
-const deferredSystemMessages = [];
+﻿const deferredSystemMessages = [];
 let connection = null;
 let groupName = '';
 let username = '';
@@ -163,7 +162,7 @@ function registerEventHandlers() {
         msgContainer.appendChild(meta);
 
         // Improved reply preview box (if this message is a reply)
-        if (message.replyToContent) {
+        if (message.replyToContent && !message.replyToDeleted) {
             const replyBox = document.createElement("div");
             replyBox.style.fontSize = "13px";
             replyBox.style.color = "#444";
@@ -306,6 +305,24 @@ function registerEventHandlers() {
         renderMembers(members);
     });
 
+    connection.on("RefreshReplies", (replyMessageIds) => {
+        replyMessageIds.forEach(id => {
+            const msgElement = document.getElementById(`message-${id}`);
+            if (msgElement) {
+                const msgContainer = msgElement.querySelector(".message");
+                if (msgContainer) {
+                    const divs = msgContainer.querySelectorAll("div");
+                    // replyBox should be second div child
+                    const replyBox = divs[1];
+
+                    if (replyBox && replyBox.style && replyBox.style.borderLeft === "4px solid rgb(66, 133, 244)") {
+                        replyBox.remove();
+                    }
+                }
+            }
+        });
+    });
+
     connection.on("ChatHistory", (messages) => {
         messages.reverse().forEach(msg => {
             const li = document.createElement("li");
@@ -323,7 +340,7 @@ function registerEventHandlers() {
             msgContainer.appendChild(meta);
 
             // If this message is a reply, show the replied message context
-            if (msg.replyToContent) {
+            if (msg.replyToContent && !msg.replyToDeleted) {
                 const replyBox = document.createElement("div");
                 replyBox.style.fontSize = "13px";
                 replyBox.style.color = "#444";
