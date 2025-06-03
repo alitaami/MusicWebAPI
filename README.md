@@ -12,6 +12,7 @@
   <li>✅ ElasticSearch + Kibana integration for log monitoring</li>
   <li>✅ Redis caching for fast data access</li>
   <li>✅ MinIO object storage integration</li>
+  <li>✅ Stream & Download songs directly from MinIO via secure endpoints</li>
   <li>✅ Minimal APIs support in .NET 8</li>
   <li>✅ Clean, maintainable architecture (Clean Architecture)</li>
   <li>✅ Containerized with Docker and Docker Compose</li>
@@ -26,7 +27,7 @@
   <tr><td><strong>Logging</strong></td><td>Serilog + Elasticsearch + Kibana</td></tr>
   <tr><td><strong>Auth</strong></td><td>JWT Bearer Token</td></tr>
   <tr><td><strong>Docs</strong></td><td>Swagger / OpenAPI</td></tr>
-  <tr><td><strong>Object Storage</strong></td><td>MinIO</td></tr>
+  <tr><td><strong>Object Storage</strong></td><td>MinIO – stores, download and streams uploaded songs securely</td></tr>
   <tr><td><strong>Caching</strong></td><td>Redis</td></tr>
   <tr><td><strong>Containerization</strong></td><td>Docker, Docker Compose</td></tr>
   <tr><td><strong>Database</strong></td><td>PostgreSQL</td></tr>
