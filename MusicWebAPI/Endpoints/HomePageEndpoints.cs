@@ -7,12 +7,17 @@ using MusicWebAPI.API.Base;
 using MusicWebAPI.Application.Commands;
 using MusicWebAPI.Application.Features.Properties.Queries;
 using MusicWebAPI.Core;
+using MusicWebAPI.Core.Resources;
 using MusicWebAPI.Domain.Entities;
+using MusicWebAPI.Domain.External.FileService;
 using MusicWebAPI.Domain.Interfaces;
 using MusicWebAPI.Infrastructure.Data.Context;
 using MusicWebAPI.Infrastructure.FileService;
 using Serilog;
+using Swashbuckle.AspNetCore.Annotations;
+using System.ComponentModel;
 using System.Drawing.Printing;
+using System.Net.Http;
 using System.Threading.Tasks;
 using static MusicWebAPI.Application.ViewModels.HomeViewModel;
 
@@ -67,6 +72,64 @@ namespace MusicWebAPI.API.Endpoints
             .WithTags("Home")
             .RequireRateLimiting("main")
             .WithOpenApi();
+
+
+            app.MapGet("/api/home/stream-song/{objectId}", async (
+                [Description("objectId is made of: {musicId}.mp3")]
+                string objectId,
+                HttpContext httpContext,
+                FileStorageService fileStorageService,
+                [Description("Optional HTTP Range header (e.g. 'bytes=0-1023') for partial file streaming")]
+                [FromQuery] string? range = null) =>
+            {
+                try
+                {
+                    var rangeHeader = range ?? httpContext.Request.Headers["Range"].ToString();
+                    var fileStreamResult = await fileStorageService.GetFileStream(objectId, rangeHeader);
+
+                    if (fileStreamResult == null)
+                        return NotFound(Resource.FileNotExists);
+
+                    var response = httpContext.Response;
+
+                    response.ContentType = fileStreamResult.ContentType ?? "audio/mpeg";
+                    response.Headers["Accept-Ranges"] = "bytes";
+                    response.Headers["Content-Disposition"] = new System.Net.Http.Headers.ContentDispositionHeaderValue("inline")
+                    {
+                        FileNameStar = objectId
+                    }.ToString();
+
+                    if (fileStreamResult.IsPartial)
+                    {
+                        response.StatusCode = StatusCodes.Status206PartialContent;
+                        response.Headers["Content-Range"] = fileStreamResult.ContentRange!;
+                    }
+                    else
+                    {
+                        response.StatusCode = StatusCodes.Status200OK;
+                    }
+
+                    await fileStreamResult.Stream.CopyToAsync(response.Body);
+                    return Results.Empty;
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    return BadRequest(Resource.InvalidRangeHeader);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error in streaming file: {ex.Message}");
+
+                    return InternalServerError("");
+                }
+            })
+            .WithName("StreamSong")
+            .Produces(StatusCodes.Status206PartialContent)
+            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status416RangeNotSatisfiable)
+            .WithTags("Home");
+
         }
 
         private static object GetUserId(HttpContext httpContext)

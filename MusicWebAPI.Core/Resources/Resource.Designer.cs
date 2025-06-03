@@ -88,6 +88,15 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to File not found!.
+        /// </summary>
+        public static string FileNotExists {
+            get {
+                return ResourceManager.GetString("FileNotExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An unexpected error occurred. Please try again later..
         /// </summary>
         public static string GeneralUnhandledErrorText {
@@ -120,6 +129,15 @@ namespace MusicWebAPI.Core.Resources {
         public static string InvalidCredentials {
             get {
                 return ResourceManager.GetString("InvalidCredentials", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid Range header1.
+        /// </summary>
+        public static string InvalidRangeHeader {
+            get {
+                return ResourceManager.GetString("InvalidRangeHeader", resourceCulture);
             }
         }
         

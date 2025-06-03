@@ -79,8 +79,6 @@ public class ChatHub : Hub
 
     public async Task SendMessage(string groupName, string senderId, string content, int? replyToMessageId = null)
     {
-        Console.WriteLine("SendMessage started");
-        Console.WriteLine($"GroupName: {groupName}, SenderId: {senderId}, Content: {content}, ReplyToMessageId: {replyToMessageId}");
         var parentMessage = new Message();
         var group = await _context.ChatGroups.FirstOrDefaultAsync(g => g.Name == groupName);
         if (group == null) return;

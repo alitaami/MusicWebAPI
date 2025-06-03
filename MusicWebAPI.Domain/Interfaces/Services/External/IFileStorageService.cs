@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using MusicWebAPI.Core.Utilities;
 
 namespace MusicWebAPI.Domain.External.FileService
 {
@@ -21,5 +18,13 @@ namespace MusicWebAPI.Domain.External.FileService
         /// </summary>
         /// <param name="url">The URL or object ID of the file to delete.</param>
         Task DeleteFile(string url);
+
+        /// <summary>
+        /// Retrieves a file stream from the object storage.
+        /// </summary>
+        /// <param name="objectId"></param>
+        /// <param name="rangeHeader"></param>
+        /// <returns></returns>
+        Task<FileStreamResult> GetFileStream(string objectId, string rangeHeader);
     }
 }

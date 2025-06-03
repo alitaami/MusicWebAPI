@@ -36,8 +36,8 @@ public static class SeedData
                     Bio = "SuperUser..",
                     IsApproved = true,
                     IsArtist = null, // SuperUser must get a null value for IsArtist
-                    SecurityStamp = Guid.NewGuid().ToString(),  
-                    ConcurrencyStamp = Guid.NewGuid().ToString()  
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
                 };
 
                 // Hash the password manually
@@ -64,7 +64,7 @@ public static class SeedData
                     IsArtist = true,
                     IsApproved = true,
                     SecurityStamp = Guid.NewGuid().ToString(),  // Required field for Identity
-                    ConcurrencyStamp = Guid.NewGuid().ToString()  
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
                 };
 
                 // Hash the password manually
@@ -89,7 +89,7 @@ public static class SeedData
                     NormalizedEmail = "ALITAAMI@GMAIL.COM",
                     IsApproved = true,
                     SecurityStamp = Guid.NewGuid().ToString(),  // Required field for Identity
-                    ConcurrencyStamp = Guid.NewGuid().ToString()  
+                    ConcurrencyStamp = Guid.NewGuid().ToString()
                 };
 
                 // Hash the password manually
@@ -133,8 +133,8 @@ public static class SeedData
             if (!context.Roles.Any(r => r.Name == "SuperUser"))
             {
                 context.Roles.Add(new IdentityRole { Name = "SuperUser", NormalizedName = "SUPERUSER" });
-            } 
-            
+            }
+
             if (!context.Roles.Any(r => r.Name == "Artist"))
             {
                 context.Roles.Add(new IdentityRole { Name = "Artist", NormalizedName = "ARTIST" });
@@ -159,7 +159,7 @@ public static class SeedData
             var artistRole = context.Roles.FirstOrDefault(r => r.Name == "Artist");
             var userRole = context.Roles.FirstOrDefault(r => r.Name == "User");
 
-            if (superUser1 !=null &&
+            if (superUser1 != null &&
                 user1 != null &&
                 user2 != null &&
                 user3 != null &&
@@ -175,7 +175,7 @@ public static class SeedData
                 context.UserRoles.Add(new IdentityUserRole<string> { UserId = user3.Id, RoleId = artistRole.Id });
                 context.UserRoles.Add(new IdentityUserRole<string> { UserId = user4.Id, RoleId = artistRole.Id });
                 context.UserRoles.Add(new IdentityUserRole<string> { UserId = user5.Id, RoleId = userRole.Id });
-            } 
+            }
 
             context.SaveChanges();
             #endregion
@@ -240,9 +240,13 @@ public static class SeedData
                     GenreId = rockGenre?.Id ?? Guid.NewGuid(), // Rock
                     Duration = TimeSpan.FromMinutes(3),
                     Listens = 100,
-                    AudioUrl = UploadSongToMinIO(fileStorageService, $"{Guid.NewGuid()}.mp3", sampleAudio)
                 };
+
                 context.Songs.Add(song1);
+                context.SaveChanges();
+
+                // Now upload using song.Id as filename
+                song1.AudioUrl = UploadSongToMinIO(fileStorageService, $"{song1.Id}.mp3", sampleAudio);
             }
 
             if (!context.Songs.Any(s => s.Title == "Dele Man"))
@@ -255,9 +259,12 @@ public static class SeedData
                     GenreId = popGenre?.Id ?? Guid.NewGuid(), // Pop
                     Duration = TimeSpan.FromMinutes(4),
                     Listens = 1000,
-                    AudioUrl = UploadSongToMinIO(fileStorageService, $"{Guid.NewGuid()}.mp3", sampleAudio)
                 };
                 context.Songs.Add(song2);
+                context.SaveChanges();
+
+                // Now upload using song.Id as filename
+                song2.AudioUrl = UploadSongToMinIO(fileStorageService, $"{song2.Id}.mp3", sampleAudio);
             }
 
             if (!context.Songs.Any(s => s.Title == "Namaz"))
@@ -270,9 +277,12 @@ public static class SeedData
                     GenreId = popGenre?.Id ?? Guid.NewGuid(), // Pop
                     Duration = TimeSpan.FromMinutes(4),
                     Listens = 10000,
-                    AudioUrl = UploadSongToMinIO(fileStorageService, $"{Guid.NewGuid()}.mp3", sampleAudio)
                 };
                 context.Songs.Add(song3);
+                context.SaveChanges();
+
+                // Now upload using song.Id as filename
+                song3.AudioUrl = UploadSongToMinIO(fileStorageService, $"{song3.Id}.mp3", sampleAudio);
             }
 
             // Nirvana songs
@@ -288,10 +298,13 @@ public static class SeedData
                         GenreId = rockGenre?.Id ?? Guid.NewGuid(),
                         Duration = TimeSpan.FromMinutes(5),
                         Listens = 200,
-                        AudioUrl = UploadSongToMinIO(fileStorageService, $"{Guid.NewGuid()}.mp3", sampleAudio)
                     };
 
                     context.Songs.Add(song1);
+                    context.SaveChanges();
+
+                    // Now upload using song.Id as filename
+                    song1.AudioUrl = UploadSongToMinIO(fileStorageService, $"{song1.Id}.mp3", sampleAudio);
                 }
                 if (!context.Songs.Any(s => s.Title == "Come as You Are"))
                 {
@@ -302,9 +315,12 @@ public static class SeedData
                         GenreId = rockGenre?.Id ?? Guid.NewGuid(),
                         Duration = TimeSpan.FromMinutes(4),
                         Listens = 300,
-                        AudioUrl = UploadSongToMinIO(fileStorageService, $"{Guid.NewGuid()}.mp3", sampleAudio)
                     };
                     context.Songs.Add(song2);
+                    context.SaveChanges();
+
+                    // Now upload using song.Id as filename
+                    song2.AudioUrl = UploadSongToMinIO(fileStorageService, $"{song2.Id}.mp3", sampleAudio);
                 }
             }
 
@@ -321,9 +337,12 @@ public static class SeedData
                         GenreId = rockGenre?.Id ?? Guid.NewGuid(),
                         Duration = TimeSpan.FromMinutes(4),
                         Listens = 10000,
-                        AudioUrl = UploadSongToMinIO(fileStorageService, $"{Guid.NewGuid()}.mp3", sampleAudio)
                     };
                     context.Songs.Add(song3);
+                    context.SaveChanges();
+
+                    // Now upload using song.Id as filename
+                    song3.AudioUrl = UploadSongToMinIO(fileStorageService, $"{song3.Id}.mp3", sampleAudio);
                 }
                 if (!context.Songs.Any(s => s.Title == "The Pretender"))
                 {
@@ -334,9 +353,12 @@ public static class SeedData
                         GenreId = rockGenre?.Id ?? Guid.NewGuid(),
                         Duration = TimeSpan.FromMinutes(4),
                         Listens = 10,
-                        AudioUrl = UploadSongToMinIO(fileStorageService, $"{Guid.NewGuid()}.mp3", sampleAudio)
                     };
                     context.Songs.Add(song4);
+                    context.SaveChanges();
+
+                    // Now upload using song.Id as filename
+                    song4.AudioUrl = UploadSongToMinIO(fileStorageService, $"{song4.Id}.mp3", sampleAudio);
                 }
             }
 
@@ -352,9 +374,12 @@ public static class SeedData
                         UserId = greenDay.Id,
                         GenreId = rockGenre?.Id ?? Guid.NewGuid(),
                         Duration = TimeSpan.FromMinutes(5),
-                        AudioUrl = UploadSongToMinIO(fileStorageService, $"{Guid.NewGuid()}.mp3", sampleAudio)
-                    }; 
+                    };
                     context.Songs.Add(song5);
+                    context.SaveChanges();
+
+                    // Now upload using song.Id as filename
+                    song5.AudioUrl = UploadSongToMinIO(fileStorageService, $"{song5.Id}.mp3", sampleAudio);
                 }
                 if (!context.Songs.Any(s => s.Title == "American Idiot"))
                 {
@@ -364,9 +389,12 @@ public static class SeedData
                         UserId = greenDay.Id,
                         GenreId = rockGenre?.Id ?? Guid.NewGuid(),
                         Duration = TimeSpan.FromMinutes(3),
-                        AudioUrl = UploadSongToMinIO(fileStorageService, $"{Guid.NewGuid()}.mp3", sampleAudio)
                     };
                     context.Songs.Add(song6);
+                    context.SaveChanges();
+
+                    // Now upload using song.Id as filename
+                    song6.AudioUrl = UploadSongToMinIO(fileStorageService, $"{song6.Id}.mp3", sampleAudio);
                 }
             }
 
