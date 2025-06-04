@@ -102,16 +102,144 @@ const membersList = document.getElementById("membersList");
 const messageInput = document.getElementById("messageInput");
 const cancelReplyBtn = document.getElementById('cancelReplyBtn');
 const logoutBtn = document.getElementById('logoutBtn');
+function createMessageElement(message, isOwn) {
+    const li = document.createElement("li");
+    li.id = `message-${message.id}`;
+    li.className = `message-container ${isOwn ? 'own' : 'other'}`;
 
+    // Create avatar element
+    if (message.senderAvatar) {
+        const avatar = document.createElement("img");
+        avatar.className = "message-avatar";
+        avatar.src = message.senderAvatar;
+        avatar.alt = message.senderUsername;
+        li.appendChild(avatar);
+    }
+
+    const bubble = document.createElement("div");
+    bubble.className = "message-bubble";
+
+    // Meta info (username and time)
+    const meta = document.createElement("div");
+    meta.className = "message-meta";
+
+    if (!isOwn) {
+        const usernameSpan = document.createElement("span");
+        usernameSpan.className = "message-username";
+        usernameSpan.textContent = message.senderUsername;
+        meta.appendChild(usernameSpan);
+    }
+
+    const timeSpan = document.createElement("span");
+    timeSpan.className = "message-time";
+    timeSpan.textContent = new Date(message.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    meta.appendChild(timeSpan);
+
+    bubble.appendChild(meta);
+
+    // Reply box if applicable
+    if (message.replyToContent && !message.replyToDeleted) {
+        const replyBox = document.createElement("div");
+        replyBox.className = "reply-box";
+        replyBox.title = `Replying to ${message.replyToSenderUsername}: ${message.replyToContent}`;
+
+        // Add avatar if available
+        if (message.replyToSenderAvatar) {
+            const replyAvatar = document.createElement("img");
+            replyAvatar.className = "reply-avatar";
+            replyAvatar.src = message.replyToSenderAvatar;
+            replyAvatar.alt = message.replyToSenderUsername;
+            replyBox.appendChild(replyAvatar);
+        }
+
+        const replyText = document.createElement("div");
+        const replyUsername = document.createElement("span");
+        replyUsername.className = "reply-username";
+        replyUsername.textContent = message.replyToSenderUsername;
+
+        let trimmedContent = message.replyToContent;
+        if (trimmedContent.length > 30) {
+            trimmedContent = trimmedContent.substring(0, 30) + "...";
+        }
+
+        const replyContent = document.createElement("span");
+        replyContent.className = "reply-content";
+        replyContent.textContent = trimmedContent;
+
+        replyText.appendChild(replyUsername);
+        replyText.appendChild(document.createTextNode(" "));
+        replyText.appendChild(replyContent);
+        replyBox.appendChild(replyText);
+
+        replyBox.onclick = () => {
+            const repliedMessage = document.getElementById(`message-${message.replyToMessageId}`);
+            if (repliedMessage) {
+                repliedMessage.scrollIntoView({ behavior: 'smooth' });
+                repliedMessage.classList.add('highlight');
+                setTimeout(() => repliedMessage.classList.remove('highlight'), 2000);
+            }
+        };
+
+        bubble.appendChild(replyBox);
+    }
+
+    // Message content
+    const content = document.createElement("div");
+    content.className = "message-text";
+    content.textContent = message.content;
+    bubble.appendChild(content);
+
+    // Action buttons
+    const actions = document.createElement("div");
+    actions.className = "message-actions";
+
+    // Reply button
+    const replyBtn = document.createElement("button");
+    replyBtn.classList.add("reply-button");
+    replyBtn.textContent = "Reply";
+    replyBtn.onclick = () => {
+        setReplyContext(message);
+    };
+    actions.appendChild(replyBtn);
+
+    // Only allow delete on own messages
+    if (isOwn) {
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete-button";
+        deleteBtn.textContent = "Delete";
+        deleteBtn.onclick = async () => {
+            await connection.invoke("DeleteMessage", groupName, message.id);
+        };
+        actions.appendChild(deleteBtn);
+    }
+
+    bubble.appendChild(actions);
+    li.appendChild(bubble);
+
+    return li;
+}
 function renderMembers(members) {
     membersList.innerHTML = '';
     members.forEach(m => {
         const div = document.createElement("div");
         div.className = "member-item";
-        div.textContent = m.username || m.fullName || m.userId;
+
+        if (m.avatar) {
+            const avatarImg = document.createElement("img");
+            avatarImg.src = m.avatar;
+            avatarImg.alt = m.username;
+            avatarImg.className = "member-avatar";
+            div.appendChild(avatarImg);
+        }
+
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = m.username || m.fullName || m.userId;
+        div.appendChild(nameSpan);
+
         membersList.appendChild(div);
     });
 }
+
 
 let handlersRegistered = false;
 
@@ -144,80 +272,27 @@ function registerEventHandlers() {
     connection.off("UserLeft");
     connection.off("GroupMembers");
     connection.off("ChatHistory");
-
+    
     connection.on("ReceiveMessage", (message) => {
-        const li = document.createElement("li");
-        li.id = `message-${message.id}`;
-
         const isOwn = message.senderUsername === username;
-
-        const msgContainer = document.createElement("div");
-        msgContainer.className = `message ${isOwn ? 'own' : 'other'}`;
-
-        const meta = document.createElement("div");
-        meta.className = "message-meta";
-        meta.textContent = `${message.senderUsername} • ${new Date(message.sentAt).toLocaleTimeString()}`;
-        msgContainer.appendChild(meta);
-
-        if (message.replyToContent && !message.replyToDeleted) {
-            const replyBox = document.createElement("div");
-            replyBox.className = "reply-box";
-            replyBox.title = `Replying to ${message.replyToSenderUsername}: ${message.replyToContent}`;
-
-            const replyUsername = document.createElement("span");
-            replyUsername.className = "reply-username";
-            replyUsername.textContent = message.replyToSenderUsername;
-
-            let trimmedReplyContent = message.replyToContent;
-            if (trimmedReplyContent.length > 20) {
-                trimmedReplyContent = trimmedReplyContent.substring(0, 20) + "...";
-            }
-
-            const replyContent = document.createElement("span");
-            replyContent.className = "reply-content";
-            replyContent.textContent = trimmedReplyContent;
-
-            replyBox.appendChild(replyUsername);
-            replyBox.appendChild(document.createTextNode(" "));
-            replyBox.appendChild(replyContent);
-
-            replyBox.onclick = () => {
-                // Implement scrollToMessage or relevant function
-            };
-
-            msgContainer.appendChild(replyBox);
-        }
-
-        const content = document.createElement("div");
-        content.textContent = message.content;
-        msgContainer.appendChild(content);
-
-        // Always allow replying
-        const replyBtn = document.createElement("button");
-        replyBtn.classList.add("reply-button");
-        if (isOwn) {
-            replyBtn.classList.add("own");
-        }
-        replyBtn.textContent = "Reply";
-        replyBtn.onclick = () => {
-            setReplyContext(message);
-        };
-        msgContainer.appendChild(replyBtn);
-
-        // Only allow delete on own messages
-        if (isOwn) {
-            const deleteBtn = document.createElement("button");
-            deleteBtn.className = "delete-button";
-            deleteBtn.textContent = "Delete";
-            deleteBtn.onclick = async () => {
-                await connection.invoke("DeleteMessage", groupName, message.id);
-            };
-            msgContainer.appendChild(deleteBtn);
-        }
-
-        li.appendChild(msgContainer);
-        messagesList.appendChild(li);
+        const messageElement = createMessageElement(message, isOwn);
+        messagesList.appendChild(messageElement);
         scrollToBottom();
+    });
+
+    connection.on("ChatHistory", (messages) => {
+        messages.reverse().forEach(msg => {
+            const isOwn = msg.senderUsername === username;
+            const messageElement = createMessageElement(msg, isOwn);
+            messagesList.appendChild(messageElement);
+        });
+
+        chatHistoryLoaded = true;
+        deferredSystemMessages.forEach(msg => {
+            messagesList.appendChild(msg);
+        });
+        scrollToBottom();
+        deferredSystemMessages.length = 0;
     });
 
     connection.on("MessageDeleted", (messageId) => {
@@ -228,7 +303,7 @@ function registerEventHandlers() {
 
             setTimeout(() => {
                 msgElement.remove();
-            }, 1000);
+            }, 200);
         }
     });
 
@@ -288,99 +363,6 @@ function registerEventHandlers() {
             }
         });
     });
-
-    connection.on("ChatHistory", (messages) => {
-        messages.reverse().forEach(msg => {
-            const li = document.createElement("li");
-            li.id = `message-${msg.id}`;
-
-            const isOwn = msg.senderUsername === username;
-
-            const msgContainer = document.createElement("div");
-            msgContainer.className = `message ${isOwn ? 'own' : 'other'}`;
-
-            // Meta info (username and time)
-            const meta = document.createElement("div");
-            meta.className = "message-meta";
-            meta.textContent = `${msg.senderUsername} • ${new Date(msg.sentAt).toLocaleTimeString()}`;
-            msgContainer.appendChild(meta);
-
-            // Reply box if applicable
-            if (msg.replyToContent && !msg.replyToDeleted) {
-                const replyBox = document.createElement("div");
-                replyBox.className = "reply-box";
-                replyBox.title = `Replying to ${msg.replyToSenderUsername}: ${msg.replyToContent}`;
-
-                const replyUsername = document.createElement("span");
-                replyUsername.className = "reply-username";
-                replyUsername.textContent = msg.replyToSenderUsername;
-
-                // Trim reply content manually
-                let trimmedContent = msg.replyToContent;
-                if (trimmedContent.length > 20) {
-                    trimmedContent = trimmedContent.substring(0, 20) + "...";
-                }
-
-                const replyContent = document.createElement("span");
-                replyContent.className = "reply-content";
-                replyContent.textContent = trimmedContent;
-
-                replyBox.appendChild(replyUsername);
-                replyBox.appendChild(document.createTextNode(" "));
-                replyBox.appendChild(replyContent);
-
-                replyBox.onclick = () => {
-                    console.log(`Clicked reply preview for message ID: ${msg.replyToMessageId}`);
-                    // You can implement scroll or other UI logic here
-                };
-
-                msgContainer.appendChild(replyBox);
-            }
-
-            // Message content
-            const content = document.createElement("div");
-            content.textContent = msg.content;
-            msgContainer.appendChild(content);
-
-            // Reply button
-            const replyBtn = document.createElement("button");
-            replyBtn.classList.add("reply-button");
-            if (isOwn) {
-                replyBtn.classList.add("own");
-            }
-            replyBtn.textContent = "Reply";
-            replyBtn.onclick = () => {
-                setReplyContext(msg);
-            };
-            msgContainer.appendChild(replyBtn);
-
-            // Delete button (only own messages)
-            if (isOwn) {
-                const deleteBtn = document.createElement("button");
-                deleteBtn.className = "delete-button";
-                deleteBtn.textContent = "Delete";
-
-                deleteBtn.onclick = async () => {
-                    await connection.invoke("DeleteMessage", groupName, msg.id);
-                };
-
-                msgContainer.appendChild(deleteBtn);
-            }
-
-            li.appendChild(msgContainer);
-            messagesList.appendChild(li);
-        });
-
-        chatHistoryLoaded = true;
-
-        deferredSystemMessages.forEach(msg => {
-            messagesList.appendChild(msg);
-        });
-        scrollToBottom();
-
-        deferredSystemMessages.length = 0;
-    });
-
 }
 
 joinBtn.addEventListener("click", async () => {

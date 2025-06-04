@@ -107,10 +107,12 @@ body {
         }
 
 .system-message {
+    text-align: center;
     font-size: 13px;
-    color: #666;
+    color: #888;
     margin: 12px 0;
     font-style: italic;
+    width: 100%;
 }
 
 .message-input {
@@ -186,26 +188,27 @@ body {
         border-bottom-left-radius: 0;
         margin-right: auto;
     }
-
+     
 .message-meta {
-    font-size: 12px;
     color: #555;
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 4px;
-}
+    font-size: 12px;
+} 
 
 .reply-box {
     font-size: 13px;
     color: #444;
     background: #e8f0fe;
-    border-left: 4px solid #4285f4;
-    padding: 8px 12px;
-    margin-bottom: 6px;
-    border-radius: 6px;
+    border-left: 3px solid #1a73e8;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    border-radius: 0 8px 8px 0;
     cursor: pointer;
-    user-select: none;
-    max-width: 80%;
+    display: flex;
+    align-items: center;
 }
-
 .reply-username {
     font-weight: 600;
     color: #1a73e8;
@@ -213,29 +216,43 @@ body {
 
 .reply-content {
     font-style: italic;
-    margin-left: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
 }
 
 .reply-button {
-    font-size: 11px;
-    margin-top: 4px;
+    color: #007bff;
     background: transparent;
     border: none;
     cursor: pointer;
-    color: #007bff; 
+    font-size: 12px; /* smaller text */
+    padding: 2px 6px; /* smaller button size */
+    line-height: 1;
+    transition: color 0.3s ease, background-color 0.2s ease;
 }
 
-    .reply-button.own {
-        color: #71797E; /* Subtle grey for own messages */
-        font-weight: 600; 
-    }
+/* Blue hover for others' messages */
+.message-container:not(.own) .reply-button:hover {
+    color: #0056b3;
+    background-color: rgba(0, 123, 255, 0.1);
+    border-radius: 4px;
+    text-decoration: underline;
+}
 
-    .reply-button:hover {
+/* Gray reply button for own messages */
+.message-container.own .reply-button {
+    color: #555;
+    font-weight: 600;
+}
+
+    /* Hover effect for your own reply buttons */
+    .message-container.own .reply-button:hover {
+        color: #444;
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
         text-decoration: underline;
-    }
-
-    .reply-button.own:hover {
-        color: #5a5f63; /* Slightly darker on hover */
     }
 
 .delete-button {
@@ -244,12 +261,57 @@ body {
     background: transparent;
     border: none;
     cursor: pointer;
+    font-weight:bold;
     color: #EE4B2B;
 }
 
     .delete-button:hover {
         color: #B22222;
     }
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.reply-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.member-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background-color: #ffffff;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    border: 1px solid #dce0e4;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+    .member-item:hover {
+        background-color: #f0f4f8;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    }
+
+.member-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ccc;
+    background-color: #f9f9f9;
+}
+
 
 .auth-overlay {
     position: absolute;
@@ -359,3 +421,115 @@ body {
     cursor: pointer;
     margin-left: auto;
 }
+
+
+
+
+
+
+
+
+
+
+.message-container {
+    display: flex;
+    margin-bottom: 12px;
+    padding: 0 12px;
+}
+
+.message-bubble {
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    position: relative;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+.message-container.own {
+    justify-content: flex-end;
+}
+
+    .message-container.own .message-bubble {
+        background-color: #007bff;
+        color: white;
+        border-bottom-right-radius: 4px;
+        margin-left: 20%;
+    }
+
+.message-container.other {
+    justify-content: flex-start;
+}
+
+    .message-container.other .message-bubble {
+        background-color: #e2e3e5;
+        color: black;
+        border-bottom-left-radius: 4px;
+        margin-right: 20%;
+    }
+
+.message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 8px;
+    align-self: flex-end;
+}
+
+.message-container.own .message-avatar {
+    order: 1;
+    margin-left: 8px;
+    margin-right: 0;
+}
+
+.message-container.other .message-avatar {
+    order: -1;
+    margin-right: 8px;
+    margin-left: 0;
+}
+
+.message-container.own .message-meta {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.message-container.other .message-meta {
+    color: #666;
+}
+
+.message-container.own .reply-box {
+    background: rgba(255, 255, 255, 0.15);
+    border-left-color: rgba(255, 255, 255, 0.5);
+}
+
+.reply-username {
+    font-weight: 600;
+    color: #1a73e8;
+    margin-right: 4px;
+}
+
+.message-container.own .reply-username {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.message-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.message-container:hover .message-actions {
+    opacity: 1;
+}
+
+.message-time {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-left: 8px;
+}
+

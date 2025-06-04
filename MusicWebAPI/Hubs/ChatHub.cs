@@ -106,16 +106,18 @@ public class ChatHub : Hub
             parentMessage = await _context.Messages.Where(m => m.Id == replyToMessageId).Include(m => m.User).FirstOrDefaultAsync();
         }
 
-        await Clients.Group(groupName).SendAsync("ReceiveMessage", new
+        await Clients.Group(groupName).SendAsync("ReceiveMessage", new 
         {
             message.Id,
             message.Content,
             message.SenderId,
+            SenderAvatar = message.User.Avatar,
             SenderUsername = user.UserName, 
             message.SentAt,
             message.ReplyToMessageId,
             ReplyToContent = message.ReplyTo != null ? message.ReplyTo.Content : null,
             ReplytoSenderId = message.ReplyTo != null ? message.ReplyTo?.User.Id : null,
+            ReplytoSenderAvatar = message.ReplyTo != null ? message.ReplyTo?.User.Avatar : null,
             ReplyToSenderUsername = message.ReplyTo != null ? message.ReplyTo?.User.UserName : null,
             ReplyToDeleted = message.ReplyTo?.IsDeleted != null ? message.ReplyTo.IsDeleted : false
         });
@@ -134,6 +136,7 @@ public class ChatHub : Hub
             .Select(ug => new GroupMembersViewModel
             {
                 UserId = ug.UserId,
+                Avatar = ug.User.Avatar,
                 Username = ug.User.UserName,
                 FullName = ug.User.FullName
             })
@@ -163,12 +166,14 @@ public class ChatHub : Hub
                 Id = m.Id,
                 Content = m.Content,
                 SentAt = m.SentAt,
+                SenderAvatar = m.User.Avatar,
                 SenderId = m.SenderId,
                 SenderUsername = m.User.UserName,
                 SenderFullName = m.User.FullName,
                 ReplyToMessageId = m.ReplyToMessageId,
                 ReplyToContent = m.ReplyTo != null ? m.ReplyTo.Content : null,
                 ReplytoSenderId = m.ReplyTo != null ? m.ReplyTo.User.Id : null,
+                ReplytoSenderAvatar = m.ReplyTo != null ? m.ReplyTo.User.Avatar : null,
                 ReplyToSenderUsername = m.ReplyTo != null ? m.ReplyTo.User.UserName : null,
                 ReplyToDeleted = m.ReplyTo.IsDeleted  != null ? m.ReplyTo.IsDeleted : false
             })
