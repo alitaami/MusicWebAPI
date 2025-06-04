@@ -117,7 +117,8 @@ services:
      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD} 
      FILE_SERVER_DOWNLOAD_URL: ${FILE_SERVER_DOWNLOAD_URL}
-     MINIO_BUCKET_NAME: ${MINIO_BUCKET_NAME}
+     MINIO_MUSIC_BUCKET_NAME: ${MINIO_MUSIC_BUCKET_NAME}
+     MINIO_IMAGES_BUCKET_NAME: ${MINIO_IMAGES_BUCKET_NAME}
     restart: on-failure
     command: server /data
     volumes:
@@ -134,13 +135,18 @@ services:
       /bin/sh -c "
         sleep 5 &&
         mc alias set local http://minio:9000 $${MINIO_ROOT_USER} $${MINIO_ROOT_PASSWORD} &&
-        mc mb local/$${MINIO_BUCKET_NAME} &&
-        mc anonymous set download local/$${MINIO_BUCKET_NAME} &&
-        echo '✅ Public access granted to music-files bucket'
+        mc mb local/$${MINIO_MUSIC_BUCKET_NAME} &&
+        mc anonymous set download local/$${MINIO_MUSIC_BUCKET_NAME} &&
+        echo '✅ Public access granted to music-files bucket' &&
+  
+        mc mb local/$${MINIO_IMAGES_BUCKET_NAME} &&
+        mc anonymous set download local/$${MINIO_IMAGES_BUCKET_NAME} &&
+        echo '✅ Public access granted to image-files bucket'
       "
     env_file: .env
     networks:
       - musicnet
+  
   
   portainer:
     image: portainer/portainer-ce:latest

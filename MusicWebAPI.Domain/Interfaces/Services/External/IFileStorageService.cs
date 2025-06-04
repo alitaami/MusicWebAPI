@@ -17,7 +17,7 @@ namespace MusicWebAPI.Domain.External.FileService
         /// Deletes a file from the object storage using its URL or object ID.
         /// </summary>
         /// <param name="url">The URL or object ID of the file to delete.</param>
-        Task DeleteFile(string url);
+        Task DeleteFile(string url, string bucketName);
 
         /// <summary>
         /// Retrieves a file stream from the object storage.

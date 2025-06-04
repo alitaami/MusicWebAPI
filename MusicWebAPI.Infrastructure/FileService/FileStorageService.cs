@@ -16,14 +16,16 @@ namespace MusicWebAPI.Infrastructure.FileService
     public class FileStorageService : IFileStorageService
     {
         private readonly IMinioClient _minioClient;
-        private readonly string _bucketName;
+        private readonly string _musicBucket;
+        private readonly string _imagesBucket;
         private readonly string _fileServerDownloadUrl;
         private readonly string _fileStreamUrl;
 
         public FileStorageService(IMinioClient minioClient, IConfiguration configuration)
         {
             _minioClient = minioClient;
-            _bucketName = Environment.GetEnvironmentVariable("MINIO_BUCKET_NAME");
+            _musicBucket = Environment.GetEnvironmentVariable("MINIO_MUSIC_BUCKET_NAME");
+            _imagesBucket = Environment.GetEnvironmentVariable("MINIO_IMAGES_BUCKET_NAME");
             _fileServerDownloadUrl = Environment.GetEnvironmentVariable("FILE_SERVER_DOWNLOAD_URL");
             _fileStreamUrl = Environment.GetEnvironmentVariable("FILE_STREAM_URL");
         }
@@ -32,8 +34,16 @@ namespace MusicWebAPI.Infrastructure.FileService
         {
             try
             {
+                var extension = Path.GetExtension(objectId)?.ToLowerInvariant();
+                var bucketName = extension switch
+                {
+                    ".mp3" => _musicBucket,
+                    ".jpg" or ".jpeg" or ".png" => _imagesBucket,
+                    _ => throw new NotSupportedException($"File type '{extension}' is not supported.")
+                };
+
                 var statArgs = new StatObjectArgs()
-                                .WithBucket(_bucketName)
+                                .WithBucket(_musicBucket)
                                 .WithObject(objectId);
 
                 var stat = await _minioClient.StatObjectAsync(statArgs);
@@ -64,7 +74,7 @@ namespace MusicWebAPI.Infrastructure.FileService
                     contentRange = $"bytes {start}-{end}/{fileSize}";
                 }
 
-                var objectUrl = $"{_fileStreamUrl.TrimEnd('/')}/{_bucketName}/{objectId}";
+                var objectUrl = $"{_fileStreamUrl.TrimEnd('/')}/{bucketName}/{objectId}";
 
                 using var httpClient = new HttpClient();
 
@@ -103,10 +113,19 @@ namespace MusicWebAPI.Infrastructure.FileService
         {
             await EnsureBucketExistsAsync();
 
-            var objectExists = await CheckFileExistence(objectId);
+            var extension = Path.GetExtension(objectId)?.ToLowerInvariant();
+
+            var bucketName = extension switch
+            {
+                ".mp3" => _musicBucket,
+                ".jpg" or ".jpeg" or ".png" => _imagesBucket,
+                _ => throw new NotSupportedException($"File type '{extension}' is not supported.")
+            };
+
+            var objectExists = await CheckFileExistence(objectId, bucketName);
             if (objectExists)
             {
-                await DeleteFile(objectId);
+                await DeleteFile(objectId, bucketName);
             }
 
             // Clean base64 if needed
@@ -117,19 +136,19 @@ namespace MusicWebAPI.Infrastructure.FileService
             using var stream = new MemoryStream(fileBytes);
 
             var putObjectArgs = new PutObjectArgs()
-                .WithBucket(_bucketName)
+                .WithBucket(bucketName)
                 .WithObject(objectId)
                 .WithStreamData(stream)
                 .WithObjectSize(fileBytes.Length);
 
             await _minioClient.PutObjectAsync(putObjectArgs);
 
-            var fileUrl = $"{_fileServerDownloadUrl.TrimEnd('/')}/{_bucketName}/{objectId}";
+            var fileUrl = $"{_fileServerDownloadUrl.TrimEnd('/')}/{bucketName}/{objectId}";
 
             return fileUrl;
         }
 
-        public async Task DeleteFile(string url)
+        public async Task DeleteFile(string url, string bucketName)
         {
             string objectId;
             try
@@ -143,77 +162,90 @@ namespace MusicWebAPI.Infrastructure.FileService
                 objectId = Path.GetFileName(url);
             }
 
-            // Check object existence
-            var objectExists = await CheckFileExistence(objectId);
-
-            // Delete object if exists
+            var objectExists = await CheckFileExistence(objectId, bucketName);
             if (objectExists)
             {
                 var removeObjectArgs = new RemoveObjectArgs()
-                                    .WithBucket(_bucketName)
-                                    .WithObject(objectId);
+                    .WithBucket(bucketName)
+                    .WithObject(objectId);
 
                 await _minioClient.RemoveObjectAsync(removeObjectArgs);
             }
         }
 
-        private async Task<bool> CheckFileExistence(string objectId)
+        private async Task<bool> CheckFileExistence(string objectId, string bucketName)
         {
             try
             {
-                // Check file existence
-                // throws an error if the file does not exists
                 var objectExistenceArgs = new StatObjectArgs()
-                                    .WithBucket(_bucketName)
-                                    .WithObject(objectId);
+                    .WithBucket(bucketName)
+                    .WithObject(objectId);
 
                 _ = await _minioClient.StatObjectAsync(objectExistenceArgs);
-
                 return true;
             }
             catch (Exception)
             {
+                // You can log the exception if needed
             }
-
             return false;
         }
+
         private async Task EnsureBucketExistsAsync()
         {
-            var bucketExistsArgs = new BucketExistsArgs().WithBucket(_bucketName);
-            bool bucketExists = await _minioClient.BucketExistsAsync(bucketExistsArgs);
-
-            if (!bucketExists)
+            var buckets = new List<string>
             {
-                var makeBucketArgs = new MakeBucketArgs().WithBucket(_bucketName);
-                await _minioClient.MakeBucketAsync(makeBucketArgs);
+                _imagesBucket,
+                _musicBucket
+            };
+
+            foreach (var bucket in buckets)
+            {
+                var bucketExistsArgs = new BucketExistsArgs().WithBucket(bucket);
+                bool bucketExists = await _minioClient.BucketExistsAsync(bucketExistsArgs);
+
+                if (!bucketExists)
+                {
+                    var makeBucketArgs = new MakeBucketArgs().WithBucket(bucket);
+                    await _minioClient.MakeBucketAsync(makeBucketArgs);
+                }
             }
         }
 
         private async Task ListBucketObjectsAsync()
         {
-            var listObjectsArgs = new ListObjectsArgs()
-                .WithBucket(_bucketName)
+            var buckets = new List<string>
+            {
+                _imagesBucket,
+                _musicBucket
+            };
+
+            foreach (var bucket in buckets)
+            {
+                var listObjectsArgs = new ListObjectsArgs()
+                .WithBucket(bucket)
                 .WithRecursive(true);
 
-            var observable = _minioClient.ListObjectsAsync(listObjectsArgs);
+                var observable = _minioClient.ListObjectsAsync(listObjectsArgs);
 
-            var tcs = new TaskCompletionSource<bool>();
+                var tcs = new TaskCompletionSource<bool>();
 
-            var subscription = observable.Subscribe(
-                ex =>
-                {
-                    tcs.SetResult(false);
-                },
-                () =>
-                {
-                    tcs.SetResult(true);
-                });
+                var subscription = observable.Subscribe(
+                    ex =>
+                    {
+                        tcs.SetResult(false);
+                    },
+                    () =>
+                    {
+                        tcs.SetResult(true);
+                    });
 
-            // Wait for the listing to complete
-            await tcs.Task;
+                // Wait for the listing to complete
+                await tcs.Task;
 
-            // Dispose subscription
-            subscription.Dispose();
+                // Dispose subscription
+                subscription.Dispose();
+            }
         }
     }
 }

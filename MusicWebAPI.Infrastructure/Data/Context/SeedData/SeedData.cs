@@ -71,12 +71,12 @@ public static class SeedData
             var unknownGenre = context.Genres.FirstOrDefault(g => g.Name == "Unknown");
             #endregion
 
-            #region Users & Songs
+            #region Users-Songs
             SeedSuperUser(context, passwordHasher, superUserRole);
 
             SeedArtistsAndSongs(context, passwordHasher, fileStorageService, unknownGenre, artistRole, sampleAudio, random);
 
-            SeedRegularUsers(context, passwordHasher, userRole);
+            SeedRegularUsers(context, passwordHasher, fileStorageService, userRole);
             #endregion
 
             #region ChatGroup
@@ -103,6 +103,16 @@ public static class SeedData
     private static string UploadSongToMinIO(IFileStorageService fileStorageService, string objectId, string base64FileData)
     {
         return fileStorageService.UploadFile(objectId, base64FileData).GetAwaiter().GetResult();
+    }
+
+    private static string UploadDefaultProfileImageIfNeeded(IFileStorageService fileStorageService, string userId)
+    {
+        var defaultAvatarObjectId = $"{userId}.jpg";
+        var defaultAvatarBase64 = Convert.ToBase64String(File.ReadAllBytes("wwwroot/images/default-avatar.jpg"));
+
+        var avatarUrl = fileStorageService.UploadFile(defaultAvatarObjectId, defaultAvatarBase64).GetAwaiter().GetResult();
+
+        return avatarUrl;
     }
 
     private static void SeedArtistsAndSongs(
@@ -193,6 +203,9 @@ public static class SeedData
                 artist.PasswordHash = passwordHasher.HashPassword(artist, "19851381");
                 context.Users.Add(artist);
                 context.SaveChanges();
+
+                artist.Avatar = UploadDefaultProfileImageIfNeeded(fileStorageService, artist.Id);
+                context.SaveChanges();
             }
 
             var album1 = context.Albums.FirstOrDefault(a => a.Title == $"Album One - {userName}" && a.UserId == artist.Id);
@@ -258,6 +271,7 @@ public static class SeedData
     private static void SeedRegularUsers(
     MusicDbContext context,
     IPasswordHasher<User> passwordHasher,
+    FileStorageService fileStorageService,
     IdentityRole userRole)
     {
         var regularUsersData = new List<(string UserName, string FullName, string Email)>
@@ -289,6 +303,9 @@ public static class SeedData
 
                 user.PasswordHash = passwordHasher.HashPassword(user, "19851381");
                 context.Users.Add(user);
+                context.SaveChanges();
+
+                user.Avatar = UploadDefaultProfileImageIfNeeded(fileStorageService, user.Id);
                 context.SaveChanges();
 
                 if (!context.UserRoles.Any(ur => ur.UserId == user.Id && ur.RoleId == userRole.Id))
