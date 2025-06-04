@@ -115,7 +115,7 @@ docker-compose up --build -d
 
 <h2>💬 Real-Time Chat</h2>
 <p><strong>URL:</strong> <a href="http://localhost:8080/chat">http://localhost:8080/chat</a></p>
-<img src="https://github.com/user-attachments/assets/09f28d83-f9a2-42a3-80c6-39884f304bc4" alt="Real-Time Chat Screenshot" />
+<img src="https://github.com/user-attachments/assets/cc8ee4f7-b919-430e-b9c2-52fcd50b1e6a" alt="Real-Time Chat Screenshot" />
 
 <h2>🕒 Hangfire Dashboard</h2>
 <p><strong>URL:</strong> <a href="http://localhost:8080/hangfire">http://localhost:8080/hangfire</a></p>
