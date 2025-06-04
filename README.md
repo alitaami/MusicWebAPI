@@ -18,6 +18,8 @@
   <li>✅ Containerized with Docker and Docker Compose</li>
 </ul>
 
+<h2>🧠 ML-Based Song Recommendation</h2> <p> Leveraging <strong>Spotify's API</strong> alongside user interaction data stored in the local database, the project uses <strong>ML.NET</strong> to train a recommendation engine that suggests songs tailored to each user’s preferences. </p> <ul> <li>✅ Combines Spotify metadata with local listening behavior</li> <li>✅ ML model trained periodically using <code>Hangfire</code></li> <li>✅ Trained recommendation results are cached in <code>Redis</code> for quick access</li> <li>✅ Supports extensible training pipeline with ML.NET</li> </ul>
+
 <h2>🛠️ Technologies Used</h2>
 <table>
   <tr><th>Stack</th><th>Details</th></tr>
