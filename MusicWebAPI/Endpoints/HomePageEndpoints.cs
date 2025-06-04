@@ -57,7 +57,7 @@ namespace MusicWebAPI.API.Endpoints
             .RequireRateLimiting("main")
             .WithOpenApi();
 
-            app.MapGet("/api/home/recommended-songs", async (IMediator mediator, HttpContext httpContext, int count, CancellationToken ct) =>
+            app.MapGet("/api/home/recommended-songs", async (IMediator mediator, HttpContext httpContext, CancellationToken ct, int count = 5) =>
             {
                 var userId = GetUserId(httpContext);
                 var query = new GetRecommendedSongsQuery(userId.ToString(), count);

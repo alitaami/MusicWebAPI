@@ -187,6 +187,15 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Song not found!.
+        /// </summary>
+        public static string SongNotFound {
+            get {
+                return ResourceManager.GetString("SongNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SuperUser.
         /// </summary>
         public static string SuperUserRole {

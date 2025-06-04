@@ -95,10 +95,10 @@ public static class WebApplicationExtensions
         public static void ScheduleJobs()
         {
             RecurringJob.AddOrUpdate<IRecommendationService>(
-                "daily-ml-training",
-                x => x.TrainAsync(CancellationToken.None),
-                "0 */12 * * *",
-                TimeZoneInfo.Local
+            "ml-training-every-3-hours",
+            x => x.TrainAsync(CancellationToken.None),
+            "0 */3 * * *",
+            TimeZoneInfo.Local
             );
         }
     }

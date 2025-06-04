@@ -11,7 +11,7 @@ namespace MusicWebAPI.Application.DTOs
         public class AddToPlaylistDTO
         {
             public Guid SongId { get; set; }
-            public Guid? PlaylistId { get; set; }
+            public Guid? PlaylistId { get; set; } = null;
             public string? PlaylistName { get; set; } // optional if PlaylistId exists
         }
     }

@@ -159,6 +159,9 @@
   <data name="PlaylistSongNotFound" xml:space="preserve">
     <value>There is no song in related Playlist with that SongName!</value>
   </data>
+  <data name="SongNotFound" xml:space="preserve">
+    <value>Song not found!</value>
+  </data>
   <data name="SuperUserRole" xml:space="preserve">
     <value>SuperUser</value>
   </data>

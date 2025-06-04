@@ -62,9 +62,13 @@ namespace MusicWebAPI.Application.Services
         {
             var playList = new Playlist();
             var user = await _userManager.FindByIdAsync(userId.ToString());
+            var song = await _repositoryManager.Song.GetByIdAsync(cancellationToken, songId);
 
             if (user == null)
                 throw new NotFoundException(Resource.UserNotFound);
+            
+            if (song == null)
+                throw new NotFoundException(Resource.SongNotFound);
 
             if (playlistId.HasValue)
             {

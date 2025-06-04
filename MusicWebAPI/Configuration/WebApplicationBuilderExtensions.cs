@@ -252,6 +252,8 @@ public static class WebApplicationBuilderExtensions
             .AddDefaultTokenProviders();
         #endregion
 
+        builder.Services.AddHttpClient();
+
         // Enable API Explorer for Swagger
         builder.Services.AddEndpointsApiExplorer();
 
