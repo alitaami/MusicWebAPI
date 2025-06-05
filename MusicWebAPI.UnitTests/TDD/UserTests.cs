@@ -13,6 +13,8 @@ using MusicWebAPI.Application.Features.Properties.Queries.Handlers;
 using MusicWebAPI.Application.Features.Properties.Queries;
 using MusicWebAPI.Core;
 using static MusicWebAPI.Application.ViewModels.HomeViewModel;
+using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
+using MusicWebAPI.Core.Resources;
 
 namespace MusicWebAPI.UnitTests.TDD
 {
@@ -34,7 +36,7 @@ namespace MusicWebAPI.UnitTests.TDD
         }
          
         [Test]
-        public async Task Handle_RegisterUser_ReturnsMappedViewModel()
+        public async Task Handle_RegisterUser_When_Successful()
         {
             // Arrange
             var command = new RegisterUserCommand
@@ -46,17 +48,7 @@ namespace MusicWebAPI.UnitTests.TDD
                 IsArtist = false
             };
 
-            var userEntity = new User
-            {
-                Id = "123",
-                UserName = "testuser",
-                Email = "test@example.com",
-                FullName = "Test User",
-                IsArtist = false,
-                Bio = "test"
-            };
-
-            var expectedToken = "some-jwt-token";
+             var expectedToken = "some-jwt-token";
              
             _serviceManagerMock.Setup(s => s.User.RegisterUser(It.IsAny<User>(), It.IsAny<string>()))
                 .ReturnsAsync(expectedToken);
@@ -71,7 +63,7 @@ namespace MusicWebAPI.UnitTests.TDD
         }
 
         [Test]
-        public void Handle_RegisterUser_ThrowsException_ReturnsError()
+        public void Handle_RegisterUser_When_Not_Successful()
         {
             // Arrange
             var command = new RegisterUserCommand
@@ -84,14 +76,14 @@ namespace MusicWebAPI.UnitTests.TDD
             };
 
             _serviceManagerMock.Setup(s => s.User.RegisterUser(It.IsAny<User>(), It.IsAny<string>()))
-                .ThrowsAsync(new Exception("User already exists"));
+                .ThrowsAsync(new LogicException(Resource.DuplicateUserError));
 
             // Act & Assert
-            Assert.ThrowsAsync<Exception>(async () => await _registerUserHandler.Handle(command, CancellationToken.None));
+            Assert.ThrowsAsync<LogicException>(async () => await _registerUserHandler.Handle(command, CancellationToken.None));
         }
 
         [Test]
-        public async Task Handle_ShouldReturnToken_WhenCredentialsAreValid()
+        public async Task Handle_LoginUser_When_Successful()
         {
             // Arrange
             var loginCommand = new LoginUserCommand
@@ -116,7 +108,7 @@ namespace MusicWebAPI.UnitTests.TDD
         }
 
         [Test]
-        public async Task Handle_ShouldThrowException_WhenInvalidCredentials()
+        public async Task Handle_LoginUser_When_Not_Successful()
         {
             // Arrange
             var loginCommand = new LoginUserCommand
