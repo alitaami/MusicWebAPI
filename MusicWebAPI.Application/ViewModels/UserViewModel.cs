@@ -26,10 +26,12 @@ namespace MusicWebAPI.Application.ViewModels
         //}
         public class LoginUserViewModel  
         {
+            public string? ReturnUrl { get; set; } = null;
             public string Token { get; set; }
         }
         public class RegisterUserViewModel  
         {
+            public string? ReturnUrl { get; set; } = null;
             public string Token { get; set; }
         }
     }

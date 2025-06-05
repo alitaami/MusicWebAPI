@@ -131,6 +131,7 @@ namespace MusicWebAPI.API.Endpoints
             .WithTags("Home");
         }
 
+        #region Common
         private static object GetUserId(HttpContext httpContext)
         {
             var userIdClaim = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
@@ -140,5 +141,6 @@ namespace MusicWebAPI.API.Endpoints
             }
             return userId.ToString();
         }
+        #endregion
     }
 }

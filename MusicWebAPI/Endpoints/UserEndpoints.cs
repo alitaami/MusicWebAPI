@@ -14,6 +14,7 @@ using static MusicWebAPI.Application.DTOs.UserSongsDTO;
 using static MusicWebAPI.Application.ViewModels.UserViewModel;
 using MusicWebAPI.Core.Base;
 using System.Net.Http;
+using Microsoft.AspNetCore.Mvc;
 namespace MusicWebAPI.API.Endpoints
 {
     public class UserEndpoints : ApiResponseBase
@@ -21,11 +22,13 @@ namespace MusicWebAPI.API.Endpoints
         public static void RegisterUserEndpoints(WebApplication app)
         {
             // Register user endpoint
-            app.MapPost("/api/register", async (IMediator mediator, RegisterUserCommand command, HttpContext httpContext) =>
+            app.MapPost("/api/register", async (IMediator mediator, RegisterUserCommand command, HttpContext httpContext, [FromQuery] string? returnUrl = null) =>
             {
-                var token = await mediator.Send(command);
+                var result = await mediator.Send(command);
 
-                return Ok(token);
+                result.ReturnUrl = returnUrl;
+
+                return Ok(result);
             })
             .WithName("RegisterUser")
             .Produces<RegisterUserViewModel>(StatusCodes.Status200OK)
@@ -35,12 +38,14 @@ namespace MusicWebAPI.API.Endpoints
             .WithOpenApi(); // This enables Swagger for Minimal API
 
             // Login user endpoint
-            app.MapPost("/api/login", async (IMediator mediator, LoginUserCommand command, HttpContext httpContext) =>
+            app.MapPost("/api/login", async (IMediator mediator, LoginUserCommand command, HttpContext httpContext, [FromQuery] string? returnUrl = null) =>
             {
                 // getting JWT token
-                var token = await mediator.Send(command);
+                var result = await mediator.Send(command);
 
-                return Ok(token);
+                result.ReturnUrl = returnUrl;
+
+                return Ok(result);
 
             })
             .WithName("LoginUser")
@@ -119,6 +124,7 @@ namespace MusicWebAPI.API.Endpoints
             .RequireRateLimiting("main")
             .WithOpenApi();
 
+            // ListenToSong endpoint
             app.MapPut("/api/songs/{songId}/listen",
                 [Authorize(Roles = "User")]
             async (IMediator mediator, Guid songId, HttpContext httpContext) =>
@@ -136,6 +142,7 @@ namespace MusicWebAPI.API.Endpoints
                 .WithOpenApi();
         }
 
+        #region Common
         private static async Task AppendTokenToCookies(HttpContext httpContext, string token)
         {
             var cookieOptions = new CookieOptions
@@ -158,5 +165,6 @@ namespace MusicWebAPI.API.Endpoints
             }
             return userId;
         }
+        #endregion
     }
 }
