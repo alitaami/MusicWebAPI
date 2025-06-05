@@ -1,21 +1,16 @@
 ﻿using AutoMapper;
 using Moq;
-using MusicWebAPI.Application.Commands.Handlers;
 using MusicWebAPI.Application.Features.Properties.Commands;
 using MusicWebAPI.Application.Features.Properties.Commands.Handlers;
 using MusicWebAPI.Application.Features.Properties.Queries;
 using MusicWebAPI.Application.Features.Properties.Queries.Handlers;
 using MusicWebAPI.Core;
+using MusicWebAPI.Core.Resources;
 using MusicWebAPI.Domain.External.Caching;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
 using static MusicWebAPI.Application.ViewModels.HomeViewModel;
 using static MusicWebAPI.Application.ViewModels.SongsViewModel;
+using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
 
 namespace MusicWebAPI.UnitTests.TDD
 {
@@ -31,6 +26,7 @@ namespace MusicWebAPI.UnitTests.TDD
         private AddToPlaylistCommandHandler _addToPlaylistHandler;
         private DeletePlayListCommandHandler _deletePlayListHandler;
         private DeletePlayListSongCommandHandler _deletePlayListSongHandler;
+        private ListenToSongCommandHandler _listenToSongHandler;
 
         [SetUp]
         public void Setup()
@@ -45,7 +41,7 @@ namespace MusicWebAPI.UnitTests.TDD
             _addToPlaylistHandler = new AddToPlaylistCommandHandler(_serviceManagerMock.Object);
             _deletePlayListHandler = new DeletePlayListCommandHandler(_serviceManagerMock.Object);
             _deletePlayListSongHandler = new DeletePlayListSongCommandHandler(_serviceManagerMock.Object);
-
+            _listenToSongHandler = new ListenToSongCommandHandler(_serviceManagerMock.Object, _cacheServiceMock.Object);
         }
 
         [Test]
@@ -270,7 +266,7 @@ namespace MusicWebAPI.UnitTests.TDD
             var ex = Assert.ThrowsAsync<Exception>(async () =>
                 await _deletePlayListHandler.Handle(command, CancellationToken.None));
 
-            Assert.That(ex.Message, Is.EqualTo("Failed to delete playlist")); 
+            Assert.That(ex.Message, Is.EqualTo("Failed to delete playlist"));
         }
 
         [Test]
@@ -319,5 +315,90 @@ namespace MusicWebAPI.UnitTests.TDD
             Assert.That(ex.Message, Is.EqualTo("Delete failed"));
         }
 
+        [Test]
+        public async Task Handle_ListenToSong_When_Successful()
+        {
+            // Arrange
+            var command = new ListenToSongCommand(
+                songId: Guid.NewGuid(),
+                userId: Guid.NewGuid()
+            );
+
+            _serviceManagerMock.Setup(s => s.User.ListenToSong(
+                command.songId,
+                command.userId,
+                It.IsAny<CancellationToken>()
+            )).Returns(Task.CompletedTask);
+
+            // Act
+            await _listenToSongHandler.Handle(command, CancellationToken.None);
+
+            // Assert
+            _serviceManagerMock.Verify(s => s.User.ListenToSong(
+                command.songId,
+                command.userId,
+                It.IsAny<CancellationToken>()
+            ), Times.Once);
+        }
+
+        [Test]
+        public void Handle_ListenToSong_When_UserNotFound()
+        {
+            // Arrange
+            var command = new ListenToSongCommand(
+                songId: Guid.NewGuid(),
+                userId: Guid.NewGuid()
+            );
+
+            _serviceManagerMock.Setup(s => s.User.ListenToSong(
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>(),
+                It.IsAny<CancellationToken>()
+            )).ThrowsAsync(new NotFoundException(Resource.UserNotFound));
+
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<NotFoundException>(async () => await _listenToSongHandler.Handle(command, CancellationToken.None));
+            Assert.That(ex.Message, Is.EqualTo(Resource.UserNotFound));
+        }
+
+        [Test]
+        public void Handle_ListenToSong_When_SongNotFound()
+        {
+            // Arrange
+            var command = new ListenToSongCommand(
+                songId: Guid.NewGuid(),
+                userId: Guid.NewGuid()
+            );
+
+            _serviceManagerMock.Setup(s => s.User.ListenToSong(
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>(),
+                It.IsAny<CancellationToken>()
+            )).ThrowsAsync(new NotFoundException(Resource.SongNotFound));
+
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<NotFoundException>(async () => await _listenToSongHandler.Handle(command, CancellationToken.None));
+            Assert.That(ex.Message, Is.EqualTo(Resource.SongNotFound));
+        }
+
+        [Test]
+        public void Handle_ListenToSong_When_ThrowException()
+        {
+            // Arrange
+            var command = new ListenToSongCommand(
+                songId: Guid.NewGuid(),
+                userId: Guid.NewGuid()
+            );
+
+            _serviceManagerMock.Setup(s => s.User.ListenToSong(
+                It.IsAny<Guid>(),
+                It.IsAny<Guid>(),
+                It.IsAny<CancellationToken>()
+            )).ThrowsAsync(new Exception("Error Occured"));
+
+            // Act & Assert
+            var ex = Assert.ThrowsAsync<Exception>(async () => await _listenToSongHandler.Handle(command, CancellationToken.None));
+            Assert.That(ex.Message, Is.EqualTo("Error Occured"));
+        }
     }
 }
