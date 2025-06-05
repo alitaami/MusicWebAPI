@@ -8,8 +8,9 @@ namespace MusicWebAPI.Domain.External.Caching
 {
     public interface ICacheService
     {
-        Task SetAsync<T>(string key, T value, int minutes);
+        Task SetAsync<T>(string key, T value, int minutes, string? prefix = null);
         Task<T?> GetAsync<T>(string key);
         Task RemoveAsync(string key);
+        Task RemoveByPrefixAsync(List<string> prefixs);
     }
 }

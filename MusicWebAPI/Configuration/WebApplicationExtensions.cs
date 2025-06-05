@@ -111,7 +111,7 @@ public static class WebApplicationExtensions
     private static void RegisterMinimalApis(this WebApplication app)
     {
         UserEndpoints.RegisterUserEndpoints(app); // Call the method that registers UserEndpoints
-        HomePageEndpoints.RegisterHomeEndpoints(app); // Call the method that registers HomeEndpoints
+        SongEndpoints.RegisterHomeEndpoints(app); // Call the method that registers HomeEndpoints
     }
 
     #endregion

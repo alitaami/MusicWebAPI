@@ -64,7 +64,7 @@ namespace MusicWebAPI.API.Endpoints
             .WithName("AddToPlaylist")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
-            .WithTags("Playlists")
+            .WithTags("User-Playlists")
             .RequireRateLimiting("main")
             .WithOpenApi();
 
@@ -85,7 +85,7 @@ namespace MusicWebAPI.API.Endpoints
             .WithName("GetPlaylists")
             .Produces<List<PlaylistViewModel>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
-            .WithTags("Playlists")
+            .WithTags("User-Playlists")
             .RequireRateLimiting("main")
             .WithOpenApi();
 
@@ -100,10 +100,9 @@ namespace MusicWebAPI.API.Endpoints
             .WithName("DeletePlaylist")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithTags("Playlists")
+            .WithTags("User-Playlists")
             .RequireRateLimiting("main")
             .WithOpenApi();
-
 
             // DeleteSongFromPlaylist endpoint
             app.MapDelete("/api/playlists/{playlistId}/songs/{songId}",
@@ -116,10 +115,25 @@ namespace MusicWebAPI.API.Endpoints
             .WithName("DeleteSongFromPlaylist")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithTags("Playlists")
+            .WithTags("User-Playlists")
             .RequireRateLimiting("main")
             .WithOpenApi();
 
+            app.MapPut("/api/songs/{songId}/listen",
+                [Authorize(Roles = "User")]
+            async (IMediator mediator, Guid songId, HttpContext httpContext) =>
+                {
+                    Guid? userId = (Guid?)GetUserId(httpContext);
+
+                    await mediator.Send(new ListenToSongCommand(songId, (Guid)userId));
+                    return Results.NoContent();
+                })
+                .WithName("ListenToSong")
+                .WithTags("User-Songs")
+                .RequireRateLimiting("main")
+                .Produces(StatusCodes.Status204NoContent)
+                .Produces(StatusCodes.Status404NotFound)
+                .WithOpenApi();
         }
 
         private static async Task AppendTokenToCookies(HttpContext httpContext, string token)

@@ -76,7 +76,7 @@ namespace MusicWebAPI.Application.Features.Properties.Queries.Handlers
             };
 
             // Cache the final mapped result
-            await _cacheService.SetAsync(cacheKey, result, 60); // Adjust cache duration as needed
+            await _cacheService.SetAsync(cacheKey, result, 60, Resource.GetPopularSongs_CacheKey);  // Adjust cache duration as needed 
 
             return result;
         }

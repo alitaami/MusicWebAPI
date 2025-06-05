@@ -240,8 +240,8 @@ namespace MusicWebAPI.Application.Services
                 using var ms = new MemoryStream();
                 _mlContext.Model.Save(_model, mlData.Schema, ms);
 
-                await _cacheService.SetAsync(ModelCacheKey, ms.ToArray(), CacheMinutes);
-                await _cacheService.SetAsync(ModelDataCacheKey, _modelData, CacheMinutes);
+                await _cacheService.SetAsync(ModelCacheKey, ms.ToArray(), CacheMinutes, ModelCacheKey);
+                await _cacheService.SetAsync(ModelDataCacheKey, _modelData, CacheMinutes, ModelDataCacheKey);
             }
             catch (Exception ex)
             {

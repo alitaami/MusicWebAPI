@@ -15,12 +15,12 @@ using System.Threading.Tasks;
 
 namespace MusicWebAPI.Application.Services
 {
-    public class HomeService : IHomeService
+    public class SongService : ISongService
     {
         private readonly IMapper _mapper;
         private IRepositoryManager _repositoryManager;
 
-        public HomeService(IRepositoryManager repositoryManager, IMapper mapper)
+        public SongService(IRepositoryManager repositoryManager, IMapper mapper)
         {
             _repositoryManager = repositoryManager;
             _mapper = mapper;

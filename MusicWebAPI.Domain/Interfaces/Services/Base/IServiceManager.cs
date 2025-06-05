@@ -10,7 +10,7 @@ namespace MusicWebAPI.Domain.Interfaces.Services.Base
     public interface IServiceManager
     {
         IUserService User { get; }
-        IHomeService Home { get; }
+        ISongService Home { get; }
         IRecommendationService Recommendation { get; }
     }
 }

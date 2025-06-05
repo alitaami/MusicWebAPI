@@ -20,24 +20,25 @@ namespace MusicWebAPI.Infrastructure.Caching
             _cache = cache ?? throw new ArgumentNullException(nameof(cache));
         }
 
-        public async Task SetAsync<T>(string key, T value, int minutes)
+        public async Task SetAsync<T>(string key, T value, int minutes, string? prefix = null)
         {
-            try
+            var options = new DistributedCacheEntryOptions
             {
-                var options = new DistributedCacheEntryOptions
-                {
-                    SlidingExpiration = TimeSpan.FromMinutes(minutes)
-                };
+                SlidingExpiration = TimeSpan.FromMinutes(minutes)
+            };
 
-                var serialized = JsonSerializer.Serialize(value);
+            var serialized = JsonSerializer.Serialize(value);
+            await _cache.SetStringAsync(key, serialized, options);
 
-                await _cache.SetStringAsync(key, serialized, options);
-
-            }
-            catch (Exception ex)
+            // Store reference in a key list for the given prefix
+            if (!string.IsNullOrEmpty(prefix))
             {
-                Console.WriteLine($"Exception in CacheService.SetAsync: {ex}");
-                throw;
+                var trackingKey = $"CacheKeys:{prefix}";
+                var current = await _cache.GetStringAsync(trackingKey);
+                var keys = current != null ? JsonSerializer.Deserialize<HashSet<string>>(current)! : new HashSet<string>();
+
+                keys.Add(key);
+                await _cache.SetStringAsync(trackingKey, JsonSerializer.Serialize(keys), options);
             }
         }
 
@@ -66,6 +67,31 @@ namespace MusicWebAPI.Infrastructure.Caching
             {
                 Console.WriteLine($"Exception in CacheService.RemoveAsync: {ex}");
                 throw;
+            }
+        }
+
+        public async Task RemoveByPrefixAsync(List<string> prefixes)
+        {
+            foreach (var prefix in prefixes)
+            {
+                var trackingKey = $"CacheKeys:{prefix}";
+                var data = await _cache.GetStringAsync(trackingKey);
+
+                if (data != null)
+                {
+                    var keys = JsonSerializer.Deserialize<HashSet<string>>(data);
+
+                    if (keys != null)
+                    {
+                        foreach (var key in keys)
+                        {
+                            await RemoveAsync(key);
+                        }
+                    }
+
+                    // Remove tracking key itself
+                    await RemoveAsync(trackingKey);
+                }
             }
         }
     }

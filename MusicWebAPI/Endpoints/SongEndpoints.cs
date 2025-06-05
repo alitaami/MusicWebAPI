@@ -23,7 +23,7 @@ using static MusicWebAPI.Application.ViewModels.HomeViewModel;
 
 namespace MusicWebAPI.API.Endpoints
 {
-    public class HomePageEndpoints : ApiResponseBase
+    public class SongEndpoints : ApiResponseBase
     {
         public static void RegisterHomeEndpoints(WebApplication app)
         {
@@ -129,7 +129,6 @@ namespace MusicWebAPI.API.Endpoints
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status416RangeNotSatisfiable)
             .WithTags("Home");
-
         }
 
         private static object GetUserId(HttpContext httpContext)
