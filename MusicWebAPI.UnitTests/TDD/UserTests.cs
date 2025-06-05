@@ -67,7 +67,7 @@ namespace MusicWebAPI.UnitTests.TDD
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(expectedToken, result.Token);
-            _serviceManagerMock.Verify(service => service.User.LoginUser(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+            _serviceManagerMock.Verify(service => service.User.RegisterUser(It.IsAny<User>(), It.IsAny<string>()), Times.Once);
         }
 
         [Test]
