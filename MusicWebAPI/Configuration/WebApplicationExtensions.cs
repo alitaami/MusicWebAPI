@@ -110,6 +110,7 @@ public static class WebApplicationExtensions
 
     private static void RegisterMinimalApis(this WebApplication app)
     {
+        AuthEndpoints.RegisterAuthEndpoints(app); // Call the method that registers AuthEndpoints
         UserEndpoints.RegisterUserEndpoints(app); // Call the method that registers UserEndpoints
         SongEndpoints.RegisterHomeEndpoints(app); // Call the method that registers HomeEndpoints
         SubscriptionEndpoints.RegisterSubscriptionEndpoints(app); // Call the method that registers SubscriptionEndpoints
