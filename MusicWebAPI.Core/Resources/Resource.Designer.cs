@@ -108,9 +108,9 @@ namespace MusicWebAPI.Core.Resources {
         /// <summary>
         ///   Looks up a localized string similar to An unexpected error occurred. Please try again later..
         /// </summary>
-        public static string GeneralUnhandledErrorText {
+        public static string GeneralUnhandledError {
             get {
-                return ResourceManager.GetString("GeneralUnhandledErrorText", resourceCulture);
+                return ResourceManager.GetString("GeneralUnhandledError", resourceCulture);
             }
         }
         
@@ -214,6 +214,15 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Stream limit reached. Please wait for your 12-hour window to reset or consider subscribing to our premium plan for unlimited access..
+        /// </summary>
+        public static string SongStreamLimitError {
+            get {
+                return ResourceManager.GetString("SongStreamLimitError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Subscription not found!.
         /// </summary>
         public static string SubscriptionNotFound {
@@ -228,6 +237,15 @@ namespace MusicWebAPI.Core.Resources {
         public static string SuperUserRole {
             get {
                 return ResourceManager.GetString("SuperUserRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You should authorize first!.
+        /// </summary>
+        public static string UnAuthorizedError {
+            get {
+                return ResourceManager.GetString("UnAuthorizedError", resourceCulture);
             }
         }
         

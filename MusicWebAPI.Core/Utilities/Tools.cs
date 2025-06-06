@@ -1,5 +1,6 @@
 ﻿using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -78,6 +79,16 @@ namespace MusicWebAPI.Core.Utilities
                 return httpContext?.User.Identity?.IsAuthenticated == true &&
                        httpContext.User.IsInRole(_requiredRole);
             }
+        }
+
+        public static object GetUserId(HttpContext httpContext)
+        {
+            var userIdClaim = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Results.Unauthorized();
+            }
+            return userId.ToString();
         }
     }
 }

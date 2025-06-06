@@ -110,7 +110,7 @@ public class ErrorHandlingMiddleware
 
         // Create the default error response for unhandled 500 errors
         string errorMessage = statusCode == StatusCodes.Status500InternalServerError
-            ? Resource.GeneralUnhandledErrorText
+            ? Resource.GeneralUnhandledError
             : exception.Message;
 
         var result = new ApiResult<object>(errorMessage, statusCode)

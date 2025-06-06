@@ -9,6 +9,7 @@ using MusicWebAPI.Application.Features.Properties.Commands;
 using MusicWebAPI.Application.Features.Properties.Queries;
 using MusicWebAPI.Core;
 using MusicWebAPI.Core.Resources;
+using MusicWebAPI.Core.Utilities;
 using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Domain.Entities.Subscription_Models;
 using MusicWebAPI.Domain.External.FileService;
@@ -44,12 +45,13 @@ namespace MusicWebAPI.API.Endpoints
             .WithName("GetSubscriptionPlans")
             .Produces<List<SubscriptionPlan>>(StatusCodes.Status200OK)
             .WithTags("Subscription")
+            .RequireRateLimiting("main")
             .WithOpenApi();
 
             // Subscribe to a plan  
             app.MapPost("/api/subscriptions/subscribe", async (IMediator mediator, [FromBody] SubscribeDTO dto, HttpContext httpContext, CancellationToken cancellationToken) =>
             {
-                var userId = GetUserId(httpContext);
+                var userId = Tools.GetUserId(httpContext);
                 var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
                 var command = new SubscribeCommand(dto.PlanId, (Guid)userId, baseUrl);
 
@@ -60,10 +62,12 @@ namespace MusicWebAPI.API.Endpoints
                     CheckoutUrl = paymentUrl
                 });
             })
+            .RequireAuthorization(policy => policy.RequireRole("User"))
             .WithName("SubscribeToPlan")
             .Produces<RedirectToGatewayResponseDTO>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .WithTags("Subscription")
+            .RequireRateLimiting("main")
             .WithOpenApi();
 
             // Verify subscription payment
@@ -81,19 +85,8 @@ namespace MusicWebAPI.API.Endpoints
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .WithTags("Subscription")
+            .RequireRateLimiting("main")
             .WithOpenApi();
-        }
-
-        #region Common
-        private static object GetUserId(HttpContext httpContext)
-        {
-            var userIdClaim = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-            {
-                return Unauthorized("");
-            }
-            return userId;
-        }
-        #endregion
+        } 
     }
 }

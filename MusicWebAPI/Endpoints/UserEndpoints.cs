@@ -15,6 +15,7 @@ using static MusicWebAPI.Application.ViewModels.UserViewModel;
 using MusicWebAPI.Core.Base;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
+using MusicWebAPI.Core.Utilities;
 namespace MusicWebAPI.API.Endpoints
 {
     public class UserEndpoints : ApiResponseBase
@@ -59,7 +60,7 @@ namespace MusicWebAPI.API.Endpoints
             app.MapPost("/api/playlists", [Authorize(Roles = "User")]
             async (IMediator mediator, AddToPlaylistDTO dto, HttpContext httpContext) =>
             {
-                Guid? userId = (Guid?)GetUserId(httpContext);
+                Guid? userId = (Guid?)Tools.GetUserId(httpContext);
                 var command = new AddToPlaylistCommand(dto.SongId, (Guid)userId, dto.PlaylistName, dto.PlaylistId);
 
                 await mediator.Send(command);
@@ -79,14 +80,14 @@ namespace MusicWebAPI.API.Endpoints
             async (IMediator mediator,
             HttpContext httpContext) =>
             {
-                // Extract user id or info from ClaimsPrincipal (httpContext.User)
-                var userId = GetUserId(httpContext);
+                var userId = Tools.GetUserId(httpContext);
 
                 var query = new GetPlaylistsQuery((Guid)userId);
                 var result = await mediator.Send(query);
 
                 return Ok(result);
             })
+            .RequireAuthorization(policy => policy.RequireRole("User"))
             .WithName("GetPlaylists")
             .Produces<List<PlaylistViewModel>>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status401Unauthorized)
@@ -96,12 +97,12 @@ namespace MusicWebAPI.API.Endpoints
 
             // DeletePlaylist endpoint
             app.MapDelete("/api/playlists/{playlistId}",
-            [Authorize(Roles = "User")]
             async (IMediator mediator, Guid playlistId) =>
             {
                 await mediator.Send(new DeletePlayListCommand(playlistId));
                 return NoContent();
             })
+            .RequireAuthorization(policy => policy.RequireRole("User"))
             .WithName("DeletePlaylist")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
@@ -111,12 +112,12 @@ namespace MusicWebAPI.API.Endpoints
 
             // DeleteSongFromPlaylist endpoint
             app.MapDelete("/api/playlists/{playlistId}/songs/{songId}",
-            [Authorize(Roles = "User")]
             async (IMediator mediator, Guid playlistId, Guid songId) =>
             {
                 await mediator.Send(new DeletePlayListSongCommand(songId, playlistId));
                 return NoContent();
             })
+            .RequireAuthorization(policy => policy.RequireRole("User"))
             .WithName("DeleteSongFromPlaylist")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
@@ -126,14 +127,14 @@ namespace MusicWebAPI.API.Endpoints
 
             // ListenToSong endpoint
             app.MapPut("/api/songs/{songId}/listen",
-                [Authorize(Roles = "User")]
             async (IMediator mediator, Guid songId, HttpContext httpContext) =>
                 {
-                    Guid? userId = (Guid?)GetUserId(httpContext);
+                    Guid? userId = (Guid?)Tools.GetUserId(httpContext);
 
                     await mediator.Send(new ListenToSongCommand(songId, (Guid)userId));
                     return Results.NoContent();
                 })
+                .RequireAuthorization(policy => policy.RequireRole("User"))
                 .WithName("ListenToSong")
                 .WithTags("User-Songs")
                 .RequireRateLimiting("main")
@@ -154,16 +155,6 @@ namespace MusicWebAPI.API.Endpoints
                 Expires = DateTime.UtcNow.AddHours(2) // Match token expiration
             };
             httpContext.Response.Cookies.Append("access_token", token, cookieOptions);
-        }
-
-        private static object GetUserId(HttpContext httpContext)
-        {
-            var userIdClaim = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-            {
-                return Unauthorized("");
-            }
-            return userId;
         }
         #endregion
     }
