@@ -242,13 +242,26 @@ docker-compose up --build -d
         </td>
       </tr>
       <tr>
-        <td>Chat UI</td>
-        <td><a href="http://localhost:8080/chat" target="_blank" rel="noopener noreferrer">http://localhost:8080/chat</a></td>
-        <td>Real-time chat playground</td>
-        <td>
-          <img src="https://github.com/user-attachments/assets/cc8ee4f7-b919-430e-b9c2-52fcd50b1e6a" alt="Real-Time Chat Screenshot" style="max-width: 150px; height: auto;" />
-        </td>
-      </tr>
+  <td>Chat UI</td>
+  <td>
+    <a href="http://localhost:8080/chat" target="_blank" rel="noopener noreferrer">
+      http://localhost:8080/chat
+    </a>
+  </td>
+  <td>Real-time chat playground including login/register </td>
+
+  <td style="display: flex; gap: 10px;">
+    <img src="https://github.com/user-attachments/assets/37e1a06b-7bab-40e7-900f-0f6556c38e91" 
+         alt="Chat Screenshot 2" 
+         style="max-width: 150px; height: auto;" />
+    <img src="https://github.com/user-attachments/assets/e4c95a0b-e67a-4ce8-b49c-1ef0d6ac8b73" 
+         alt="Chat Screenshot 3" 
+         style="max-width: 150px; height: auto;" />
+    <img src="https://github.com/user-attachments/assets/cc8ee4f7-b919-430e-b9c2-52fcd50b1e6a" 
+         alt="Real-Time Chat Screenshot" 
+         style="max-width: 150px; height: auto;" />      
+  </td>
+</tr>
       <tr>
         <td>Hangfire</td>
         <td><a href="http://localhost:8080/hangfire" target="_blank" rel="noopener noreferrer">http://localhost:8080/hangfire</a></td>
