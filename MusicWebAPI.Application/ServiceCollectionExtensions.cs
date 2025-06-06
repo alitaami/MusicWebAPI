@@ -20,6 +20,7 @@ namespace MusicWebAPI.Application
             services.AddSingleton<ILoggerManager, LoggerManager>(); // Register LoggerManager
             services.AddScoped<IRecommendationService, RecommendationService>();
             services.AddScoped<ICacheService, CacheService>();
+            services.AddScoped<IUserService, UserService>();
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly())
                     .AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<RegisterUserCommand>())

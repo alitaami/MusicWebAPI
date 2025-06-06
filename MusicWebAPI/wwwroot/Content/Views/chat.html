@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>SignalR Group Chat</title>
     <link rel="stylesheet" href="../css/chat.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@latest/dist/browser/signalr.min.js"></script>
 </head>
 <body>
@@ -15,6 +16,22 @@
                     <input type="text" id="loginUsername" placeholder="Username" />
                     <input type="password" id="loginPassword" placeholder="Password" />
                     <button id="loginBtn">Login</button>
+
+                    <div id="g_id_onload"
+                         data-callback="onGoogleSignIn"
+                         data-auto_prompt="false">
+                    </div>
+                    <div class="google-signin-wrapper">
+                        <div class="g_id_signin"
+                             data-type="standard"
+                             data-shape="rectangular"
+                             data-theme="outline"
+                             data-text="sign_in_with"
+                             data-size="large"
+                             data-logo_alignment="left">
+                        </div>
+                    </div>
+
                     <p>Not registered yet? <a href="#" id="showRegisterForm">Register here</a></p>
 
                 </div>
@@ -32,6 +49,22 @@
                         </label>
                     </div>
                     <button id="registerBtn">Register</button>
+
+                    <div id="g_id_onload"
+                         data-callback="onGoogleSignIn"
+                         data-auto_prompt="false">
+                    </div>
+                    <div class="google-signin-wrapper">
+                        <div class="g_id_signin"
+                             data-type="standard"
+                             data-shape="rectangular"
+                             data-theme="outline"
+                             data-text="sign_in_with"
+                             data-size="large"
+                             data-logo_alignment="left">
+                        </div>
+                    </div>
+
                     <p>Already have an account? <a href="#" id="showLoginForm">Login here</a></p>
 
                 </div>

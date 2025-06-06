@@ -16,12 +16,37 @@ using MusicWebAPI.Core.Base;
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using MusicWebAPI.Core.Utilities;
+using MusicWebAPI.Domain.Interfaces.Services;
 namespace MusicWebAPI.API.Endpoints
 {
     public class UserEndpoints : ApiResponseBase
     {
         public static void RegisterUserEndpoints(WebApplication app)
         {
+            // Getting client_id from .env file to use in Google login
+            app.MapGet("/api/auth/google/client_id", () =>
+            {
+                var clientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+                return Ok(clientId);
+            })
+            .WithName("Google-ClientId")
+            .RequireRateLimiting("main")
+            .ExcludeFromDescription();
+
+            // Google login endpoint
+            app.MapPost("/api/auth/google-login", async (IMediator mediator, GoogleLoginCommand command) =>
+            {
+                var result = await mediator.Send(command);
+
+                return Ok(result);
+            })
+            .WithName("Google-Login")
+            .Produces<string>(StatusCodes.Status200OK)
+            .Produces<string>(StatusCodes.Status400BadRequest)
+            .WithTags("User")
+            .RequireRateLimiting("main")
+            .WithOpenApi();
+
             // Register user endpoint
             app.MapPost("/api/register", async (IMediator mediator, RegisterUserCommand command, HttpContext httpContext, [FromQuery] string? returnUrl = null) =>
             {

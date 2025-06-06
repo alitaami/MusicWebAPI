@@ -142,6 +142,15 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to InvalidGoogleToken!.
+        /// </summary>
+        public static string InvalidGoogleToken {
+            get {
+                return ResourceManager.GetString("InvalidGoogleToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid plan!.
         /// </summary>
         public static string InvalidPlan {

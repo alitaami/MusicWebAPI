@@ -144,6 +144,9 @@
   <data name="InvalidCredentials" xml:space="preserve">
     <value>Email or Password is not correct! Try again.</value>
   </data>
+  <data name="InvalidGoogleToken" xml:space="preserve">
+    <value>InvalidGoogleToken!</value>
+  </data>
   <data name="InvalidPlan" xml:space="preserve">
     <value>Invalid plan!</value>
   </data>

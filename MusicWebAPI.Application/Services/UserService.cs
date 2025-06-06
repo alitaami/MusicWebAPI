@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using MusicWebAPI.Core.Resources;
@@ -17,6 +18,7 @@ namespace MusicWebAPI.Application.Services
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly IRepositoryManager _repositoryManager;
+        private readonly string _googleClientId;
 
         public UserService(UserManager<User> userManager, IRepositoryManager repositoryManager, IMapper mapper, IConfiguration configuration)
         {
@@ -24,9 +26,52 @@ namespace MusicWebAPI.Application.Services
             _configuration = configuration;
             _userManager = userManager;
             _mapper = mapper;
+            _googleClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
         }
 
         #region Authorization & Authentication
+
+        public async Task<string> GoogleLogin(string idToken)
+        {
+            GoogleJsonWebSignature.Payload payload;
+
+            try
+            {
+                payload = await GoogleJsonWebSignature.ValidateAsync(idToken, new GoogleJsonWebSignature.ValidationSettings()
+                {
+                    Audience = new[] { _googleClientId }
+                });
+            }
+            catch
+            {
+                throw new UnauthorizedException(Resource.InvalidGoogleToken);
+            }
+
+            var user = await _userManager.FindByEmailAsync(payload.Email);
+
+            if (user == null)
+            {
+                user = new User
+                {
+                    Email = payload.Email,
+                    UserName = payload.Email,
+                    FullName = payload.Name,
+                    EmailConfirmed = true,
+                    Avatar = payload.Picture,
+                    IsArtist = false,
+                };
+
+                var result = await _userManager.CreateAsync(user);
+
+                if (!result.Succeeded)
+                    throw new BadRequestException(Resource.UserRegistrationError);
+
+                await AssignRole(user, false);
+            }
+
+            return JwtHelper.GenerateToken(user, _configuration);
+        }
+
         public async Task<string> RegisterUser(User user, string password)
         {
             if (await IsUserExists(user.Email, user.UserName))

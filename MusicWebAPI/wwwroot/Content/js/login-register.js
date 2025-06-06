@@ -132,6 +132,7 @@ async function register() {
 
 window.onload = function () {
     const accessToken = getCookie('access_token');
+    setGoogleClientId();
 
     if (accessToken) {
         // Token found — show chat, hide login/register
@@ -159,4 +160,57 @@ function getCookie(name) {
 function toggleForm(form) {
     document.getElementById('loginForm').style.display = form === 'login' ? 'block' : 'none';
     document.getElementById('registerForm').style.display = form === 'register' ? 'block' : 'none';
+}
+
+async function setGoogleClientId() {
+    try {
+        const res = await fetch('http://localhost:8080/api/auth/google/client_id');
+        if (!res.ok) throw new Error('Failed to fetch client id');
+
+        const data = await res.json();
+
+        const clientId = data.data;
+
+        const gIdOnload = document.getElementById('g_id_onload');
+        gIdOnload.setAttribute('data-client_id', clientId);
+
+        // Now load the Google script dynamically AFTER setting client_id
+        const script = document.createElement('script');
+        script.src = 'https://accounts.google.com/gsi/client';
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    } catch (error) {
+        console.error('Error fetching Google Client ID:', error);
+    }
+}
+
+async function onGoogleSignIn(response) {
+    const idToken = response.credential;
+
+    try {
+        const googleLoginUrl = 'http://localhost:8080/api/auth/google-login';
+
+        const res = await fetch(googleLoginUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ idToken })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.errorMessage || 'Google login failed');
+            return;
+        }
+
+        // Extract token directly from data.data (which is a string token)
+        setCookie('access_token', data.data);
+
+        document.getElementById('authWrapper').style.display = 'none';
+        document.getElementById('chatContainer').style.display = 'block';
+    } catch (err) {
+        console.error("Google login error:", err);
+        alert('An error occurred during Google login.');
+    }
 }

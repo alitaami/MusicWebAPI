@@ -533,3 +533,16 @@ body {
     margin-left: 8px;
 }
 
+#loginBtn {
+    margin-bottom: 15px; 
+}
+
+.g_id_signin {
+    margin-top: 15px;
+    display: inline-block; 
+}
+
+.google-signin-wrapper {
+    text-align: center;
+    margin-top: 15px;
+}
