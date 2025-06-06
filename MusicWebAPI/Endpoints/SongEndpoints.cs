@@ -8,7 +8,9 @@ using MusicWebAPI.Application.Commands;
 using MusicWebAPI.Application.Features.Properties.Queries;
 using MusicWebAPI.Core;
 using MusicWebAPI.Core.Resources;
+using MusicWebAPI.Core.Utilities;
 using MusicWebAPI.Domain.Entities;
+using MusicWebAPI.Domain.External.Caching;
 using MusicWebAPI.Domain.External.FileService;
 using MusicWebAPI.Domain.Interfaces;
 using MusicWebAPI.Infrastructure.Data.Context;
@@ -18,6 +20,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel;
 using System.Drawing.Printing;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using static MusicWebAPI.Application.ViewModels.HomeViewModel;
 
@@ -59,7 +62,7 @@ namespace MusicWebAPI.API.Endpoints
 
             app.MapGet("/api/home/recommended-songs", async (IMediator mediator, HttpContext httpContext, CancellationToken ct, int count = 5) =>
             {
-                var userId = GetUserId(httpContext);
+                var userId = Tools.GetUserId(httpContext);
                 var query = new GetRecommendedSongsQuery(userId.ToString(), count);
 
                 var songs = await mediator.Send(query);
@@ -75,12 +78,13 @@ namespace MusicWebAPI.API.Endpoints
 
 
             app.MapGet("/api/home/stream-song/{objectId}", async (
-                [Description("objectId is made of: {musicId}.mp3")]
-                string objectId,
-                HttpContext httpContext,
-                FileStorageService fileStorageService,
-                [Description("Optional HTTP Range header (e.g. 'bytes=0-1023') for partial file streaming")]
-                [FromQuery] string? range = null) =>
+               [Description("objectId is made of: {musicId}.mp3")]
+               string objectId,
+               HttpContext httpContext,
+               FileStorageService fileStorageService,
+               ICacheService cacheService,
+               [Description("Optional HTTP Range header (e.g. 'bytes=0-1023') for partial file streaming")]
+               [FromQuery] string? range = null) =>
             {
                 try
                 {
@@ -110,11 +114,10 @@ namespace MusicWebAPI.API.Endpoints
                     }
 
                     await fileStreamResult.Stream.CopyToAsync(response.Body);
+
+                    await UpdateListenCountAsync(httpContext, cacheService);
+
                     return Results.Empty;
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    return BadRequest(Resource.InvalidRangeHeader);
                 }
                 catch (Exception ex)
                 {
@@ -123,24 +126,37 @@ namespace MusicWebAPI.API.Endpoints
                     return InternalServerError("");
                 }
             })
+            .RequireAuthorization(policy => policy.RequireRole("User"))
+            .AddEndpointFilter<LimitStreamingAttribute>()
             .WithName("StreamSong")
             .Produces(StatusCodes.Status206PartialContent)
             .Produces(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status404NotFound)
             .Produces(StatusCodes.Status416RangeNotSatisfiable)
+            .RequireRateLimiting("main")
             .WithTags("Home");
         }
 
         #region Common
-        private static object GetUserId(HttpContext httpContext)
+        private static async Task UpdateListenCountAsync(HttpContext httpContext, ICacheService cacheService)
         {
-            var userIdClaim = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
-            {
-                return Unauthorized("");
-            }
-            return userId.ToString();
+            int count = 0;
+            var userId = httpContext.User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrWhiteSpace(userId))
+                return;
+
+            var now = DateTime.UtcNow;
+            var windowGroup = now.Hour < 12 ? "1" : "2";
+            var keyPattern = Resource.ListenCountCacheKey;
+            var cacheKey = string.Format(keyPattern, userId, now.ToString("yyyyMMdd"), windowGroup);
+
+            count = await cacheService.GetAsync<int>(cacheKey);
+            count++;
+
+            await cacheService.SetAsync(cacheKey, count, 720); // 720 minutes = 12h
         }
+
         #endregion
     }
 }
