@@ -51,9 +51,9 @@ namespace MusicWebAPI.API.Endpoints
             // Subscribe to a plan  
             app.MapPost("/api/subscriptions/subscribe", async (IMediator mediator, [FromBody] SubscribeDTO dto, HttpContext httpContext, CancellationToken cancellationToken) =>
             {
-                var userId = Tools.GetUserId(httpContext);
+                var userId = (Guid)Tools.GetUserId(httpContext);
                 var baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
-                var command = new SubscribeCommand(dto.PlanId, (Guid)userId, baseUrl);
+                var command = new SubscribeCommand(dto.PlanId, userId, baseUrl);
 
                 var paymentUrl = await mediator.Send(command, cancellationToken);
 

@@ -88,7 +88,7 @@ namespace MusicWebAPI.Core.Utilities
             {
                 return Results.Unauthorized();
             }
-            return userId.ToString();
+            return userId;
         }
     }
 }

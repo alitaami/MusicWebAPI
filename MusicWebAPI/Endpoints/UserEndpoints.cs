@@ -57,7 +57,7 @@ namespace MusicWebAPI.API.Endpoints
             .WithOpenApi(); // This enables Swagger for Minimal API
 
             // AddToPlayList endpoint 
-            app.MapPost("/api/playlists", [Authorize(Roles = "User")]
+            app.MapPost("/api/playlists",
             async (IMediator mediator, AddToPlaylistDTO dto, HttpContext httpContext) =>
             {
                 Guid? userId = (Guid?)Tools.GetUserId(httpContext);
@@ -67,6 +67,7 @@ namespace MusicWebAPI.API.Endpoints
 
                 return NoContent();
             })
+            .RequireAuthorization(policy => policy.RequireRole("User"))
             .WithName("AddToPlaylist")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status400BadRequest)
@@ -76,11 +77,10 @@ namespace MusicWebAPI.API.Endpoints
 
             // GetPlayLists endpoint 
             app.MapGet("/api/playlists",
-            [Authorize(Roles = "User")]
             async (IMediator mediator,
             HttpContext httpContext) =>
             {
-                var userId = Tools.GetUserId(httpContext);
+                var userId = (Guid)Tools.GetUserId(httpContext);
 
                 var query = new GetPlaylistsQuery((Guid)userId);
                 var result = await mediator.Send(query);

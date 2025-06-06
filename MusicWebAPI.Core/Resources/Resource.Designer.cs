@@ -160,6 +160,15 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ListenCount:{0}:{1}:{2}.
+        /// </summary>
+        public static string ListenCountCacheKey {
+            get {
+                return ResourceManager.GetString("ListenCountCacheKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password must be 8 or more than 8 characters!.
         /// </summary>
         public static string PasswordMin {

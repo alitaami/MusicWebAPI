@@ -150,6 +150,9 @@
   <data name="InvalidRangeHeader" xml:space="preserve">
     <value>Invalid Range header1</value>
   </data>
+  <data name="ListenCountCacheKey" xml:space="preserve">
+    <value>ListenCount:{0}:{1}:{2}</value>
+  </data>
   <data name="PasswordMin" xml:space="preserve">
     <value>Password must be 8 or more than 8 characters!</value>
   </data>
