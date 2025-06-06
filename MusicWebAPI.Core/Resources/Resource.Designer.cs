@@ -61,6 +61,15 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You already have an active plan!.
+        /// </summary>
+        public static string AlreadySubscribedError {
+            get {
+                return ResourceManager.GetString("AlreadySubscribedError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Artist.
         /// </summary>
         public static string ArtistRole {
@@ -133,6 +142,15 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid plan!.
+        /// </summary>
+        public static string InvalidPlan {
+            get {
+                return ResourceManager.GetString("InvalidPlan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid Range header1.
         /// </summary>
         public static string InvalidRangeHeader {
@@ -192,6 +210,15 @@ namespace MusicWebAPI.Core.Resources {
         public static string SongNotFound {
             get {
                 return ResourceManager.GetString("SongNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Subscription not found!.
+        /// </summary>
+        public static string SubscriptionNotFound {
+            get {
+                return ResourceManager.GetString("SubscriptionNotFound", resourceCulture);
             }
         }
         

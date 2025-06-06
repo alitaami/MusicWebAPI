@@ -112,6 +112,7 @@ public static class WebApplicationExtensions
     {
         UserEndpoints.RegisterUserEndpoints(app); // Call the method that registers UserEndpoints
         SongEndpoints.RegisterHomeEndpoints(app); // Call the method that registers HomeEndpoints
+        SubscriptionEndpoints.RegisterSubscriptionEndpoints(app); // Call the method that registers SubscriptionEndpoints
     }
 
     #endregion

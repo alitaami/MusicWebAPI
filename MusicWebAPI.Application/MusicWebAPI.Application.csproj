@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="Features\Properties\Queries\Handlers\GetSubscriptionsQueryHandler.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
@@ -19,6 +23,7 @@
     <PackageReference Include="Microsoft.ML" Version="4.0.2" />
     <PackageReference Include="Microsoft.ML.Recommender" Version="0.22.2" />
     <PackageReference Include="StackExchange.Redis" Version="2.8.37" />
+    <PackageReference Include="Stripe.net" Version="48.2.0" />
   </ItemGroup>
 
   <ItemGroup>

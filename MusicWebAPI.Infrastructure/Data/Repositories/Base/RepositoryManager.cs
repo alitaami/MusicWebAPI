@@ -23,6 +23,8 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories.Base
         private ISongRepository _songRepository;
         private IPlayListRepository _playListRepository;
         private IPlayListSongsRepository _playListSongsRepository;
+        private ISubscriptionRepository _subscriptionRepository;
+        private IUserSubscriptionRepository _userSubscriptionRepository;
 
         public RepositoryManager(MusicDbContext context, ICacheService cacheService)
         {
@@ -70,6 +72,26 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories.Base
         #endregion
 
         #region Model Repositories
+        public ISubscriptionRepository Subscription
+        {
+            get
+            {
+                if (this._subscriptionRepository == null)
+                    this._subscriptionRepository = new SubscriptionRepository(_context);
+
+                return this._subscriptionRepository;
+            }
+        }
+        public IUserSubscriptionRepository UserSubscription
+        {
+            get
+            {
+                if (this._userSubscriptionRepository == null)
+                    this._userSubscriptionRepository = new UserSubscriptionRepository(_context);
+
+                return this._userSubscriptionRepository;
+            }
+        }
         public ISongRepository Song
         {
             get

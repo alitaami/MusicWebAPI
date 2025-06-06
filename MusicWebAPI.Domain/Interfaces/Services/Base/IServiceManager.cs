@@ -12,5 +12,6 @@ namespace MusicWebAPI.Domain.Interfaces.Services.Base
         IUserService User { get; }
         ISongService Home { get; }
         IRecommendationService Recommendation { get; }
+        ISubscriptionService Subscription { get; }
     }
 }

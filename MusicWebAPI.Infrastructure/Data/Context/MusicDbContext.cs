@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using MusicWebAPI.Core.Utilities;
 using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Domain.Entities.Chat_Models;
+using MusicWebAPI.Domain.Entities.Subscription_Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,8 @@ namespace MusicWebAPI.Infrastructure.Data.Context
         public DbSet<ChatGroup> ChatGroups { get; set; }
         public DbSet<UserGroup> UserGroups { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
+        public DbSet<UserSubscription> UserSubscriptions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

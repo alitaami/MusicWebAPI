@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Domain.Entities.Chat_Models;
+using MusicWebAPI.Domain.Entities.Subscription_Models;
 using MusicWebAPI.Domain.External.FileService;
 using MusicWebAPI.Domain.Interfaces.Services;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
@@ -94,6 +95,10 @@ public static class SeedData
             context.SaveChanges();
 
             #endregion
+
+            #region Subscription
+            SeedSubscriptionPlans(context);
+            #endregion
         }
         catch (Exception ex)
         {
@@ -113,6 +118,60 @@ public static class SeedData
         var avatarUrl = fileStorageService.UploadFile(defaultAvatarObjectId, defaultAvatarBase64).GetAwaiter().GetResult();
 
         return avatarUrl;
+    }
+
+    private static void SeedSubscriptionPlans(MusicDbContext context)
+    {
+        var existingPlanNames = context.SubscriptionPlans
+            .Select(s => s.Name)
+            .ToList();
+
+        var plansToAdd = new List<SubscriptionPlan>();
+
+        if (!existingPlanNames.Contains("Premium Monthly"))
+        {
+            plansToAdd.Add(new SubscriptionPlan
+            {
+                Id = Guid.NewGuid(),
+                Name = "Premium Monthly",
+                DurationInDays = 30,
+                Price = 8, //$
+                Description = "Access premium features for a month",
+                IsActive = true
+            });
+        }
+        
+        if (!existingPlanNames.Contains("Premium 3-Monthly"))
+        {
+            plansToAdd.Add(new SubscriptionPlan
+            {
+                Id = Guid.NewGuid(),
+                Name = "Premium 3-Monthly",
+                DurationInDays = 90,
+                Price = 20, //$
+                Description = "Access premium features for 3 months",
+                IsActive = true
+            });
+        }
+
+        if (!existingPlanNames.Contains("Premium Yearly"))
+        {
+            plansToAdd.Add(new SubscriptionPlan
+            {
+                Id = Guid.NewGuid(),
+                Name = "Premium Yearly",
+                DurationInDays = 365,
+                Price = 60, //$
+                Description = "Access premium features for a year",
+                IsActive = true
+            });
+        }
+
+        if (plansToAdd.Any())
+        {
+            context.SubscriptionPlans.AddRange(plansToAdd);
+            context.SaveChanges();
+        }
     }
 
     private static void SeedArtistsAndSongs(

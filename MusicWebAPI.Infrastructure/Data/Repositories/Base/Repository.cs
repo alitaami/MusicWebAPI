@@ -1,8 +1,8 @@
-﻿using MusicWebAPI.Domain.Interfaces.Repositories.Base;
+﻿using Microsoft.EntityFrameworkCore;
+using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 using MusicWebAPI.Infrastructure.Data.Context;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -35,7 +35,7 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories.Base
                 await _context.SaveChangesAsync(cancellationToken);
             }
         }
-        
+
         public async Task<TEntity> AddAndGetAsync(TEntity entity, CancellationToken cancellationToken, bool saveNow = true)
         {
             await _context.Set<TEntity>().AddAsync(entity, cancellationToken);

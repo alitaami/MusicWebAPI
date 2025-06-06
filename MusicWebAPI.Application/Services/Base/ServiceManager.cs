@@ -23,6 +23,7 @@ public class ServiceManager : IServiceManager
     private readonly Lazy<IUserService> _userService;
     private readonly Lazy<ISongService> _homeService;
     private readonly Lazy<IRecommendationService> _recommendService;
+    private readonly Lazy<ISubscriptionService> _subscriptionService;
     public ServiceManager(IRepositoryManager repositoryManager, ICacheService cacheService, UserManager<User> userManager, IConfiguration configuration, HttpClient httpClient)
     {
         _cacheService = cacheService;
@@ -40,10 +41,12 @@ public class ServiceManager : IServiceManager
         // Lazy initialization for thread safety
         _userService = new Lazy<IUserService>(() => new UserService(_userManager, repositoryManager, _mapper, _configuration));
         _homeService = new Lazy<ISongService>(() => new SongService(_repositoryManager, _mapper));
-        _recommendService = new Lazy<IRecommendationService>(() => new RecommendationService(_repositoryManager, cacheService,configuration,_httpClient));
+        _recommendService = new Lazy<IRecommendationService>(() => new RecommendationService(_repositoryManager, cacheService, configuration, _httpClient));
+        _subscriptionService = new Lazy<ISubscriptionService>(() => new SubscriptionService(_repositoryManager, _httpClient));
     }
 
     public IUserService User => _userService.Value;
     public ISongService Home => _homeService.Value;
     public IRecommendationService Recommendation => _recommendService.Value;
+    public ISubscriptionService Subscription => _subscriptionService.Value;
 }
