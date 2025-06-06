@@ -1,4 +1,5 @@
-﻿using MusicWebAPI.Application.Features.Properties.Commands;
+﻿using Microsoft.EntityFrameworkCore;
+using MusicWebAPI.Application.Features.Properties.Commands;
 using MusicWebAPI.Core.Base;
 using MusicWebAPI.Core.Resources;
 using MusicWebAPI.Domain.Entities.Subscription_Models;
@@ -7,7 +8,6 @@ using MusicWebAPI.Domain.Interfaces.Services;
 using Stripe.Checkout;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http.Json;
@@ -36,7 +36,7 @@ namespace MusicWebAPI.Application.Services
 
         public async Task<string> Subscribe(Guid planId, Guid userId, CancellationToken cancellationToken, string? callbackBaseUrl = null)
         {
-            bool activePlan = ActivePlanExists(userId, cancellationToken);
+            bool activePlan = await ActivePlanExists(userId, cancellationToken);
 
             if (activePlan)
                 throw new LogicException(Resource.AlreadySubscribedError);
@@ -99,11 +99,11 @@ namespace MusicWebAPI.Application.Services
 
             if (session.PaymentStatus == "paid")
             {
-                var subscription = _repositoryManager
+                var subscription = await _repositoryManager
                     .UserSubscription
                     .Get(cancellationToken)
                     .Where(x => x.PaymentReference == sessionId)
-                    .FirstOrDefault();
+                    .FirstOrDefaultAsync();
 
                 if (subscription == null)
                     throw new NotFoundException(Resource.SubscriptionNotFound);
@@ -120,12 +120,12 @@ namespace MusicWebAPI.Application.Services
             return false;
         }
 
-        private bool ActivePlanExists(Guid userId, CancellationToken cancellationToken)
+        private async Task<bool> ActivePlanExists(Guid userId, CancellationToken cancellationToken)
         {
-            return _repositoryManager
+            return await _repositoryManager
                 .UserSubscription
-                .Get(cancellationToken)
-                .Any(x => x.UserId == userId && x.IsVerified && x.EndDate > DateTime.UtcNow);
+                .TableNoTracking
+                .AnyAsync(x => x.UserId == userId && x.IsVerified && x.EndDate > DateTime.UtcNow);
         }
     }
 }

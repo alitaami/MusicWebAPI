@@ -113,7 +113,8 @@ namespace MusicWebAPI.Application.Services
             try
             {
                 var playlists = await _repositoryManager.PlayList
-                    .Get(cancellationToken, p => !p.IsDeleted)
+                    .Get(cancellationToken)
+                    .Where(p => !p.IsDeleted)
                     .Include(p => p.PlaylistSongs)
                     .ThenInclude(ps => ps.Song)
                     .Select(p => new
