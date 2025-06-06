@@ -1,7 +1,6 @@
 <h1 align="center">🎵 Music Web API</h1>
 <p align="center">
-  A full-featured, containerized .NET Web API inspired by <strong>Spotify</strong>, built for scalability and performance. <br/>
-  Features real-time chat, intelligent recommendations, and modern architecture.
+  A robust and scalable containerized <strong>.NET Web API</strong> inspired by <strong>Spotify</strong>, designed to deliver high performance and seamless user experience. This project incorporates advanced features including <strong>Hangfire</strong> for background job scheduling, <strong>JWT-based authentication</strong> for secure access control, <strong>Swagger</strong> for comprehensive API documentation, <strong>SignalR</strong> to enable real-time chat functionality, <strong>Kibana</strong> for centralized log monitoring, <strong>Minimal APIs</strong> for streamlined endpoints, <strong>MinIO</strong> as an object storage solution, and <strong>Redis</strong> for efficient caching and improved responsiveness.
 </p>
 
 <p align="center">
@@ -14,7 +13,7 @@
 <h2>🚀 Project Features</h2>
 <ul>
   <li>✅ JWT Authentication with role-based access</li>
-  <li>✅ Hangfire Dashboard for background job monitoring</li>
+  <li>✅ Hangfire Dashboard for background job monitoring (accessible only to users with the <strong>SuperUser</strong> role)</li>
   <li>✅ Swagger UI for easy API testing</li>
   <li>✅ Real-time chat with SignalR</li>
   <li>✅ ElasticSearch + Kibana integration for log monitoring</li>
@@ -118,6 +117,19 @@ docker-compose up --build -d
   </li>
 </ul>
 
+<h2>🛢️ Database Access</h2>
+<p>To connect locally using <a href="https://www.beekeeperstudio.io/">Beekeeper Studio</a> or any PostgreSQL client, use:</p>
+<ul>
+  <li><strong>Connection Type:</strong> PostgreSQL</li>
+  <li><strong>Host:</strong> localhost</li>
+  <li><strong>Port:</strong> 5432</li>
+  <li><strong>User:</strong> sa</li>
+  <li><strong>Password:</strong> sa123</li>
+  <li><strong>Database:</strong> MusicDb</li>
+</ul>
+<img src="https://github.com/user-attachments/assets/d682a25f-df28-48c1-bfc4-d94817662ae5" alt="Beekeeper Screenshot" />
+
+
 <h2>🧠 ML-Based Song Recommendation</h2> <p> Leveraging <strong>Spotify's API</strong> alongside user interaction data stored in the local database, the project uses <strong>ML.NET</strong> to train a recommendation engine that suggests songs tailored to each user’s preferences. </p> <ul> <li>✅ Combines Spotify metadata with local listening behavior</li> <li>✅ ML model trained periodically using <code>Hangfire</code></li> <li>✅ Trained recommendation results are cached in <code>Redis</code> for quick access</li> <li>✅ Supports extensible training pipeline with ML.NET</li> </ul>
 
 
@@ -208,6 +220,7 @@ docker-compose up --build -d
   This mechanism ensures fair usage and protects system performance while still offering flexibility for premium subscribers.
 </p>
 
+
 <section>
   <h2>🛠 Dev Tools & Dashboards</h2>
   <p>📘 SWAGGER / 🕒 HANGFIRE / KIBANA (Minor Enhancements)</p>
@@ -255,19 +268,6 @@ docker-compose up --build -d
     </tbody>
   </table>
 </section>
-
-
-<h2>🛢️ Database Access</h2>
-<p>To connect locally using <a href="https://www.beekeeperstudio.io/">Beekeeper Studio</a> or any PostgreSQL client, use:</p>
-<ul>
-  <li><strong>Connection Type:</strong> PostgreSQL</li>
-  <li><strong>Host:</strong> localhost</li>
-  <li><strong>Port:</strong> 5432</li>
-  <li><strong>User:</strong> sa</li>
-  <li><strong>Password:</strong> sa123</li>
-  <li><strong>Default Database:</strong> MusicDb</li>
-</ul>
-<img src="https://github.com/user-attachments/assets/d682a25f-df28-48c1-bfc4-d94817662ae5" alt="Beekeeper Screenshot" />
 
 
 <h2>🧪 Testing</h2>
