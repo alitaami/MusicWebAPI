@@ -208,31 +208,54 @@ docker-compose up --build -d
   This mechanism ensures fair usage and protects system performance while still offering flexibility for premium subscribers.
 </p>
 
+<section>
+  <h2>🛠 Dev Tools & Dashboards</h2>
+  <p>📘 SWAGGER / 🕒 HANGFIRE / KIBANA (Minor Enhancements)</p>
+  <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+    <thead>
+      <tr>
+        <th>Tool</th>
+        <th>URL</th>
+        <th>Description</th>
+        <th>Screenshot</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Swagger</td>
+        <td><a href="http://localhost:8080/swagger/index.html" target="_blank" rel="noopener noreferrer">http://localhost:8080/swagger/index.html</a></td>
+        <td>API documentation &amp; testing</td>
+        <td>
+        </td>
+      </tr>
+      <tr>
+        <td>Chat UI</td>
+        <td><a href="http://localhost:8080/chat" target="_blank" rel="noopener noreferrer">http://localhost:8080/chat</a></td>
+        <td>Real-time chat playground</td>
+        <td>
+          <img src="https://github.com/user-attachments/assets/cc8ee4f7-b919-430e-b9c2-52fcd50b1e6a" alt="Real-Time Chat Screenshot" style="max-width: 150px; height: auto;" />
+        </td>
+      </tr>
+      <tr>
+        <td>Hangfire</td>
+        <td><a href="http://localhost:8080/hangfire" target="_blank" rel="noopener noreferrer">http://localhost:8080/hangfire</a></td>
+        <td>Job scheduling &amp; dashboard</td>
+        <td>
+          <img src="https://github.com/user-attachments/assets/81504572-a251-4f40-8782-24c2b7451d30" alt="Hangfire Screenshot" style="max-width: 150px; height: auto;" />
+        </td>
+      </tr>
+      <tr>
+        <td>Kibana</td>
+        <td><a href="http://localhost:5601" target="_blank" rel="noopener noreferrer">http://localhost:5601</a></td>
+        <td>Log visualization via Serilog</td>
+        <td>
+          <img src="https://github.com/user-attachments/assets/be466f44-c7ae-4365-b40e-486f3bc244bf" alt="Kibana Monitoring" style="max-width: 150px; height: auto;" />
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</section>
 
-<h2>📘 Swagger UI</h2>
-<p><strong>URL:</strong> <a href="http://localhost:8080/swagger/index.html">http://localhost:8080/swagger/index.html</a></p>
-
-<h2>💬 Real-Time Chat</h2>
-<p><strong>URL:</strong> <a href="http://localhost:8080/chat">http://localhost:8080/chat</a></p>
-<img src="https://github.com/user-attachments/assets/cc8ee4f7-b919-430e-b9c2-52fcd50b1e6a" alt="Real-Time Chat Screenshot" />
-
-<h2>🕒 Hangfire Dashboard</h2>
-<p><strong>URL:</strong> <a href="http://localhost:8080/hangfire">http://localhost:8080/hangfire</a></p>
-<img src="https://github.com/user-attachments/assets/81504572-a251-4f40-8782-24c2b7451d30" alt="Hangfire Screenshot" />
-
-<h2>📊 Kibana Log Monitoring</h2>
-<ol>
-  <li>Visit Kibana dashboard (<code>http://localhost:5601</code> by default)</li>
-  <li>Go to <strong>Management → Stack Management → Index Patterns</strong></li>
-  <li>Create a new index pattern:
-    <ul>
-      <li><strong>Name:</strong> <code>musicwebapi-logs-*</code></li>
-      <li><strong>Timestamp field:</strong> <code>@timestamp</code></li>
-    </ul>
-  </li>
-  <li>Go to <strong>Discover</strong> to view logs</li>
-</ol>
-<img src="https://github.com/user-attachments/assets/be466f44-c7ae-4365-b40e-486f3bc244bf" alt="Kibana Monitoring" />
 
 <h2>🛢️ Database Access</h2>
 <p>To connect locally using <a href="https://www.beekeeperstudio.io/">Beekeeper Studio</a> or any PostgreSQL client, use:</p>
