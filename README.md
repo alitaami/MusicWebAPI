@@ -16,6 +16,7 @@
   <li>✅ Minimal APIs support in .NET 8</li>
   <li>✅ Clean, maintainable architecture (Clean Architecture)</li>
   <li>✅ Containerized with Docker and Docker Compose</li>
+  <li>✅ Subscription plans with Stripe payment gateway integration</li>
 </ul>
 
 <h2>🧠 ML-Based Song Recommendation</h2> <p> Leveraging <strong>Spotify's API</strong> alongside user interaction data stored in the local database, the project uses <strong>ML.NET</strong> to train a recommendation engine that suggests songs tailored to each user’s preferences. </p> <ul> <li>✅ Combines Spotify metadata with local listening behavior</li> <li>✅ ML model trained periodically using <code>Hangfire</code></li> <li>✅ Trained recommendation results are cached in <code>Redis</code> for quick access</li> <li>✅ Supports extensible training pipeline with ML.NET</li> </ul>
@@ -162,6 +163,67 @@ docker-compose up --build -d
   <li><strong>Default Database:</strong> MusicDb</li>
 </ul>
 <img src="https://github.com/user-attachments/assets/d682a25f-df28-48c1-bfc4-d94817662ae5" alt="Beekeeper Screenshot" />
+
+
+<h2>💳 Stripe Payment Gateway for Subscription Plans</h2>
+<p>
+  This project integrates <strong>Stripe</strong> as the payment gateway to manage subscription plans securely and efficiently.
+</p>
+
+<h3>How Stripe Works Here:</h3>
+<ul>
+  <li>When a user subscribes to a plan, the backend generates a <strong>Stripe Checkout session URL</strong>.</li>
+  <li>The frontend or API consumer is redirected to this secure Stripe-hosted payment page.</li>
+  <li>Stripe handles all sensitive card data and payment processing.</li>
+  <li>After successful payment, Stripe redirects back to your app with confirmation.</li>
+  <li>Webhooks can be configured (optional) to update subscription status in the system.</li>
+</ul>
+
+<h3>Testing Stripe Integration</h3>
+<p>Use the following <strong>test card details</strong> when testing the subscription payment flow with Stripe in development mode:</p>
+<table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse;">
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Card Number</td>
+      <td><code>4242 4242 4242 4242</code></td>
+    </tr>
+    <tr>
+      <td>Expiry Date</td>
+      <td><code>12/29</code></td>
+    </tr>
+    <tr>
+      <td>CVC / CVV</td>
+      <td><code>123</code></td>
+    </tr>
+    <tr>
+      <td>ZIP Code</td>
+      <td>Any 5-digit number</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+  These are Stripe's official test card numbers — no real money will be charged.<br/>
+  Use these in the Stripe Checkout page during subscription testing.<br/>
+  Stripe will simulate successful or failed payments based on the card number used.
+</p>
+
+<h3>Summary</h3>
+<p>
+  With Stripe integrated:<br/>
+  - Your API generates secure, single-use Checkout URLs for each subscription.<br/>
+  - The subscription workflow is seamless and PCI-compliant.<br/>
+  - Test payments are easy with Stripe’s official test cards.<br/>
+  - This ensures users can safely subscribe to your music plans, with billing handled by Stripe.
+</p>
+<img src="https://github.com/user-attachments/assets/52ec43d0-bf21-4d2a-b740-320bb9fe523a" alt="Beekeeper Screenshot" />
+ 
 
 <h2>🙋‍♂️ Author</h2>
 <p><strong>Ali</strong> – .NET Core Developer in Iran 🇮🇷<br>
