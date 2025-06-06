@@ -1,6 +1,14 @@
-<h1>🎵 Music Web API</h1>
-<p>
-  A powerful, containerized .NET Web API project inspired by <strong>Spotify</strong>, featuring built-in support for <strong>Hangfire scheduling</strong>, <strong>JWT-based authentication</strong>, <strong>Swagger for API documentation</strong>, <strong>SignalR real-time chat</strong>, <strong>Kibana log monitoring</strong>, <strong>Minimal APIs</strong>, <strong>MinIO</strong> for object storage, and <strong>Redis</strong> for high-performance caching.
+<h1 align="center">🎵 Music Web API</h1>
+<p align="center">
+  A full-featured, containerized .NET Web API inspired by <strong>Spotify</strong>, built for scalability and performance. <br/>
+  Features real-time chat, intelligent recommendations, and modern architecture.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/.NET-8.0-blue" />
+  <img src="https://img.shields.io/badge/Docker-Compose-blue" />
+  <img src="https://img.shields.io/badge/Architecture-Clean-green" />
+  <img src="https://img.shields.io/badge/Auth-JWT-orange" />
 </p>
 
 <h2>🚀 Project Features</h2>
@@ -18,8 +26,6 @@
   <li>✅ Containerized with Docker and Docker Compose</li>
   <li>✅ Subscription plans with Stripe payment gateway integration</li>
 </ul>
-
-<h2>🧠 ML-Based Song Recommendation</h2> <p> Leveraging <strong>Spotify's API</strong> alongside user interaction data stored in the local database, the project uses <strong>ML.NET</strong> to train a recommendation engine that suggests songs tailored to each user’s preferences. </p> <ul> <li>✅ Combines Spotify metadata with local listening behavior</li> <li>✅ ML model trained periodically using <code>Hangfire</code></li> <li>✅ Trained recommendation results are cached in <code>Redis</code> for quick access</li> <li>✅ Supports extensible training pipeline with ML.NET</li> </ul>
 
 <h2>🛠️ Technologies Used</h2>
 <table>
@@ -51,12 +57,12 @@
 </p>
 <p>
   <a href="https://drive.google.com/file/d/1PISHbiUgCH54-B5mt7jEKzO2ubvsgrvK/view?usp=drive_link" target="_blank">
-    👉 Access .env file
+    👉 .env file
   </a>
 </p>
 <p>
   <a href="https://drive.google.com/file/d/1iysuL5EzC4rUrbHnlBEka4qJZUSlayZE/view?usp=drive_link" target="_blank">
-    👉 Access appsettings.json file
+    👉 appsettings.json file
   </a>
 </p>
 <p>
@@ -78,7 +84,6 @@ docker-compose up --build -d
 <h2>📂 Project Structure (Clean Architecture)</h2>
 <pre><code>/tests
   ├── MusicWebAPI.UnitTests          → Unit Tests
-
 /src
   ├── MusicWebAPI.API                  → Web entry point
   ├── MusicWebAPI.Application          → Business logic and use cases
@@ -113,56 +118,7 @@ docker-compose up --build -d
   </li>
 </ul>
 
-<h2>📘 Swagger UI</h2>
-<p><strong>URL:</strong> <a href="http://localhost:8080/swagger/index.html">http://localhost:8080/swagger/index.html</a></p>
-
-<h2>💬 Real-Time Chat</h2>
-<p><strong>URL:</strong> <a href="http://localhost:8080/chat">http://localhost:8080/chat</a></p>
-<img src="https://github.com/user-attachments/assets/cc8ee4f7-b919-430e-b9c2-52fcd50b1e6a" alt="Real-Time Chat Screenshot" />
-
-<h2>🕒 Hangfire Dashboard</h2>
-<p><strong>URL:</strong> <a href="http://localhost:8080/hangfire">http://localhost:8080/hangfire</a></p>
-<img src="https://github.com/user-attachments/assets/81504572-a251-4f40-8782-24c2b7451d30" alt="Hangfire Screenshot" />
-
-<h2>📊 Kibana Log Monitoring</h2>
-<ol>
-  <li>Visit Kibana dashboard (<code>http://localhost:5601</code> by default)</li>
-  <li>Go to <strong>Management → Stack Management → Index Patterns</strong></li>
-  <li>Create a new index pattern:
-    <ul>
-      <li><strong>Name:</strong> <code>musicwebapi-logs-*</code></li>
-      <li><strong>Timestamp field:</strong> <code>@timestamp</code></li>
-    </ul>
-  </li>
-  <li>Go to <strong>Discover</strong> to view logs</li>
-</ol>
-<img src="https://github.com/user-attachments/assets/be466f44-c7ae-4365-b40e-486f3bc244bf" alt="Kibana Monitoring" />
-
-<h2>🧪 Testing</h2>
-<ul>
-  <li>Unit Tests: <code>NUnit</code></li>
-  <li>TDD-style encouraged</li>
-  <li>Coverage and integration tests coming soon...</li>
-</ul>
-
-<h2>🧼 Linting and Code Standards</h2>
-<ul>
-  <li>Follows Clean Architecture principles</li>
-  <li>SOLID principles applied</li>
-  <li>Centralized logging via Serilog</li>
-</ul>
-
-<h2>🛢️ Database Access</h2>
-<p>To connect locally using <a href="https://www.beekeeperstudio.io/">Beekeeper Studio</a> or any PostgreSQL client, use:</p>
-<ul>
-  <li><strong>Connection Type:</strong> PostgreSQL</li>
-  <li><strong>Host:</strong> localhost</li>
-  <li><strong>Port:</strong> 5432</li>
-  <li><strong>User:</strong> sa</li>
-  <li><strong>Password:</strong> sa123</li>
-  <li><strong>Default Database:</strong> MusicDb</li>
-</ul>
-<img src="https://github.com/user-attachments/assets/d682a25f-df28-48c1-bfc4-d94817662ae5" alt="Beekeeper Screenshot" />
+<h2>🧠 ML-Based Song Recommendation</h2> <p> Leveraging <strong>Spotify's API</strong> alongside user interaction data stored in the local database, the project uses <strong>ML.NET</strong> to train a recommendation engine that suggests songs tailored to each user’s preferences. </p> <ul> <li>✅ Combines Spotify metadata with local listening behavior</li> <li>✅ ML model trained periodically using <code>Hangfire</code></li> <li>✅ Trained recommendation results are cached in <code>Redis</code> for quick access</li> <li>✅ Supports extensible training pipeline with ML.NET</li> </ul>
 
 
 <h2>💳 Stripe Payment Gateway for Subscription Plans</h2>
@@ -223,7 +179,87 @@ docker-compose up --build -d
   - This ensures users can safely subscribe to your music plans, with billing handled by Stripe.
 </p>
 <img src="https://github.com/user-attachments/assets/52ec43d0-bf21-4d2a-b740-320bb9fe523a" alt="Beekeeper Screenshot" />
- 
+
+
+<h2>🎧 Limit Streaming Feature</h2>
+<p>
+  To manage system resources and enforce fair usage policies, the API includes a <strong>Limit Streaming</strong> feature that restricts how many times a user can stream a specific song within a certain timeframe.
+</p>
+
+<h3>🧠 Logic Overview</h3>
+<ul>
+  <li>Each time a user streams a song, the system logs the attempt in the Redis cache.</li>
+  <li>The stream count is tracked using a unique key per user and song combination (e.g., <code>ListenCount:{userId}:{yyyyMMdd}:{windowGroup}</code>).</li>
+  <li>If the user exceeds the allowed number of streams (e.g., <strong>10 streams per 12 hour</strong> for non-premium users), the API blocks further attempts with an appropriate error response </li>
+  <li>Premium users may have higher or unlimited stream limits based on their subscription tier.</li>
+</ul>
+
+<h3>🚫 Error Response Example</h3>
+<pre><code>
+{
+  "data": null,
+  "errorMessage": "Stream limit reached. Please wait for your 12-hour window to reset or consider subscribing to our premium plan for unlimited access.",
+  "isSuccess": false,
+  "statusCode": 422,
+  "errors": []
+}</code></pre>
+
+<p>
+  This mechanism ensures fair usage and protects system performance while still offering flexibility for premium subscribers.
+</p>
+
+
+<h2>📘 Swagger UI</h2>
+<p><strong>URL:</strong> <a href="http://localhost:8080/swagger/index.html">http://localhost:8080/swagger/index.html</a></p>
+
+<h2>💬 Real-Time Chat</h2>
+<p><strong>URL:</strong> <a href="http://localhost:8080/chat">http://localhost:8080/chat</a></p>
+<img src="https://github.com/user-attachments/assets/cc8ee4f7-b919-430e-b9c2-52fcd50b1e6a" alt="Real-Time Chat Screenshot" />
+
+<h2>🕒 Hangfire Dashboard</h2>
+<p><strong>URL:</strong> <a href="http://localhost:8080/hangfire">http://localhost:8080/hangfire</a></p>
+<img src="https://github.com/user-attachments/assets/81504572-a251-4f40-8782-24c2b7451d30" alt="Hangfire Screenshot" />
+
+<h2>📊 Kibana Log Monitoring</h2>
+<ol>
+  <li>Visit Kibana dashboard (<code>http://localhost:5601</code> by default)</li>
+  <li>Go to <strong>Management → Stack Management → Index Patterns</strong></li>
+  <li>Create a new index pattern:
+    <ul>
+      <li><strong>Name:</strong> <code>musicwebapi-logs-*</code></li>
+      <li><strong>Timestamp field:</strong> <code>@timestamp</code></li>
+    </ul>
+  </li>
+  <li>Go to <strong>Discover</strong> to view logs</li>
+</ol>
+<img src="https://github.com/user-attachments/assets/be466f44-c7ae-4365-b40e-486f3bc244bf" alt="Kibana Monitoring" />
+
+<h2>🛢️ Database Access</h2>
+<p>To connect locally using <a href="https://www.beekeeperstudio.io/">Beekeeper Studio</a> or any PostgreSQL client, use:</p>
+<ul>
+  <li><strong>Connection Type:</strong> PostgreSQL</li>
+  <li><strong>Host:</strong> localhost</li>
+  <li><strong>Port:</strong> 5432</li>
+  <li><strong>User:</strong> sa</li>
+  <li><strong>Password:</strong> sa123</li>
+  <li><strong>Default Database:</strong> MusicDb</li>
+</ul>
+<img src="https://github.com/user-attachments/assets/d682a25f-df28-48c1-bfc4-d94817662ae5" alt="Beekeeper Screenshot" />
+
+
+<h2>🧪 Testing</h2>
+<ul>
+  <li>Unit Tests: <code>NUnit</code></li>
+  <li>TDD-style encouraged</li>
+  <li>Coverage and integration tests coming soon...</li>
+</ul>
+
+<h2>🧼 Linting and Code Standards</h2>
+<ul>
+  <li>Follows Clean Architecture principles</li>
+  <li>SOLID principles applied</li>
+  <li>Centralized logging via Serilog</li>
+</ul>
 
 <h2>🙋‍♂️ Author</h2>
 <p><strong>Ali</strong> – .NET Core Developer in Iran 🇮🇷<br>
