@@ -13,13 +13,13 @@
 <h2>🚀 Project Features</h2>
 <ul>
   <li>✅ JWT Authentication with role-based access</li>
+  <li>✅ Google OAuth 2.0 </li>
   <li>✅ Hangfire Dashboard for background job monitoring (accessible only to users with the <strong>SuperUser</strong> role)</li>
   <li>✅ Swagger UI for easy API testing</li>
   <li>✅ Real-time chat with SignalR</li>
   <li>✅ ElasticSearch + Kibana integration for log monitoring</li>
   <li>✅ Redis caching for fast data access</li>
   <li>✅ MinIO object storage integration</li>
-  <li>✅ Stream & Download songs directly from MinIO via secure endpoints</li>
   <li>✅ Minimal APIs support in .NET 8</li>
   <li>✅ Clean, maintainable architecture (Clean Architecture)</li>
   <li>✅ Containerized with Docker and Docker Compose</li>
@@ -35,7 +35,7 @@
   <tr><td><strong>Logging</strong></td><td>Serilog + Elasticsearch + Kibana</td></tr>
   <tr><td><strong>Auth</strong></td><td>JWT Bearer Token</td></tr>
   <tr><td><strong>Docs</strong></td><td>Swagger / OpenAPI</td></tr>
-  <tr><td><strong>Object Storage</strong></td><td>MinIO – stores, download and streams uploaded songs securely</td></tr>
+  <tr><td><strong>Object Storage</strong></td><td>MinIO – store, download and stream uploaded songs securely</td></tr>
   <tr><td><strong>Caching</strong></td><td>Redis</td></tr>
   <tr><td><strong>Containerization</strong></td><td>Docker, Docker Compose</td></tr>
   <tr><td><strong>Database</strong></td><td>PostgreSQL</td></tr>
@@ -242,13 +242,26 @@ docker-compose up --build -d
         </td>
       </tr>
       <tr>
-        <td>Chat UI</td>
-        <td><a href="http://localhost:8080/chat" target="_blank" rel="noopener noreferrer">http://localhost:8080/chat</a></td>
-        <td>Real-time chat playground</td>
-        <td>
-          <img src="https://github.com/user-attachments/assets/cc8ee4f7-b919-430e-b9c2-52fcd50b1e6a" alt="Real-Time Chat Screenshot" style="max-width: 150px; height: auto;" />
-        </td>
-      </tr>
+  <td>Chat UI</td>
+  <td>
+    <a href="http://localhost:8080/chat" target="_blank" rel="noopener noreferrer">
+      http://localhost:8080/chat
+    </a>
+  </td>
+  <td>Real-time chat playground including login/register </td>
+
+  <td style="display: flex; gap: 10px;">
+    <img src="https://github.com/user-attachments/assets/37e1a06b-7bab-40e7-900f-0f6556c38e91" 
+         alt="Chat Screenshot 2" 
+         style="max-width: 150px; height: auto;" />
+    <img src="https://github.com/user-attachments/assets/e4c95a0b-e67a-4ce8-b49c-1ef0d6ac8b73" 
+         alt="Chat Screenshot 3" 
+         style="max-width: 150px; height: auto;" />
+    <img src="https://github.com/user-attachments/assets/cc8ee4f7-b919-430e-b9c2-52fcd50b1e6a" 
+         alt="Real-Time Chat Screenshot" 
+         style="max-width: 150px; height: auto;" />      
+  </td>
+</tr>
       <tr>
         <td>Hangfire</td>
         <td><a href="http://localhost:8080/hangfire" target="_blank" rel="noopener noreferrer">http://localhost:8080/hangfire</a></td>
