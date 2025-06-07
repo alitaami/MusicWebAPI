@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using MusicWebAPI.API.Base;
 using MusicWebAPI.Application.Commands;
 using MusicWebAPI.Application.Features.Properties.Queries;
+using MusicWebAPI.Application.Features.Properties.Queries.Songs;
 using MusicWebAPI.Core;
 using MusicWebAPI.Core.Resources;
 using MusicWebAPI.Core.Utilities;

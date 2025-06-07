@@ -17,6 +17,8 @@ using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using MusicWebAPI.Core.Utilities;
 using MusicWebAPI.Domain.Interfaces.Services;
+using MusicWebAPI.Application.Features.Properties.Commands.UserSongs;
+using MusicWebAPI.Application.Features.Properties.Queries.UserSongs;
 namespace MusicWebAPI.API.Endpoints
 {
     public class UserEndpoints : ApiResponseBase

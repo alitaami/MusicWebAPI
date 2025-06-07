@@ -2,8 +2,11 @@
 using Moq;
 using MusicWebAPI.Application.Features.Properties.Commands;
 using MusicWebAPI.Application.Features.Properties.Commands.Handlers;
+using MusicWebAPI.Application.Features.Properties.Commands.UserSongs;
 using MusicWebAPI.Application.Features.Properties.Queries;
 using MusicWebAPI.Application.Features.Properties.Queries.Handlers;
+using MusicWebAPI.Application.Features.Properties.Queries.Songs;
+using MusicWebAPI.Application.Features.Properties.Queries.UserSongs;
 using MusicWebAPI.Core;
 using MusicWebAPI.Core.Resources;
 using MusicWebAPI.Domain.External.Caching;

@@ -15,6 +15,7 @@ using MusicWebAPI.Core;
 using static MusicWebAPI.Application.ViewModels.HomeViewModel;
 using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
 using MusicWebAPI.Core.Resources;
+using MusicWebAPI.Application.Features.Properties.Commands.Auth;
 
 namespace MusicWebAPI.UnitTests.TDD
 {
