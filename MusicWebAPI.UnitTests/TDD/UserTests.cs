@@ -1,21 +1,12 @@
-using NUnit.Framework;
 using Moq;
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
-using MusicWebAPI.Application.Commands;
 using MusicWebAPI.Application.Commands.Handlers;
 using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
-using static MusicWebAPI.Application.ViewModels.UserViewModel;
-using System.Reflection.Metadata;
-using MusicWebAPI.Application.Features.Properties.Queries.Handlers;
-using MusicWebAPI.Application.Features.Properties.Queries;
-using MusicWebAPI.Core;
-using static MusicWebAPI.Application.ViewModels.HomeViewModel;
 using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
 using MusicWebAPI.Core.Resources;
 using MusicWebAPI.Application.Features.Properties.Commands.Auth;
+using MusicWebAPI.Application.Features.Properties.Commands.Handlers;
 
 namespace MusicWebAPI.UnitTests.TDD
 {
@@ -26,6 +17,7 @@ namespace MusicWebAPI.UnitTests.TDD
         private Mock<IMapper> _mapperMock;
         private RegisterUserHandler _registerUserHandler;
         private LoginUserHandler _loginUserHandler;
+        private GoogleLoginCommandHandler _googleLoginCommandHandler;
 
         [SetUp]
         public void Setup()
@@ -34,8 +26,9 @@ namespace MusicWebAPI.UnitTests.TDD
             _mapperMock = new Mock<IMapper>();
             _registerUserHandler = new RegisterUserHandler(_serviceManagerMock.Object, _mapperMock.Object);
             _loginUserHandler = new LoginUserHandler(_serviceManagerMock.Object);
+            _googleLoginCommandHandler = new GoogleLoginCommandHandler(_serviceManagerMock.Object);
         }
-         
+
         [Test]
         public async Task Handle_RegisterUser_When_Successful()
         {
@@ -49,18 +42,18 @@ namespace MusicWebAPI.UnitTests.TDD
                 IsArtist = false
             };
 
-             var expectedToken = "some-jwt-token";
-             
+            var expectedToken = "some-jwt-token";
+
             _serviceManagerMock.Setup(s => s.User.RegisterUser(It.IsAny<User>(), It.IsAny<string>()))
                 .ReturnsAsync(expectedToken);
-             
+
             // Act
             var result = await _registerUserHandler.Handle(command, CancellationToken.None);
 
             // Assert
+            _serviceManagerMock.Verify(service => service.User.RegisterUser(It.IsAny<User>(), It.IsAny<string>()), Times.Once);
             Assert.IsNotNull(result);
             Assert.AreEqual(expectedToken, result.Token);
-            _serviceManagerMock.Verify(service => service.User.RegisterUser(It.IsAny<User>(), It.IsAny<string>()), Times.Once);
         }
 
         [Test]
@@ -79,8 +72,12 @@ namespace MusicWebAPI.UnitTests.TDD
             _serviceManagerMock.Setup(s => s.User.RegisterUser(It.IsAny<User>(), It.IsAny<string>()))
                 .ThrowsAsync(new LogicException(Resource.DuplicateUserError));
 
-            // Act & Assert
-            Assert.ThrowsAsync<LogicException>(async () => await _registerUserHandler.Handle(command, CancellationToken.None));
+            // Act 
+            var ex = Assert.ThrowsAsync<LogicException>(async () => await _registerUserHandler.Handle(command, CancellationToken.None));
+
+            // Assert
+            _serviceManagerMock.Verify(service => service.User.RegisterUser(It.IsAny<User>(), It.IsAny<string>()), Times.Once);
+            Assert.AreEqual(Resource.DuplicateUserError, ex.Message);
         }
 
         [Test]
@@ -103,9 +100,9 @@ namespace MusicWebAPI.UnitTests.TDD
             var result = await _loginUserHandler.Handle(loginCommand, CancellationToken.None);
 
             // Assert
+            _serviceManagerMock.Verify(service => service.User.LoginUser(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.NotNull(result);
             Assert.AreEqual(expectedToken, result.Token);
-            _serviceManagerMock.Verify(service => service.User.LoginUser(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         }
 
         [Test]
@@ -123,9 +120,48 @@ namespace MusicWebAPI.UnitTests.TDD
                 .Setup(service => service.User.LoginUser(It.IsAny<string>(), It.IsAny<string>()))
                 .ThrowsAsync(new Exception("Invalid credentials"));
 
-            // Act & Assert
+            // Act 
             var ex = Assert.ThrowsAsync<Exception>(async () => await _loginUserHandler.Handle(loginCommand, CancellationToken.None));
+
+            // Assert
+            _serviceManagerMock.Verify(service => service.User.LoginUser(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             Assert.AreEqual("Invalid credentials", ex.Message);
+        }
+
+        [Test]
+        public async Task Handle_GoogleLogin_When_Successful()
+        {
+            // Arrange
+
+            var expectedToken = "some-jwt-token";
+            _serviceManagerMock
+                .Setup(service => service.User.GoogleLogin(It.IsAny<string>()))
+                .ReturnsAsync(expectedToken);
+
+            // Act
+            var result = await _googleLoginCommandHandler.Handle(new GoogleLoginCommand(It.IsAny<string>()), CancellationToken.None);
+
+            // Assert
+            _serviceManagerMock.Verify(service => service.User.GoogleLogin(It.IsAny<string>()), Times.Once);
+            Assert.NotNull(result);
+            Assert.AreEqual(expectedToken, result);
+        }
+
+        [Test]
+        public async Task Handle_GoogleLogin_When_NotSuccessful()
+        {
+            // Arrange
+
+            _serviceManagerMock
+                .Setup(service => service.User.GoogleLogin(It.IsAny<string>()))
+                .ThrowsAsync(new Exception("Error"));
+
+            // Act
+            var ex = Assert.ThrowsAsync<Exception>(async () => await _googleLoginCommandHandler.Handle(new GoogleLoginCommand(It.IsAny<string>()), CancellationToken.None));
+
+            // Assert
+            _serviceManagerMock.Verify(service => service.User.GoogleLogin(It.IsAny<string>()), Times.Once);
+            Assert.AreEqual("Error", ex.Message);
         }
     }
 }
