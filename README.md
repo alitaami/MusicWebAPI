@@ -286,7 +286,7 @@ docker-compose up --build -d
 <h2>🧪 Testing</h2>
 <ul>
   <li>Unit Tests: <code>NUnit</code></li>
-  <li>TDD-style encouraged</li>
+  <li>Post-Implementation style encouraged</li>
   <li>Coverage and integration tests coming soon...</li>
 </ul>
 
