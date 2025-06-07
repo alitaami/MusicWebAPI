@@ -28,7 +28,9 @@ namespace MusicWebAPI.API.Endpoints
             async (IMediator mediator, AddToPlaylistDTO dto, HttpContext httpContext) =>
             {
                 Guid? userId = (Guid?)Tools.GetUserId(httpContext);
-                var command = new AddToPlaylistCommand(dto.SongId, (Guid)userId, dto.PlaylistName, dto.PlaylistId);
+                Guid? playlistId = Guid.TryParse(dto.PlaylistId, out var parsed) ? parsed : null;
+
+                var command = new AddToPlaylistCommand(dto.SongId, (Guid)userId, dto.PlaylistName, playlistId);
 
                 await mediator.Send(command);
 

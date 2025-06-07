@@ -1,8 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MusicWebAPI.API.Base;
-using MusicWebAPI.Application.Commands;
-using MusicWebAPI.Application.Features.Properties.Commands;
+using MusicWebAPI.Application.Features.Properties.Commands.Auth;
 using static MusicWebAPI.Application.ViewModels.UserViewModel;
 
 namespace MusicWebAPI.API.Endpoints

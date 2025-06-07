@@ -2,7 +2,6 @@
 using Mappings.CustomMapping;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using MusicWebAPI.Application.Commands;
 using MusicWebAPI.Application.Services;
 using MusicWebAPI.Domain.Interfaces.Services.MusicWebAPI.Domain.Interfaces;
 using MusicWebAPI.Infrastructure.Caching;
@@ -10,6 +9,7 @@ using MusicWebAPI.Infrastructure.Logging;
 using System.Reflection;
 using MusicWebAPI.Domain.Interfaces.Services;
 using MusicWebAPI.Domain.External.Caching;
+using MusicWebAPI.Application.Features.Properties.Commands.Auth;
 
 namespace MusicWebAPI.Application
 {
