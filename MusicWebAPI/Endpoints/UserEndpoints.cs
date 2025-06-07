@@ -100,9 +100,7 @@ namespace MusicWebAPI.API.Endpoints
             app.MapPut("/api/songs/{songId}/listen",
             async (IMediator mediator, Guid songId, HttpContext httpContext) =>
                 {
-                    Guid? userId = (Guid?)Tools.GetUserId(httpContext);
-
-                    await mediator.Send(new ListenToSongCommand(songId, (Guid)userId));
+                    await mediator.Send(new ListenToSongCommand(songId));
                     return Results.NoContent();
                 })
                 .RequireAuthorization(policy => policy.RequireRole("User"))

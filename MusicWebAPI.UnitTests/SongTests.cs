@@ -323,13 +323,11 @@ namespace MusicWebAPI.UnitTests.TDD
         {
             // Arrange
             var command = new ListenToSongCommand(
-                songId: Guid.NewGuid(),
-                userId: Guid.NewGuid()
+                songId: Guid.NewGuid()
             );
 
             _serviceManagerMock.Setup(s => s.User.ListenToSong(
                 command.songId,
-                command.userId,
                 It.IsAny<CancellationToken>()
             )).Returns(Task.CompletedTask);
 
@@ -339,7 +337,6 @@ namespace MusicWebAPI.UnitTests.TDD
             // Assert
             _serviceManagerMock.Verify(s => s.User.ListenToSong(
                 command.songId,
-                command.userId,
                 It.IsAny<CancellationToken>()
             ), Times.Once);
         }
@@ -349,13 +346,11 @@ namespace MusicWebAPI.UnitTests.TDD
         {
             // Arrange
             var command = new ListenToSongCommand(
-                songId: Guid.NewGuid(),
-                userId: Guid.NewGuid()
-            );
+                songId: Guid.NewGuid()
+                );
 
             _serviceManagerMock.Setup(s => s.User.ListenToSong(
-                It.IsAny<Guid>(),
-                It.IsAny<Guid>(),
+                It.IsAny<Guid>(), 
                 It.IsAny<CancellationToken>()
             )).ThrowsAsync(new NotFoundException(Resource.UserNotFound));
 
@@ -369,12 +364,10 @@ namespace MusicWebAPI.UnitTests.TDD
         {
             // Arrange
             var command = new ListenToSongCommand(
-                songId: Guid.NewGuid(),
-                userId: Guid.NewGuid()
-            );
+                songId: Guid.NewGuid()
+                );
 
             _serviceManagerMock.Setup(s => s.User.ListenToSong(
-                It.IsAny<Guid>(),
                 It.IsAny<Guid>(),
                 It.IsAny<CancellationToken>()
             )).ThrowsAsync(new NotFoundException(Resource.SongNotFound));
@@ -389,12 +382,10 @@ namespace MusicWebAPI.UnitTests.TDD
         {
             // Arrange
             var command = new ListenToSongCommand(
-                songId: Guid.NewGuid(),
-                userId: Guid.NewGuid()
+                songId: Guid.NewGuid()
             );
 
             _serviceManagerMock.Setup(s => s.User.ListenToSong(
-                It.IsAny<Guid>(),
                 It.IsAny<Guid>(),
                 It.IsAny<CancellationToken>()
             )).ThrowsAsync(new Exception("Error Occured"));

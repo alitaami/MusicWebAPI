@@ -149,17 +149,13 @@ namespace MusicWebAPI.Application.Services
             await _repositoryManager.PlayListSongs.DeleteSongFromPlayList(songId, playListId, cancellationToken);
         }
 
-        public async Task ListenToSong(Guid songId, Guid userId, CancellationToken cancellationToken)
+        public async Task ListenToSong(Guid songId, CancellationToken cancellationToken)
         {
             var song = await _repositoryManager.Song.GetByIdAsync(cancellationToken, songId);
 
             if (song == null)
                 throw new NotFoundException(Resource.SongNotFound);
-
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null)
-                throw new NotFoundException(Resource.UserNotFound);
-
+ 
             song.Listens++;
 
             await _repositoryManager.Song.UpdateAsync(song, cancellationToken, saveNow: true);

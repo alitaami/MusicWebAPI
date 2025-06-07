@@ -7,6 +7,6 @@ using static MusicWebAPI.Application.ViewModels.SongsViewModel;
 
 namespace MusicWebAPI.Application.Features.Properties.Commands.UserSongs
 {
-    public record ListenToSongCommand(Guid songId, Guid userId) : IRequest;
+    public record ListenToSongCommand(Guid songId) : IRequest;
 
 }

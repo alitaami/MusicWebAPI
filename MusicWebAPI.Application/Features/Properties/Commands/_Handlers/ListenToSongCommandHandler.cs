@@ -30,7 +30,7 @@ namespace MusicWebAPI.Application.Features.Properties.Commands.Handlers
 
         public async Task Handle(ListenToSongCommand request, CancellationToken cancellationToken)
         {
-            await _serviceManager.User.ListenToSong(request.songId, request.userId, cancellationToken);
+            await _serviceManager.User.ListenToSong(request.songId, cancellationToken);
 
             // Invalidate all song caches
             await _cacheService.RemoveByPrefixAsync(new List<string>

@@ -16,6 +16,6 @@ namespace MusicWebAPI.Domain.Interfaces.Services
         Task<List<object>> GetPlaylists(Guid userId, CancellationToken cancellationToken);
         Task DeletePlayList(Guid playListId, CancellationToken cancellationToken);
         Task DeleteSongFromPlayList(Guid songId, Guid playListId, CancellationToken cancellationToken);
-        Task ListenToSong(Guid songId, Guid userId, CancellationToken cancellationToken);
+        Task ListenToSong(Guid songId, CancellationToken cancellationToken);
     }
 }
