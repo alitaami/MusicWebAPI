@@ -8,7 +8,7 @@ namespace MusicWebAPI.Domain.Interfaces.Services
 {
     public interface IRecommendationService
     {
-        Task<List<object>> RecommendSongsAsync(string userId, int count, CancellationToken cancellationToken);
-        Task TrainAsync(CancellationToken cancellationToken);
+        Task<List<object>> RecommendSongs(string userId, int count, CancellationToken cancellationToken);
+        Task Train(CancellationToken cancellationToken);
     }
 }

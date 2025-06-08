@@ -17,7 +17,7 @@ namespace MusicWebAPI.Application.Features.Properties.Queries.Handlers
 
         public async Task<List<GetSongsViewModel>> Handle(GetRecommendedSongsQuery request, CancellationToken cancellationToken)
         { 
-            var songs = await _serviceManager.Recommendation.RecommendSongsAsync(request.UserId, request.Count, cancellationToken);
+            var songs = await _serviceManager.Recommendation.RecommendSongs(request.UserId, request.Count, cancellationToken);
 
             var result = new List<GetSongsViewModel>();
 

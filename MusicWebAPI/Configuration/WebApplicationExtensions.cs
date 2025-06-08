@@ -96,7 +96,7 @@ public static class WebApplicationExtensions
         {
             RecurringJob.AddOrUpdate<IRecommendationService>(
             "ml-training-every-3-hours",
-            x => x.TrainAsync(CancellationToken.None),
+            x => x.Train(CancellationToken.None),
             "0 */3 * * *",
             TimeZoneInfo.Local
             );

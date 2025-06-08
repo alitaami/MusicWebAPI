@@ -16,6 +16,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using static MusicWebAPI.Application.DTOs.RecommendationDTO;
 using static MusicWebAPI.Application.ViewModels.HomeViewModel;
 
 namespace MusicWebAPI.Application.Services
@@ -49,9 +50,12 @@ namespace MusicWebAPI.Application.Services
             _clientId = Environment.GetEnvironmentVariable("SPOTIFY_CLIENT_ID");
         }
 
-        public async Task<List<object>> RecommendSongsAsync(string userId, int count, CancellationToken cancellationToken)
+        public async Task<List<object>> RecommendSongs(string userId, int count, CancellationToken cancellationToken)
         {
-            await EnsureModelIsReadyAsync(cancellationToken);
+            await EnsureModelIsReady(cancellationToken);
+
+            if (_model == null || _modelData == null)
+                return new List<object>(); // or maybe throw a custom exception
 
             if (!_modelData.UserIndexMap.TryGetValue(userId, out var userIndex))
                 return new List<object>();
@@ -108,7 +112,7 @@ namespace MusicWebAPI.Application.Services
             return topSongs;
         }
 
-        public async Task TrainAsync(CancellationToken cancellationToken)
+        public async Task Train(CancellationToken cancellationToken)
         {
             try
             {
@@ -335,56 +339,32 @@ namespace MusicWebAPI.Application.Services
             return JsonDocument.Parse(jsonResponse).RootElement.GetProperty("access_token").GetString();
         }
 
-        private async Task EnsureModelIsReadyAsync(CancellationToken cancellationToken)
+        private async Task EnsureModelIsReady(CancellationToken cancellationToken)
         {
-            if (_model != null && _modelData != null) return;
+            if (_model != null && _modelData != null)
+                return;
 
             try
             {
                 var modelBytes = await _cacheService.GetAsync<byte[]>(ModelCacheKey);
                 var modelData = await _cacheService.GetAsync<RecommendationModelData>(ModelDataCacheKey);
 
-                if (modelBytes != null && modelData != null)
+                if (modelBytes == null || modelData == null)
                 {
-                    using var ms = new MemoryStream(modelBytes);
-                    _model = _mlContext.Model.Load(ms, out _);
-                    _modelData = modelData;
+                    _model = null;
+                    _modelData = null;
+                    return; // No model trained yet
                 }
+
+                using var ms = new MemoryStream(modelBytes);
+                _model = _mlContext.Model.Load(ms, out _);
+                _modelData = modelData;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"⚠️ Error loading model: {ex.Message}");
+                _model = null;
+                _modelData = null;
             }
-
-            if (_model == null || _modelData == null)
-                throw new InvalidOperationException("Model not trained.");
-        }
-
-        private class RecommendationModelData
-        {
-            public Dictionary<string, uint> UserIndexMap { get; set; }
-            public Dictionary<string, uint> SongIndexMap { get; set; }
-            public Dictionary<string, uint> GenreIndexMap { get; set; }
-            public Dictionary<uint, string> ReverseSongIndexMap { get; set; }
-        }
-
-        private class MappedPlaylistSong
-        {
-            [KeyType(count: 1000)]
-            public uint UserIndex { get; set; }
-
-            [KeyType(count: 10000)]
-            public uint SongIndex { get; set; }
-
-            [KeyType(count: 100)]
-            public uint GenreIndex { get; set; }
-
-            public bool Label { get; set; }
-        }
-
-        private class SongPrediction
-        {
-            public float Score { get; set; }
         }
     }
 }
