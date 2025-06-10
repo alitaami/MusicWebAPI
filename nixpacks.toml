@@ -3,9 +3,9 @@ nixPkgs = ["dotnet-sdk_8"]
 
 [phases.build]
 cmds = [
-  "dotnet restore MusicWebAPI/MusicWebAPI.API.csproj",
-  "dotnet build MusicWebAPI/MusicWebAPI.API.csproj -c Release",
-  "dotnet publish MusicWebAPI/MusicWebAPI.API.csproj -c Release -o publish"
+  "dotnet restore MusicWebAPI/MusicWebAPI.API/MusicWebAPI.API.csproj",
+  "dotnet build MusicWebAPI/MusicWebAPI.API/MusicWebAPI.API.csproj -c Release",
+  "dotnet publish MusicWebAPI/MusicWebAPI.API/MusicWebAPI.API.csproj -c Release -o publish"
 ]
 
 [start]
