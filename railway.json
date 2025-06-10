@@ -1,7 +1,11 @@
 {
-  "build": [
-    "dotnet restore MusicWebAPI/MusicWebAPI.API.csproj",
-    "dotnet publish MusicWebAPI/MusicWebAPI.API.csproj -c Release -o ./publish"
-  ],
-  "start": "dotnet ./publish/MusicWebAPI.API.dll"
+  "build": {
+    "builder": "NIXPACKS",
+    "nixpacksConfigPath": "nixpacks.toml"
+  },
+  "deploy": {
+    "startCommand": "dotnet MusicWebAPI.API.dll",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
 }
