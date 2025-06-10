@@ -1,0 +1,7 @@
+{
+  "build": [
+    "dotnet restore MusicWebAPI/MusicWebAPI.API.csproj",
+    "dotnet publish MusicWebAPI/MusicWebAPI.API.csproj -c Release -o ./publish"
+  ],
+  "start": "dotnet ./publish/MusicWebAPI.API.dll"
+}
