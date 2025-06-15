@@ -82,7 +82,7 @@ docker-compose up --build -d
 
 <h2>📂 Project Structure (Clean Architecture)</h2>
 <pre><code>/tests
-  ├── MusicWebAPI.UnitTests          → Unit Tests
+  ├── MusicWebAPI.UnitTests            → Unit Tests
 /src
   ├── MusicWebAPI.API                  → Web entry point
   ├── MusicWebAPI.Application          → Business logic and use cases
