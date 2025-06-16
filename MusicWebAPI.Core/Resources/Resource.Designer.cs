@@ -106,6 +106,27 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;h2&gt;Password Reset Verification&lt;/h2&gt;
+        ///&lt;p&gt;Hello,&lt;/p&gt;
+        ///&lt;p&gt;You requested to reset your password. Please use the following OTP code to verify your identity:&lt;/p&gt;
+        ///&lt;h3 style=&quot;color: #2e6da4;&quot;&gt;{0}&lt;/h3&gt;
+        ///&lt;p&gt;This code is valid for 10 minutes.&lt;/p&gt;
+        ///
+        ///&lt;p&gt;You can also reset your password directly by clicking the link below:&lt;/p&gt;
+        ///&lt;p&gt;&lt;a href=&quot;{1}&quot; style=&quot;color: #2e6da4;&quot;&gt;Reset your password&lt;/a&gt;&lt;/p&gt;
+        ///
+        ///&lt;p&gt;If you did not request this, please ignore this email.&lt;/p&gt;
+        ///&lt;br/&gt;
+        ///&lt;p&gt;Thanks,&lt;br/&gt;The Support Team&lt;/p&gt;
+        ///.
+        /// </summary>
+        public static string ForgetPassEmailBody {
+            get {
+                return ResourceManager.GetString("ForgetPassEmailBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An unexpected error occurred. Please try again later..
         /// </summary>
         public static string GeneralUnhandledError {
@@ -178,6 +199,15 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to otp_.
+        /// </summary>
+        public static string OtpCode_CacheKey {
+            get {
+                return ResourceManager.GetString("OtpCode_CacheKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Password must be 8 or more than 8 characters!.
         /// </summary>
         public static string PasswordMin {
@@ -219,6 +249,15 @@ namespace MusicWebAPI.Core.Resources {
         public static string PlaylistSongNotFound {
             get {
                 return ResourceManager.GetString("PlaylistSongNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password reset failed!.
+        /// </summary>
+        public static string ResetPasswordError {
+            get {
+                return ResourceManager.GetString("ResetPasswordError", resourceCulture);
             }
         }
         
@@ -291,6 +330,15 @@ namespace MusicWebAPI.Core.Resources {
         public static string UserRole {
             get {
                 return ResourceManager.GetString("UserRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You have entered wrong or expired OTP code!.
+        /// </summary>
+        public static string WrongOtpCodeError {
+            get {
+                return ResourceManager.GetString("WrongOtpCodeError", resourceCulture);
             }
         }
     }

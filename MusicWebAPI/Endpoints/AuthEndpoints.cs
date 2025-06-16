@@ -66,6 +66,34 @@ namespace MusicWebAPI.API.Endpoints
             .WithTags("Auth")
             .RequireRateLimiting("main")
             .WithOpenApi(); // This enables Swagger for Minimal API
+
+            // ForgetPassword endpoint
+            app.MapPost("/api/forgetPassword", async (IMediator mediator, ForgetPasswordCommand command, HttpContext httpContext) =>
+            {
+                await mediator.Send(command);
+
+                return NoContent();
+            })
+            .WithName("ForgetPassword")
+            .Produces<Task>(StatusCodes.Status200OK)
+            .Produces<string>(StatusCodes.Status400BadRequest)
+            .WithTags("Auth")
+            .RequireRateLimiting("main")
+            .WithOpenApi(); // This enables Swagger for Minimal API
+
+            // ResetPassword endpoint
+            app.MapPost("/api/resetPassword", async (IMediator mediator, ResetPasswordCommand command, HttpContext httpContext) =>
+            {
+                await mediator.Send(command);
+
+                return NoContent();
+            })
+            .WithName("ResetPassword")
+            .Produces<Task>(StatusCodes.Status200OK)
+            .Produces<string>(StatusCodes.Status400BadRequest)
+            .WithTags("Auth")
+            .RequireRateLimiting("main")
+            .WithOpenApi(); // This enables Swagger for Minimal API
         }
     }
 }

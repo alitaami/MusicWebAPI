@@ -1,11 +1,15 @@
 ﻿using AutoMapper;
+using Common.Utilities;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using MusicWebAPI.Core.Resources;
+using MusicWebAPI.Core.Utilities;
 using MusicWebAPI.Domain.Entities;
+using MusicWebAPI.Domain.External.Caching;
 using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 using MusicWebAPI.Domain.Interfaces.Services;
+using System.Net;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
@@ -19,6 +23,7 @@ namespace MusicWebAPI.Application.Services
         private readonly IConfiguration _configuration;
         private readonly IRepositoryManager _repositoryManager;
         private readonly string _googleClientId;
+        private readonly string _resetPassUrl;
 
         public UserService(UserManager<User> userManager, IRepositoryManager repositoryManager, IMapper mapper, IConfiguration configuration)
         {
@@ -27,6 +32,7 @@ namespace MusicWebAPI.Application.Services
             _userManager = userManager;
             _mapper = mapper;
             _googleClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+            _resetPassUrl = Environment.GetEnvironmentVariable("RESETPASS_API_URL");
         }
 
         #region Authorization & Authentication
@@ -101,6 +107,39 @@ namespace MusicWebAPI.Application.Services
 
             return JwtHelper.GenerateToken(user, _configuration);
         }
+
+        public async Task<string> ForgetPassword(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+                throw new NotFoundException(Resource.UserNotFound);
+
+            var otp = Tools.GenerateOtp();
+
+            string resetPassUrl = $"{_resetPassUrl}?email={email}";
+
+            string body = string.Format(Resource.ForgetPassEmailBody, otp, resetPassUrl);
+
+            await SendMail.SendAsync(email, "Password Reset", body);
+
+            return otp;
+        }
+
+        public async Task ResetPassword(string email, string newPassword)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+                throw new NotFoundException(Resource.UserNotFound);
+
+            // Remove old password & set new one 
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+            if (!result.Succeeded)
+                throw new LogicException(Resource.ResetPasswordError);
+        }
+
         #endregion
 
         public async Task AddToPlaylist(Guid songId, Guid userId, Guid? playlistId, string playlistName, CancellationToken cancellationToken)
@@ -155,7 +194,7 @@ namespace MusicWebAPI.Application.Services
 
             if (song == null)
                 throw new NotFoundException(Resource.SongNotFound);
- 
+
             song.Listens++;
 
             await _repositoryManager.Song.UpdateAsync(song, cancellationToken, saveNow: true);

@@ -339,6 +339,7 @@ public static class SeedData
         ("janeSmith", "Jane Smith", "jane.smith@example.com"),
         ("amin", "amin h", "amin.h@gmail.com"),
         ("AliTaami", "Ali Taami", "alitaami@gmail.com"),
+        ("AliTaami81", "Ali Taami", "alitaami81@gmail.com"),
         ("AtaTaami", "Ata Taami", "atataami@gmail.com"),
     };
 
