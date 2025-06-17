@@ -55,12 +55,12 @@
   The <code>.env</code> & <code>appsettings.json</code> files are not included in the repository. Download them from the following Google Drive links:
 </p>
 <p>
-  <a href="https://drive.google.com/drive/folders/1tlrhGDnkQQI1ay8i56X5tQSgr1751DRu?usp=drive_link" target="_blank">
+  <a href="https://drive.google.com/file/d/1PISHbiUgCH54-B5mt7jEKzO2ubvsgrvK/view?usp=sharing" target="_blank">
     👉 .env file
   </a>
 </p>
 <p>
-  <a href="https://drive.google.com/file/d/1iysuL5EzC4rUrbHnlBEka4qJZUSlayZE/view?usp=drive_link" target="_blank">
+  <a href="https://drive.google.com/file/d/1iysuL5EzC4rUrbHnlBEka4qJZUSlayZE/view?usp=sharing" target="_blank">
     👉 appsettings.json file
   </a>
 </p>
