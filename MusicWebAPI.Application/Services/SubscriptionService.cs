@@ -1,18 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MusicWebAPI.Application.Features.Properties.Commands;
-using MusicWebAPI.Core.Base;
 using MusicWebAPI.Core.Resources;
 using MusicWebAPI.Domain.Entities.Subscription_Models;
 using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 using MusicWebAPI.Domain.Interfaces.Services;
 using Stripe.Checkout;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
 
 namespace MusicWebAPI.Application.Services

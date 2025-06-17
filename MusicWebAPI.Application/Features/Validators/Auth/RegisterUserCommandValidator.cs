@@ -1,9 +1,9 @@
 ﻿using FluentValidation;
-using MusicWebAPI.Application.Features.Properties.Commands.Auth;
+using MusicWebAPI.Application.Features.Properties.Auth.Commands.Register;
 
 namespace MusicWebAPI.Application.Features.Validators.Auth
 {
-    public class RegisterUserCommandValidator : AbstractValidator<RegisterUserCommand>
+    public class RegisterUserCommandValidator : AbstractValidator<RegisterCommand>
     {
         public RegisterUserCommandValidator()
         {

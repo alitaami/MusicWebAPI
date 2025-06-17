@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
-using MusicWebAPI.Application.Commands;
-using MusicWebAPI.Application.Features.Properties.Commands.UserSongs;
+using MusicWebAPI.Application.Features.Properties.UserSongs.Commands.AddToPlaylist;
 
 namespace MusicWebAPI.Application.Validators
 {

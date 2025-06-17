@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
-using MusicWebAPI.Application.Commands;
-using MusicWebAPI.Application.Features.Properties.Commands.Subscription;
+using MusicWebAPI.Application.Features.Properties.Subscription.Commands.Subscribe;
 
 namespace MusicWebAPI.Application.Features.Validators.Subscription
 {

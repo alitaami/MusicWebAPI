@@ -1,22 +1,11 @@
 ﻿using AutoMapper;
 using Moq;
-using MusicWebAPI.Application.Commands.Handlers;
-using MusicWebAPI.Application.Features.Properties.Commands;
-using MusicWebAPI.Application.Features.Properties.Commands.Handlers;
-using MusicWebAPI.Application.Features.Properties.Commands.Subscription;
-using MusicWebAPI.Application.Features.Properties.Queries;
 using MusicWebAPI.Application.Features.Properties.Queries.Handlers;
-using MusicWebAPI.Application.Features.Properties.Queries.Subscription;
-using MusicWebAPI.Domain.Entities;
+using MusicWebAPI.Application.Features.Properties.Subscription.Commands.Subscribe;
+using MusicWebAPI.Application.Features.Properties.Subscription.Commands.Verify;
+using MusicWebAPI.Application.Features.Properties.Subscription.Queries.GetSubscriptions;
 using MusicWebAPI.Domain.Entities.Subscription_Models;
-using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
 
 namespace MusicWebAPI.UnitTests.TDD

@@ -1,7 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MusicWebAPI.API.Base;
-using MusicWebAPI.Application.Features.Properties.Commands.Auth;
+using MusicWebAPI.Application.Features.Properties.Auth.Commands.ForgetPassword;
+using MusicWebAPI.Application.Features.Properties.Auth.Commands.GoogleLogin;
+using MusicWebAPI.Application.Features.Properties.Auth.Commands.Login;
+using MusicWebAPI.Application.Features.Properties.Auth.Commands.Register;
+using MusicWebAPI.Application.Features.Properties.Auth.Commands.ResetPassword;
 using static MusicWebAPI.Application.ViewModels.UserViewModel;
 
 namespace MusicWebAPI.API.Endpoints
@@ -34,7 +38,7 @@ namespace MusicWebAPI.API.Endpoints
             .WithOpenApi();
 
             // Register user endpoint
-            app.MapPost("/api/register", async (IMediator mediator, RegisterUserCommand command, HttpContext httpContext, [FromQuery] string? returnUrl = null) =>
+            app.MapPost("/api/register", async (IMediator mediator, RegisterCommand command, HttpContext httpContext, [FromQuery] string? returnUrl = null) =>
             {
                 var result = await mediator.Send(command);
 
@@ -50,7 +54,7 @@ namespace MusicWebAPI.API.Endpoints
             .WithOpenApi(); // This enables Swagger for Minimal API
 
             // Login user endpoint
-            app.MapPost("/api/login", async (IMediator mediator, LoginUserCommand command, HttpContext httpContext, [FromQuery] string? returnUrl = null) =>
+            app.MapPost("/api/login", async (IMediator mediator, LoginCommand command, HttpContext httpContext, [FromQuery] string? returnUrl = null) =>
             {
                 // getting JWT token
                 var result = await mediator.Send(command);

@@ -1,34 +1,13 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
 using MusicWebAPI.API.Base;
-using MusicWebAPI.Application.Commands;
-using MusicWebAPI.Application.Features.Properties.Commands;
-using MusicWebAPI.Application.Features.Properties.Commands.Subscription;
-using MusicWebAPI.Application.Features.Properties.Queries;
-using MusicWebAPI.Application.Features.Properties.Queries.Subscription;
-using MusicWebAPI.Core;
-using MusicWebAPI.Core.Resources;
+using MusicWebAPI.Application.Features.Properties.Subscription.Commands.Subscribe;
+using MusicWebAPI.Application.Features.Properties.Subscription.Commands.Verify;
+using MusicWebAPI.Application.Features.Properties.Subscription.Queries.GetSubscriptions;
 using MusicWebAPI.Core.Utilities;
-using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Domain.Entities.Subscription_Models;
-using MusicWebAPI.Domain.External.FileService;
-using MusicWebAPI.Domain.Interfaces;
-using MusicWebAPI.Domain.Interfaces.Services;
-using MusicWebAPI.Domain.Interfaces.Services.Base;
-using MusicWebAPI.Infrastructure.Data.Context;
-using MusicWebAPI.Infrastructure.FileService;
-using Serilog;
-using Swashbuckle.AspNetCore.Annotations;
-using System.ComponentModel;
-using System.Drawing.Printing;
-using System.Net.Http;
-using System.Threading.Tasks;
 using static MusicWebAPI.Application.DTOs.SubscribeDTOs;
 using static MusicWebAPI.Application.ViewModels.GatewayDTO;
-using static MusicWebAPI.Application.ViewModels.HomeViewModel;
 
 namespace MusicWebAPI.API.Endpoints
 {

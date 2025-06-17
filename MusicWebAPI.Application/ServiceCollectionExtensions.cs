@@ -9,7 +9,7 @@ using MusicWebAPI.Infrastructure.Logging;
 using System.Reflection;
 using MusicWebAPI.Domain.Interfaces.Services;
 using MusicWebAPI.Domain.External.Caching;
-using MusicWebAPI.Application.Features.Properties.Commands.Auth;
+using MusicWebAPI.Application.Features.Properties.Auth.Commands.Register;
 
 namespace MusicWebAPI.Application
 {
@@ -23,7 +23,7 @@ namespace MusicWebAPI.Application
             services.AddScoped<IUserService, UserService>();
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly())
-                    .AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<RegisterUserCommand>())
+                    .AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<RegisterCommand>())
                     .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly())
                     .AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>)) // Add Validation Pipeline
                     .InitializeAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

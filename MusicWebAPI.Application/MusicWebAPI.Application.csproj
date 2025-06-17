@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="Features\Properties\Queries\_Handlers\GetSubscriptionsQueryHandler.cs" />
+    <None Include="Features\Properties\Subscription\Queries\GetSubscriptions\GetSubscriptionsQueryHandler.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +29,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MusicWebAPI.Infrastructure\MusicWebAPI.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Features\Properties\Auth\Queries\" />
+    <Folder Include="Features\Properties\Songs\Commands\" />
   </ItemGroup>
 
 </Project>

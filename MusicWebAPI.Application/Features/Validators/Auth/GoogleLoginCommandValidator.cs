@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
-using MusicWebAPI.Application.Commands;
-using MusicWebAPI.Application.Features.Properties.Commands.Auth;
+using MusicWebAPI.Application.Features.Properties.Auth.Commands.GoogleLogin;
 
 namespace MusicWebAPI.Application.Features.Validators.Auth
 {

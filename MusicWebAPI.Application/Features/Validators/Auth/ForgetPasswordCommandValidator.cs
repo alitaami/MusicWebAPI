@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using MusicWebAPI.Application.Features.Properties.Commands.Auth;
+using MusicWebAPI.Application.Features.Properties.Auth.Commands.ForgetPassword;
 
 namespace MusicWebAPI.Application.Features.Validators.Auth
 {

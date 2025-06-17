@@ -1,12 +1,12 @@
 using Moq;
 using AutoMapper;
-using MusicWebAPI.Application.Commands.Handlers;
 using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
 using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
 using MusicWebAPI.Core.Resources;
-using MusicWebAPI.Application.Features.Properties.Commands.Auth;
-using MusicWebAPI.Application.Features.Properties.Commands.Handlers;
+using MusicWebAPI.Application.Features.Properties.Auth.Commands.GoogleLogin;
+using MusicWebAPI.Application.Features.Properties.Auth.Commands.Login;
+using MusicWebAPI.Application.Features.Properties.Auth.Commands.Register;
 
 namespace MusicWebAPI.UnitTests.TDD
 {
@@ -15,8 +15,8 @@ namespace MusicWebAPI.UnitTests.TDD
     {
         private Mock<IServiceManager> _serviceManagerMock;
         private Mock<IMapper> _mapperMock;
-        private RegisterUserHandler _registerUserHandler;
-        private LoginUserHandler _loginUserHandler;
+        private RegisterCommandHandler _registerUserHandler;
+        private LoginCommandHandler _loginUserHandler;
         private GoogleLoginCommandHandler _googleLoginCommandHandler;
 
         [SetUp]
@@ -24,8 +24,8 @@ namespace MusicWebAPI.UnitTests.TDD
         {
             _serviceManagerMock = new Mock<IServiceManager>();
             _mapperMock = new Mock<IMapper>();
-            _registerUserHandler = new RegisterUserHandler(_serviceManagerMock.Object, _mapperMock.Object);
-            _loginUserHandler = new LoginUserHandler(_serviceManagerMock.Object);
+            _registerUserHandler = new RegisterCommandHandler(_serviceManagerMock.Object, _mapperMock.Object);
+            _loginUserHandler = new LoginCommandHandler(_serviceManagerMock.Object);
             _googleLoginCommandHandler = new GoogleLoginCommandHandler(_serviceManagerMock.Object);
         }
 
@@ -33,7 +33,7 @@ namespace MusicWebAPI.UnitTests.TDD
         public async Task Handle_RegisterUser_When_Successful()
         {
             // Arrange
-            var command = new RegisterUserCommand
+            var command = new RegisterCommand
             {
                 UserName = "testuser",
                 Email = "test@example.com",
@@ -60,7 +60,7 @@ namespace MusicWebAPI.UnitTests.TDD
         public void Handle_RegisterUser_When_Not_Successful()
         {
             // Arrange
-            var command = new RegisterUserCommand
+            var command = new RegisterCommand
             {
                 UserName = "testuser",
                 Email = "test@example.com",
@@ -84,7 +84,7 @@ namespace MusicWebAPI.UnitTests.TDD
         public async Task Handle_LoginUser_When_Successful()
         {
             // Arrange
-            var loginCommand = new LoginUserCommand
+            var loginCommand = new LoginCommand
             {
                 Email = "user@example.com",
                 Password = "password123"
@@ -109,7 +109,7 @@ namespace MusicWebAPI.UnitTests.TDD
         public async Task Handle_LoginUser_When_Not_Successful()
         {
             // Arrange
-            var loginCommand = new LoginUserCommand
+            var loginCommand = new LoginCommand
             {
                 Email = "invaliduser@example.com",
                 Password = "wrongpassword"

@@ -1,24 +1,13 @@
 ﻿using MediatR;
-using MusicWebAPI.Application.Commands;
-using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.API.Base;
-using System.Web.WebPages.Html;
-using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
-using MusicWebAPI.Application.Features.Properties.Commands.Handlers;
-using MusicWebAPI.Application.Features.Properties.Commands;
-using Microsoft.AspNetCore.Authorization;
-using MusicWebAPI.Application.Features.Properties.Queries;
-using Microsoft.AspNetCore.Http;
 using static MusicWebAPI.Application.ViewModels.SongsViewModel;
 using static MusicWebAPI.Application.DTOs.UserSongsDTO;
-using static MusicWebAPI.Application.ViewModels.UserViewModel;
-using MusicWebAPI.Core.Base;
-using System.Net.Http;
-using Microsoft.AspNetCore.Mvc;
 using MusicWebAPI.Core.Utilities;
-using MusicWebAPI.Domain.Interfaces.Services;
-using MusicWebAPI.Application.Features.Properties.Commands.UserSongs;
-using MusicWebAPI.Application.Features.Properties.Queries.UserSongs;
+using MusicWebAPI.Application.Features.Properties.UserSongs.Commands.AddToPlaylist;
+using MusicWebAPI.Application.Features.Properties.UserSongs.Commands.DeletePlaylist;
+using MusicWebAPI.Application.Features.Properties.UserSongs.Queries.GetPlaylists;
+using MusicWebAPI.Application.Features.Properties.UserSongs.Commands.DeletePlaylistSong;
+using MusicWebAPI.Application.Features.Properties.UserSongs.Commands.ListenSong;
 namespace MusicWebAPI.API.Endpoints
 {
     public class UserEndpoints : ApiResponseBase

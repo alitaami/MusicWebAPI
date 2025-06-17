@@ -1,28 +1,16 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Distributed;
 using MusicWebAPI.API.Base;
-using MusicWebAPI.Application.Commands;
-using MusicWebAPI.Application.Features.Properties.Queries;
-using MusicWebAPI.Application.Features.Properties.Queries.Songs;
+using MusicWebAPI.Application.Features.Properties.Songs.Queries.GetPopularSongs;
+using MusicWebAPI.Application.Features.Properties.Songs.Queries.GetRecommendedSongs;
+using MusicWebAPI.Application.Features.Properties.Songs.Queries.GetSongs;
 using MusicWebAPI.Core;
 using MusicWebAPI.Core.Resources;
 using MusicWebAPI.Core.Utilities;
-using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Domain.External.Caching;
-using MusicWebAPI.Domain.External.FileService;
-using MusicWebAPI.Domain.Interfaces;
-using MusicWebAPI.Infrastructure.Data.Context;
 using MusicWebAPI.Infrastructure.FileService;
-using Serilog;
-using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel;
-using System.Drawing.Printing;
-using System.Net.Http;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using static MusicWebAPI.Application.ViewModels.HomeViewModel;
 
 namespace MusicWebAPI.API.Endpoints
