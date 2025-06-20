@@ -1,5 +1,10 @@
-﻿const registerUrl = 'http://localhost:8080/api/register';
+﻿const recoverPassUrl = 'http://localhost:8080/api/resetPassword';
+const forgetPassUrl = 'http://localhost:8080/api/forgetPassword';
+const registerUrl = 'http://localhost:8080/api/register';
 const loginUrl = 'http://localhost:8080/api/login';
+const googleLoginUrl = 'http://localhost:8080/api/auth/google-login';
+const googleClientIdUrl = 'http://localhost:8080/api/auth/google/client_id';
+const googleClientScriptUrl = 'https://accounts.google.com/gsi/client';
 
 document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('loginBtn');
@@ -12,6 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
         registerBtn.addEventListener('click', register);
     }
 
+    const forgetPassBtn = document.getElementById('forgetPassBtn');
+    if (forgetPassBtn) {
+        forgetPassBtn.addEventListener('click', forgetPass);
+    }
+
+    const recoverPassBtn = document.getElementById('recoverPassBtn');
+    if (recoverPassBtn) {
+        recoverPassBtn.addEventListener('click', recoverPass);
+    }
+
     // Show Register form link
     const showRegisterForm = document.getElementById('showRegisterForm');
     if (showRegisterForm) {
@@ -21,6 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Show Forget Pass form link
+    const showForgetPassForm = document.getElementById('showForgetPassForm');
+    if (showForgetPassForm) {
+        showForgetPassForm.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleForm('forgetPass');
+        });
+    }
+     
     // Show Login form link
     const showLoginForm = document.getElementById('showLoginForm');
     if (showLoginForm) {
@@ -130,6 +154,88 @@ async function register() {
     }
 }
 
+async function forgetPass() {
+    const email = document.getElementById('forgetPassEmail').value.trim();
+
+    if (!email) {
+        alert('Please fill in Email field.');
+        return;
+    }
+
+    try {
+        const response = await fetch(forgetPassUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email,
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.status === 422 || response.status === 401) {
+            alert(data.errorMessage || 'Validation error occurred');
+            return;
+        }
+
+        if (!response.ok) {
+            //throw new Error(data.errorMessage || 'Error occurred!');
+            alert.error(data.errorMessage);
+        }
+
+        alert.message("Otp has sent to your email!");
+
+        //show recover pass form
+        toggleForm("recoverPass");
+
+    } catch (error) {
+        console.error('ForgetPass error:', error.message);
+        alert(error.message);
+    }
+}
+
+async function recoverPass() {
+    const email = document.getElementById('recoverPassEmail').value.trim();
+    const newPassword = document.getElementById('recoverPassNewPassword').value.trim();
+    const otpCode = document.getElementById('recoverPassOtp').value.trim();
+
+    if (!userName || !otpCode || !newPassword) {
+        alert('Please fill in all fields.');
+        return;
+    }
+
+    try {
+        const response = await fetch(recoverPassUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email,
+                newPassword,
+                otpCode
+            }),
+        });
+
+        const data = await response.json();
+
+        if (response.status === 422 || response.status === 401) {
+            alert(data.errorMessage || 'Validation error occurred');
+            return;
+        }
+
+        if (!response.ok) {
+            //throw new Error(data.errorMessage || 'reset pass failed');
+            alert.error(data.errorMessage);
+        }
+
+        //show login section
+        toggleForm("login");
+
+    } catch (error) {
+        console.error('recover pass error:', error.message);
+        alert(error.message);
+    }
+}
+
 window.onload = function () {
     const accessToken = getCookie('access_token');
     setGoogleClientId();
@@ -160,11 +266,13 @@ function getCookie(name) {
 function toggleForm(form) {
     document.getElementById('loginForm').style.display = form === 'login' ? 'block' : 'none';
     document.getElementById('registerForm').style.display = form === 'register' ? 'block' : 'none';
+    document.getElementById('forgetPassForm').style.display = form === 'forgetPass' ? 'block' : 'none';
+    document.getElementById('recoverPassForm').style.display = form === 'recoverPass' ? 'block' : 'none';
 }
 
 async function setGoogleClientId() {
     try {
-        const res = await fetch('http://localhost:8080/api/auth/google/client_id');
+        const res = await fetch(googleClientIdUrl);
         if (!res.ok) throw new Error('Failed to fetch client id');
 
         const data = await res.json();
@@ -176,7 +284,7 @@ async function setGoogleClientId() {
 
         // Now load the Google script dynamically AFTER setting client_id
         const script = document.createElement('script');
-        script.src = 'https://accounts.google.com/gsi/client';
+        script.src = googleClientScriptUrl;
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
@@ -189,8 +297,6 @@ async function onGoogleSignIn(response) {
     const idToken = response.credential;
 
     try {
-        const googleLoginUrl = 'http://localhost:8080/api/auth/google-login';
-
         const res = await fetch(googleLoginUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
