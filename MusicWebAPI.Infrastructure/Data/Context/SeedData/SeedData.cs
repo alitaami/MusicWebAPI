@@ -140,7 +140,7 @@ public static class SeedData
                 IsActive = true
             });
         }
-        
+
         if (!existingPlanNames.Contains("Premium 3-Monthly"))
         {
             plansToAdd.Add(new SubscriptionPlan
@@ -366,7 +366,6 @@ public static class SeedData
                 context.SaveChanges();
 
                 user.Avatar = UploadDefaultProfileImageIfNeeded(fileStorageService, user.Id);
-                context.SaveChanges();
 
                 if (!context.UserRoles.Any(ur => ur.UserId == user.Id && ur.RoleId == userRole.Id))
                 {
@@ -376,10 +375,62 @@ public static class SeedData
                         RoleId = userRole.Id
                     });
                 }
+                context.SaveChanges();
             }
         }
 
-        context.SaveChanges();
+        #region Creating 'test' Playlist for 'alitaami' user
+        var alitaami = context.Users.FirstOrDefault(u => u.UserName == "AliTaami" || u.Email == "alitaami@gmail.com");
+
+        if (alitaami != null)
+        {
+            Guid.TryParse(alitaami?.Id, out Guid userId);
+
+            var playlist = new Playlist
+            {
+                Name = "test",
+                UserId = alitaami?.Id,
+                CreatedByUserId = userId,
+                CreatedDate = DateTime.UtcNow,
+                IsDeleted = false
+            };
+
+            context.Playlists.Add(playlist);
+            context.SaveChanges();
+
+            var songIds = context
+                          .Songs
+                          .Select(s => s.Id)
+                          .Take(3)
+                          .ToList();
+
+            context.PlaylistSongs.AddRange(
+                new PlaylistSong
+                {
+                    PlayListId = playlist.Id,
+                    SongId = songIds[0],
+                    CreatedByUserId = userId,
+                    IsDeleted = false,
+                    CreatedDate = DateTime.UtcNow
+                }, new PlaylistSong
+                {
+                    PlayListId = playlist.Id,
+                    SongId = songIds[1],
+                    CreatedByUserId = userId,
+                    IsDeleted = false,
+                    CreatedDate = DateTime.UtcNow
+                }, new PlaylistSong
+                {
+                    PlayListId = playlist.Id,
+                    SongId = songIds[2],
+                    CreatedByUserId = userId,
+                    IsDeleted = false,
+                    CreatedDate = DateTime.UtcNow
+                });
+
+            context.SaveChanges();
+        }
+        #endregion
     }
 
     private static void SeedSuperUser(
