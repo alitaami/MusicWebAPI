@@ -6,6 +6,8 @@ const googleLoginUrl = 'http://localhost:8080/api/auth/google-login';
 const googleClientIdUrl = 'http://localhost:8080/api/auth/google/client_id';
 const googleClientScriptUrl = 'https://accounts.google.com/gsi/client';
 
+const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
 document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('loginBtn');
     if (loginBtn) {
@@ -44,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleForm('forgetPass');
         });
     }
-     
+
     // Show Login form link
     const showLoginForm = document.getElementById('showLoginForm');
     if (showLoginForm) {
@@ -180,13 +182,14 @@ async function forgetPass() {
 
         if (!response.ok) {
             //throw new Error(data.errorMessage || 'Error occurred!');
-            alert.error(data.errorMessage);
+            alert(data.errorMessage);
+            return;
         }
-
-        alert.message("Otp has sent to your email!");
-
+         
         //show recover pass form
         toggleForm("recoverPass");
+
+        document.getElementById('recoverPassEmail').value = email;
 
     } catch (error) {
         console.error('ForgetPass error:', error.message);
@@ -199,8 +202,24 @@ async function recoverPass() {
     const newPassword = document.getElementById('recoverPassNewPassword').value.trim();
     const otpCode = document.getElementById('recoverPassOtp').value.trim();
 
-    if (!userName || !otpCode || !newPassword) {
+    if (!email || !otpCode || !newPassword) {
         alert('Please fill in all fields.');
+        return;
+    }
+
+    if (!passwordRegex.test(newPassword)) {
+        alert(
+            "Password must be at least 8 characters long and include:\n" +
+            "• 1 uppercase letter\n" +
+            "• 1 lowercase letter\n" +
+            "• 1 number\n" +
+            "• 1 special character (@$!%*?&)"
+        );
+        return;
+    }
+
+    if (otpCode.length !== 6) {
+        alert("Enter your OTP code correctly!");
         return;
     }
 
@@ -249,6 +268,8 @@ window.onload = function () {
         document.getElementById('chatContainer').style.display = 'none';
         document.getElementById('loginForm').style.display = 'block';
         document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('recoverPassForm').style.display = 'none';
+        document.getElementById('forgetPassForm').style.display = 'none';
     }
 };
 
@@ -264,10 +285,33 @@ function getCookie(name) {
 }
 
 function toggleForm(form) {
-    document.getElementById('loginForm').style.display = form === 'login' ? 'block' : 'none';
-    document.getElementById('registerForm').style.display = form === 'register' ? 'block' : 'none';
-    document.getElementById('forgetPassForm').style.display = form === 'forgetPass' ? 'block' : 'none';
-    document.getElementById('recoverPassForm').style.display = form === 'recoverPass' ? 'block' : 'none';
+
+
+    if (form === 'login') {
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('forgetPassForm').style.display = 'none';
+        document.getElementById('recoverPassForm').style.display = 'none';
+    }
+
+    else if (form === 'register') {
+        document.getElementById('registerForm').style.display = 'block';
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('forgetPassForm').style.display = 'none';
+        document.getElementById('recoverPassForm').style.display = 'none';
+    }
+
+    else if (form === 'forgetPass') {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('forgetPassForm').style.display = 'block';
+    }
+
+    else if (form === 'recoverPass') {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('forgetPassForm').style.display = 'none';
+        document.getElementById('recoverPassForm').style.display = 'block';
+    }
 }
 
 async function setGoogleClientId() {
