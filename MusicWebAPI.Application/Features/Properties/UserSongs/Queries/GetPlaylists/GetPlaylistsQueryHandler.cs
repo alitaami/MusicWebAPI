@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using static MusicWebAPI.Application.DTOs.UserSongsDTO;
 using static MusicWebAPI.Application.ViewModels.HomeViewModel;
@@ -31,9 +32,14 @@ namespace MusicWebAPI.Application.Features.Properties.UserSongs.Queries.GetPlayl
             {
                 try
                 {
-                    var viewModel = MapToGetPlaylistViewModel(item);
+                    // Use JSON serialization to handle the dynamic to static type conversion
+                    var data = JsonSerializer.Serialize(item);
+                    var viewModel = JsonSerializer.Deserialize<PlaylistViewModel>(data);
 
-                    mappedPlaylist.Add(viewModel);
+                    if (viewModel != null)
+                    {
+                        mappedPlaylist.Add(viewModel);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -43,6 +49,7 @@ namespace MusicWebAPI.Application.Features.Properties.UserSongs.Queries.GetPlayl
 
             return mappedPlaylist ?? new List<PlaylistViewModel>() { };
         }
+
         private PlaylistViewModel MapToGetPlaylistViewModel(object item)
         {
             if (item == null)
