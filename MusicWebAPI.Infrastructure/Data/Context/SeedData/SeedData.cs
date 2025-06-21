@@ -9,6 +9,7 @@ using MusicWebAPI.Domain.Interfaces.Services.Base;
 using MusicWebAPI.Infrastructure.Data.Context;
 using MusicWebAPI.Infrastructure.FileService;
 using System;
+using System.Data.Entity;
 using System.Linq;
 
 public static class SeedData
@@ -384,6 +385,11 @@ public static class SeedData
 
         if (alitaami != null)
         {
+            var playlistExists = context.Playlists.Any(p => p.Name == "test");
+
+            if (playlistExists)
+                return;
+
             Guid.TryParse(alitaami?.Id, out Guid userId);
 
             var playlist = new Playlist
