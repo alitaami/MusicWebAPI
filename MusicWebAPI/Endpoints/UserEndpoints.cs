@@ -8,6 +8,9 @@ using MusicWebAPI.Application.Features.Properties.UserSongs.Commands.DeletePlayl
 using MusicWebAPI.Application.Features.Properties.UserSongs.Queries.GetPlaylists;
 using MusicWebAPI.Application.Features.Properties.UserSongs.Commands.DeletePlaylistSong;
 using MusicWebAPI.Application.Features.Properties.UserSongs.Commands.ListenSong;
+using MusicWebAPI.Application.Features.Properties.UserSongs.Commands.DeleteFromFavorites;
+using MusicWebAPI.Application.Features.Properties.UserSongs.Commands.AddToFavorites;
+using Microsoft.AspNetCore.Mvc;
 namespace MusicWebAPI.API.Endpoints
 {
     public class UserEndpoints : ApiResponseBase
@@ -99,6 +102,59 @@ namespace MusicWebAPI.API.Endpoints
                 .Produces(StatusCodes.Status204NoContent)
                 .Produces(StatusCodes.Status404NotFound)
                 .WithOpenApi();
+
+            app.MapGet("/api/favorites",
+            async (IMediator mediator,
+            HttpContext httpContext) =>
+            {
+                var userId = (Guid)Tools.GetUserId(httpContext);
+
+                var query = new GetUserFavoritesQuery((Guid)userId);
+                var result = await mediator.Send(query);
+
+                return Ok(result);
+            })
+            .RequireAuthorization(policy => policy.RequireRole("User"))
+            .WithName("GetFavorites")
+            .Produces<List<UserFavoriteViewModel>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status401Unauthorized)
+            .WithTags("User-Favorites")
+            .RequireRateLimiting("main")
+            .WithOpenApi();
+
+            app.MapPost("/api/favorites",
+               async (IMediator mediator, [FromBody] AddToFavoritesDTO dto, HttpContext httpContext) =>
+               {
+                   Guid? userId = (Guid?)Tools.GetUserId(httpContext);
+
+                   var command = new AddToFavoritesCommand(dto.SongId, (Guid)userId);
+
+                   await mediator.Send(command);
+
+                   return NoContent();
+               })
+               .RequireAuthorization(policy => policy.RequireRole("User"))
+               .WithName("AddToFavorite")
+               .Produces(StatusCodes.Status204NoContent)
+               .Produces(StatusCodes.Status400BadRequest)
+               .WithTags("User-Favorites")
+               .RequireRateLimiting("main")
+               .WithOpenApi();
+
+            app.MapDelete("/api/favorites/{favoriteId}",
+            async (IMediator mediator, Guid favoriteId) =>
+            {
+                await mediator.Send(new DeleteFromFavoritesCommand(favoriteId));
+
+                return NoContent();
+            })
+            .RequireAuthorization(policy => policy.RequireRole("User"))
+            .WithName("DeleteFromFavorites")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithTags("User-Favorites")
+            .RequireRateLimiting("main")
+            .WithOpenApi();
         }
 
         #region Common

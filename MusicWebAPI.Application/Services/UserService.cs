@@ -2,6 +2,7 @@
 using Common.Utilities;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MusicWebAPI.Core.Resources;
 using MusicWebAPI.Core.Utilities;
@@ -141,6 +142,51 @@ namespace MusicWebAPI.Application.Services
         }
 
         #endregion
+
+        public async Task AddToFavorites(Guid songId, Guid userId, CancellationToken cancellationToken)
+        {
+            var favoriteExists = await _repositoryManager
+                .UserFavorite
+                .Get(cancellationToken)
+                .AsNoTracking()
+                .AnyAsync(f => f.SongId == songId && f.UserId == userId.ToString(), cancellationToken);
+
+            if (favoriteExists)
+                return;
+
+            await _repositoryManager.UserFavorite.AddAsync(new UserFavorite
+            {
+                SongId = songId,
+                UserId = userId.ToString(),
+            }, cancellationToken, saveNow: true);
+        }
+
+        public async Task DeleteFromFavorites(Guid favoriteId, CancellationToken cancellationToken)
+        {
+            var favorite = await _repositoryManager.UserFavorite.GetByIdAsync(cancellationToken, favoriteId);
+
+            if (favorite != null)
+            {
+                await _repositoryManager.UserFavorite.DeleteAsync(favorite, cancellationToken, saveNow: true);
+            }
+        }
+
+        public async Task<List<object>> GetUserFavorites(Guid userId, CancellationToken cancellationToken)
+        {
+            return await _repositoryManager
+                         .UserFavorite
+                         .Get(cancellationToken)
+                         .AsNoTracking()
+                         .Where(f => f.UserId == userId.ToString())
+                         .Select(f => (object)new
+                         {
+                             Id = f.Id,
+                             UserId = f.UserId,
+                             SongId = f.SongId,
+                             SongName = f.Song.Title
+                         })
+                         .ToListAsync(cancellationToken);
+        }
 
         public async Task AddToPlaylist(Guid songId, Guid userId, Guid? playlistId, string playlistName, CancellationToken cancellationToken)
         {

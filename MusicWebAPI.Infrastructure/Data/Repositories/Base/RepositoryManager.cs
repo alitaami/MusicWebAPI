@@ -25,6 +25,7 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories.Base
         private IPlayListSongsRepository _playListSongsRepository;
         private ISubscriptionRepository _subscriptionRepository;
         private IUserSubscriptionRepository _userSubscriptionRepository;
+        private IUserFavoriteRepository _userFavoritesRepository;
 
         public RepositoryManager(MusicDbContext context, ICacheService cacheService)
         {
@@ -122,6 +123,17 @@ namespace MusicWebAPI.Infrastructure.Data.Repositories.Base
                     this._playListSongsRepository = new PlayListSongsRepository(_context);
 
                 return this._playListSongsRepository;
+            }
+        }
+
+        public IUserFavoriteRepository UserFavorite
+        {
+            get
+            {
+                if (this._userFavoritesRepository == null)
+                    this._userFavoritesRepository = new UserFavoriteRepository(_context);
+
+                return this._userFavoritesRepository;
             }
         }
 

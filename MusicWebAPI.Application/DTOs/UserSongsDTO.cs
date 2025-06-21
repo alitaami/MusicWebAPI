@@ -22,5 +22,10 @@ namespace MusicWebAPI.Application.DTOs
             [Description("The name of the playlist to create (optional if PlaylistId is provided).")]
             public string? PlaylistName { get; set; }
         }
+
+        public class AddToFavoritesDTO
+        {
+            public Guid SongId { get; set; }
+        }
     }
 }

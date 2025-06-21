@@ -9,5 +9,5 @@ using static MusicWebAPI.Application.ViewModels.SongsViewModel;
 
 namespace MusicWebAPI.Application.Features.Properties.UserSongs.Queries.GetPlaylists
 {
-    public record GetPlaylistsQuery(Guid userId) : IRequest<List<PlaylistViewModel>>;
+    public record GetUserFavoritesQuery(Guid userId) : IRequest<List<UserFavoriteViewModel>>;
 }

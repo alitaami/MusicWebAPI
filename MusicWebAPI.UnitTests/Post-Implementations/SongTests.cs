@@ -88,7 +88,7 @@ namespace MusicWebAPI.UnitTests.TDD
             //Arrange
             var query = new GetPlaylistsQuery(Guid.NewGuid());
 
-            _serviceManagerMock.Setup(s => s.User.GetPlaylists(query.UserId, CancellationToken.None))
+            _serviceManagerMock.Setup(s => s.User.GetPlaylists(query.userId, CancellationToken.None))
                  .ReturnsAsync(new List<object>());
 
             //Act
@@ -138,7 +138,7 @@ namespace MusicWebAPI.UnitTests.TDD
             //Arrange
             var query = new GetPlaylistsQuery(Guid.NewGuid());
 
-            _serviceManagerMock.Setup(s => s.User.GetPlaylists(query.UserId, CancellationToken.None))
+            _serviceManagerMock.Setup(s => s.User.GetPlaylists(query.userId, CancellationToken.None))
                  .ThrowsAsync(new Exception("Exception"));
 
             //Act 

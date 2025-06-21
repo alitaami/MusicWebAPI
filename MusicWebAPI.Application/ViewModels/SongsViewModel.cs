@@ -17,5 +17,13 @@ namespace MusicWebAPI.Application.ViewModels
             public List<Guid> Songs { get; set; } = new();
         }
 
+        public class UserFavoriteViewModel
+        {
+            public Guid Id { get; set; }
+            public string UserId { get; set; }
+            public Guid SongId { get; set; }
+            public string SongName { get; set; }
+        }
+
     }
 }

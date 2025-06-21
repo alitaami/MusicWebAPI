@@ -24,7 +24,7 @@ namespace MusicWebAPI.Application.Features.Properties.UserSongs.Queries.GetPlayl
 
         public async Task<List<PlaylistViewModel>> Handle(GetPlaylistsQuery request, CancellationToken cancellationToken)
         {
-            var playlists = await _serviceManager.User.GetPlaylists(request.UserId, cancellationToken);
+            var playlists = await _serviceManager.User.GetPlaylists(request.userId, cancellationToken);
             var mappedPlaylist = new List<PlaylistViewModel>();
 
             foreach (var item in playlists)
