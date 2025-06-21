@@ -251,10 +251,10 @@ docker-compose up --build -d
   <td>Real-time chat playground including login/register </td>
 
   <td style="display: flex; gap: 10px;">
-    <img src="https://github.com/user-attachments/assets/37e1a06b-7bab-40e7-900f-0f6556c38e91" 
+    <img src="https://github.com/user-attachments/assets/1889b7db-ef42-4868-bb45-6fe2d5e8fd9b" 
          alt="Chat Screenshot 2" 
          style="max-width: 150px; height: auto;" />
-    <img src="https://github.com/user-attachments/assets/e4c95a0b-e67a-4ce8-b49c-1ef0d6ac8b73" 
+    <img src="https://github.com/user-attachments/assets/1c12d252-4525-4964-8c53-fbce2bb6a337" 
          alt="Chat Screenshot 3" 
          style="max-width: 150px; height: auto;" />
     <img src="https://github.com/user-attachments/assets/cc8ee4f7-b919-430e-b9c2-52fcd50b1e6a" 
