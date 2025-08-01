@@ -239,6 +239,9 @@ docker-compose up --build -d
         <td><a href="http://localhost:8080/swagger/index.html" target="_blank" rel="noopener noreferrer">http://localhost:8080/swagger/index.html</a></td>
         <td>API documentation &amp; testing</td>
         <td>
+              <img src="https://github.com/user-attachments/assets/d6a559b3-89aa-4978-a342-cc1a54cb49cf"
+                alt="Chat Screenshot 2" 
+                style="max-width: 150px; height: auto;" /> 
         </td>
       </tr>
       <tr>
