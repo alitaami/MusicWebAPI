@@ -36,6 +36,9 @@ using System.Configuration;
 using Hangfire;
 using Hangfire.PostgreSql;
 using MusicWebAPI.Domain.External.Caching;
+using MusicWebAPI.Infrastructure.Outbox;
+using MusicWebAPI.Domain.Interfaces.Services.External;
+using MusicWebAPI.Domain.External.FileService;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -244,12 +247,14 @@ public static class WebApplicationBuilderExtensions
         )
         .Build()
         );
-        builder.Services.AddSingleton<FileStorageService>();
 
         #endregion
 
         // Register Repositories , Services and LoggerManager
+        builder.Services.AddSingleton<FileStorageService>();
         builder.Services.AddSingleton<ICacheService, CacheService>();
+        builder.Services.AddScoped<IOutboxService, OutboxService>();
+        builder.Services.AddTransient<OutboxProcessor>();
 
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();

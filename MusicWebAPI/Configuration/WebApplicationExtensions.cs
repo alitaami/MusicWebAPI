@@ -12,6 +12,7 @@ using MusicWebAPI.Domain.Interfaces.Services;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
 using MusicWebAPI.Infrastructure.Caching;
 using MusicWebAPI.Infrastructure.Data.Context;
+using MusicWebAPI.Infrastructure.Outbox;
 using Serilog;
 using System.Net;
 using static MusicWebAPI.Core.Utilities.Tools;
@@ -62,7 +63,9 @@ public static class WebApplicationExtensions
             app.MapControllers();
             app.UseHangfireDashboard("/hangfire", new DashboardOptions
             {
-                Authorization = new[] { new RoleBasedAuthorizationFilter("SuperUser") }
+                Authorization = new[] { new AllowAllDashboardAuthorizationFilter() }
+
+                //Authorization = new[] { new RoleBasedAuthorizationFilter("SuperUser") }
             });
 
             #region Scheduling Jobs
@@ -100,6 +103,10 @@ public static class WebApplicationExtensions
             "0 */3 * * *",
             TimeZoneInfo.Local
             );
+
+            RecurringJob.AddOrUpdate<OutboxProcessor>("outbox-processor",
+            p => p.ProcessPendingAsync(),
+            Cron.Minutely);
         }
     }
     private static void UseMiddlewares(this WebApplication app)
@@ -114,6 +121,15 @@ public static class WebApplicationExtensions
         UserEndpoints.RegisterUserEndpoints(app); // Call the method that registers UserEndpoints
         SongEndpoints.RegisterHomeEndpoints(app); // Call the method that registers HomeEndpoints
         SubscriptionEndpoints.RegisterSubscriptionEndpoints(app); // Call the method that registers SubscriptionEndpoints
+    }
+
+    public class AllowAllDashboardAuthorizationFilter : IDashboardAuthorizationFilter
+    {
+        public bool Authorize(DashboardContext context)
+        {
+            // Always allow access to the dashboard
+            return true;
+        }
     }
 
     #endregion

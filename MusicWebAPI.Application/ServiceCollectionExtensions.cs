@@ -17,9 +17,8 @@ namespace MusicWebAPI.Application
     {
         public static void AddApplicationServices(this IServiceCollection services)
         {
-            services.AddSingleton<ILoggerManager, LoggerManager>(); // Register LoggerManager
+            services.AddSingleton<ILoggerManager, LoggerManager>(); 
             services.AddScoped<IRecommendationService, RecommendationService>();
-            services.AddScoped<ICacheService, CacheService>();
             services.AddScoped<IUserService, UserService>();
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly())

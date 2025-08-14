@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MusicWebAPI.Domain.Entities
 {
-    public class User : IdentityUser//, IEntity // Keep IEntity for reflection registration
+    public class User : IdentityUser //, IEntity // Keep IEntity for reflection registration
     {
         public string FullName { get; set; }
         public string Bio { get; set; } = string.Empty; // Artist Bio (Optional)

@@ -8,6 +8,7 @@ using MusicWebAPI.Core.Utilities;
 using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Domain.Entities.Chat_Models;
 using MusicWebAPI.Domain.Entities.Subscription_Models;
+using MusicWebAPI.Infrastructure.Outbox;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +33,7 @@ namespace MusicWebAPI.Infrastructure.Data.Context
         public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
         public DbSet<UserSubscription> UserSubscriptions { get; set; }
         public DbSet<UserFavorite> UserFavorites { get; set; }
+        public DbSet<OutboxMessage> OutboxMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

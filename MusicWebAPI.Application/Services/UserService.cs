@@ -10,6 +10,8 @@ using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Domain.External.Caching;
 using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 using MusicWebAPI.Domain.Interfaces.Services;
+using MusicWebAPI.Domain.Interfaces.Services.External;
+using MusicWebAPI.Infrastructure.Outbox;
 using System.Net;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
@@ -23,12 +25,14 @@ namespace MusicWebAPI.Application.Services
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly IRepositoryManager _repositoryManager;
+        private readonly IOutboxService _outbox;
         private readonly string _googleClientId;
         private readonly string _resetPassUrl;
 
-        public UserService(UserManager<User> userManager, IRepositoryManager repositoryManager, IMapper mapper, IConfiguration configuration)
+        public UserService(UserManager<User> userManager, IRepositoryManager repositoryManager, IOutboxService outboxService, IMapper mapper, IConfiguration configuration)
         {
             _repositoryManager = repositoryManager;
+            _outbox = outboxService;
             _configuration = configuration;
             _userManager = userManager;
             _mapper = mapper;
@@ -92,6 +96,18 @@ namespace MusicWebAPI.Application.Services
             await AssignRole(user, user.IsArtist);
 
             var token = JwtHelper.GenerateToken(user, _configuration);
+
+            #region Processing Welcome Email
+            var emailPayload = new EmailPayload { To = user.Email, Subject = "Welcome", Body = $"Hello! {user.FullName}" };
+            var outbox = new OutboxMessage
+            {
+                Type = "Email:Registration",
+                Content = System.Text.Json.JsonSerializer.Serialize(emailPayload),
+                OccuredDate = DateTime.UtcNow
+            };
+            await _outbox.AddAsync(outbox);
+            await _repositoryManager.SaveChangesAsync(cancellationToken: default);
+            #endregion
 
             return token;
         }
