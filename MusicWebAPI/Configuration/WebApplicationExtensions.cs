@@ -65,6 +65,7 @@ public static class WebApplicationExtensions
             {
                 Authorization = new[] { new AllowAllDashboardAuthorizationFilter() }
 
+                // We can use RoleBasedAuthorizationFilter to restrict access to the dashboard (it`s just for SuperUser role)
                 //Authorization = new[] { new RoleBasedAuthorizationFilter("SuperUser") }
             });
 
