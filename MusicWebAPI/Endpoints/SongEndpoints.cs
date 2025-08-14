@@ -14,7 +14,7 @@ using System.Security.Claims;
 using static MusicWebAPI.Application.ViewModels.HomeViewModel;
 
 namespace MusicWebAPI.API.Endpoints
-{
+{ 
     public class SongEndpoints : ApiResponseBase
     {
         public static void RegisterHomeEndpoints(WebApplication app)
@@ -64,7 +64,6 @@ namespace MusicWebAPI.API.Endpoints
             .WithTags("Home")
             .RequireRateLimiting("main")
             .WithOpenApi();
-
 
             app.MapGet("/api/home/stream-song/{objectId}", async (
                [Description("objectId is made of: {musicId}.mp3")]

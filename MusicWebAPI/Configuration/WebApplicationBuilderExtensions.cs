@@ -102,6 +102,8 @@ public static class WebApplicationBuilderExtensions
 
             AddRateLimiter(builder);
 
+            AddYarp(builder);
+
             builder.Services.AddApplicationServices(); //Adding configuration of 'Application layer'
 
             return builder;
@@ -111,6 +113,13 @@ public static class WebApplicationBuilderExtensions
             Log.Error(ex, "An error occurred while configuring services");
             throw;
         }
+    }
+
+    public static void AddYarp(WebApplicationBuilder builder)
+    {
+        //YARP reverse proxy
+        builder.Services.AddReverseProxy()
+               .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
     }
     public static void AddHangfire(WebApplicationBuilder builder, IConfiguration configuration)
     {
