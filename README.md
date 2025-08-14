@@ -273,14 +273,23 @@ docker-compose up --build -d
           <img src="https://github.com/user-attachments/assets/81504572-a251-4f40-8782-24c2b7451d30" alt="Hangfire Screenshot" style="max-width: 150px; height: auto;" />
         </td>
       </tr>
-      <tr>
-        <td>Kibana</td>
-        <td><a href="http://localhost:5601" target="_blank" rel="noopener noreferrer">http://localhost:5601</a></td>
-        <td>Log visualization via Serilog</td>
-        <td>
-          <img src="https://github.com/user-attachments/assets/be466f44-c7ae-4365-b40e-486f3bc244bf" alt="Kibana Monitoring" style="max-width: 150px; height: auto;" />
-        </td>
-      </tr>
+<tr>
+<td>Kibana</td>
+  <td><a href="http://localhost:5601" target="_blank" rel="noopener noreferrer">http://localhost:5601</a></td>
+  <td>
+    Log visualization via Serilog. <br/>
+    After running the Docker Compose, follow these steps to view logs:
+    <ol>
+      <li>Navigate to <a href="http://localhost:5601" target="_blank">http://localhost:5601</a>.</li>
+      <li>Create a new index pattern using: <code>musicwebapi-logs-*</code> and select <strong>@timestampt</strong> as the timestamp field.</li>
+      <li>Once the index pattern is created, go to <strong>Analytics &gt; Discover</strong> in Kibana.</li>
+      <li>You will now be able to see all logs from the Music Web API.</li>
+    </ol>
+  </td>
+  <td>
+    <img src="https://github.com/user-attachments/assets/be466f44-c7ae-4365-b40e-486f3bc244bf" alt="Kibana Monitoring" style="max-width: 150px; height: auto;" />
+</td>
+</tr>
     </tbody>
   </table>
 </section>
