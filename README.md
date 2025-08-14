@@ -60,7 +60,7 @@
   </a>
 </p>
 <p>
-  <a href="https://drive.google.com/file/d/1iysuL5EzC4rUrbHnlBEka4qJZUSlayZE/view?usp=sharing" target="_blank">
+  <a href="https://drive.google.com/file/d/1iysuL5EzC4rUrbHnlBEka4qJZUSlayZE/view?usp=drive_link" target="_blank">
     👉 appsettings.json file
   </a>
 </p>
