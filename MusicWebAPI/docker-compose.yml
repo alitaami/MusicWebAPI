@@ -84,8 +84,6 @@ services:
     restart: on-failure
     ports:
       - "${API_PORT}:8080"
-    networks:
-      - musicnet
     depends_on:
       # minio-init:
         # condition: service_completed_successfully
@@ -97,20 +95,22 @@ services:
       retries: 5
     env_file:
       - .env
-       
+    networks:
+      - musicnet  
+
   api2:
     build:
       context: ..
       dockerfile: MusicWebAPI/Dockerfile
     container_name: musicwebapi_container2
-    networks:
-      - musicnet
     restart: on-failure
     ports:
       - "${API_PORT2}:8080"
     env_file:
       - .env
-       
+    networks:
+      - musicnet
+
   minio:
     image: minio/minio:latest
     container_name: minio
