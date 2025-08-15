@@ -19,6 +19,7 @@
   <li>✅ Real-time chat with SignalR</li>
   <li>✅ ElasticSearch + Kibana integration for log monitoring</li>
   <li>✅ Redis caching for fast data access</li>
+  <li>✅ Publish & Consume events using RabbitMQ + OutBox</li>
   <li>✅ MinIO object storage integration</li>
   <li>✅ Minimal APIs support in .NET 8</li>
   <li>✅ Clean, maintainable architecture (Clean Architecture)</li>
@@ -191,6 +192,48 @@ docker-compose up --build -d
   - This ensures users can safely subscribe to your music plans, with billing handled by Stripe.
 </p>
 <img src="https://github.com/user-attachments/assets/52ec43d0-bf21-4d2a-b740-320bb9fe523a" alt="Beekeeper Screenshot" />
+
+<h2>🐇 RabbitMQ & Outbox Pattern</h2>
+<p>
+  To ensure reliable event-driven communication, the project uses <strong>RabbitMQ</strong> as a message broker in combination with the <strong>Outbox Pattern</strong>.
+</p>
+
+<h3>🔹 Why RabbitMQ?</h3>
+<ul>
+  <li>Decouples services: Producers and consumers don’t need to know about each other.</li>
+  <li>Reliable delivery: Messages are persisted until successfully consumed.</li>
+  <li>Scalable: Multiple consumers can process messages concurrently.</li>
+</ul>
+
+<h3>🔹 Outbox Pattern Overview</h3>
+<p>
+  The <strong>Outbox Pattern</strong> ensures that database changes and messages/events are reliably saved and published without loss, even if a failure occurs during processing.
+</p>
+<ul>
+  <li>Database changes (e.g., subscription verification) and the corresponding events are first stored in an <strong>Outbox table</strong>.</li>
+  <li>A background processor periodically reads unprocessed messages from the outbox and publishes them to RabbitMQ.</li>
+  <li>This guarantees eventual consistency and prevents lost events.</li>
+</ul>
+
+<h3>🔹 How It Works in This Project</h3>
+<ol>
+  <li>User subscribes to a plan → backend updates the subscription in the database.</li>
+  <li>An <strong>Outbox message</strong> is created with subscription details.</li>
+  <li>The <strong>OutboxProcessor</strong> (background job via Hangfire) reads pending messages.</li>
+  <li>Messages are published to RabbitMQ with the appropriate routing key (e.g., <code>SubscriptionPurchased</code>).</li>
+  <li>Consumers (e.g., cache updater, notification services) receive the event and act accordingly.</li>
+</ol>
+
+<h3>🔹 Benefits</h3>
+<ul>
+  <li>✅ Guarantees message delivery even if the API crashes after saving to the database.</li>
+  <li>✅ Decouples event production from consumption.</li>
+  <li>✅ Supports horizontal scaling: multiple consumers can process messages in parallel.</li>
+  <li>✅ Simplifies integration with caching, logging, notifications, or any other external service.</li>
+</ul>
+
+<h3>🔹 Example Flow</h3>
+<p><em>Subscription Payment Verification → Outbox Entry → RabbitMQ → Cache / Email / Other Services</em></p>
 
 
 <h2>🎧 Limit Streaming Feature</h2>
