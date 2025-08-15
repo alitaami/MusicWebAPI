@@ -10,9 +10,8 @@ using MusicWebAPI.Core.Utilities;
 using MusicWebAPI.Domain.Interfaces;
 using MusicWebAPI.Domain.Interfaces.Services;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
-using MusicWebAPI.Infrastructure.Caching;
 using MusicWebAPI.Infrastructure.Data.Context;
-using MusicWebAPI.Infrastructure.Outbox;
+using MusicWebAPI.Infrastructure.External.Outbox;
 using Serilog;
 using System.Net;
 using static MusicWebAPI.Core.Utilities.Tools;
@@ -105,9 +104,10 @@ public static class WebApplicationExtensions
             TimeZoneInfo.Local
             );
 
-            RecurringJob.AddOrUpdate<OutboxProcessor>("outbox-processor",
-            p => p.ProcessPendingAsync(),
-            Cron.Minutely);
+            RecurringJob.AddOrUpdate<OutboxProcessor>(
+               "outbox-processor",
+               p => p.ProcessPendingAsync(),
+               "*/3 * * * * *");
         }
     }
     private static void UseMiddlewares(this WebApplication app)

@@ -8,7 +8,7 @@ using MusicWebAPI.Core;
 using MusicWebAPI.Core.Resources;
 using MusicWebAPI.Core.Utilities;
 using MusicWebAPI.Domain.External.Caching;
-using MusicWebAPI.Infrastructure.FileService;
+using MusicWebAPI.Infrastructure.External.FileService;
 using System.ComponentModel;
 using System.Security.Claims;
 using static MusicWebAPI.Application.ViewModels.HomeViewModel;

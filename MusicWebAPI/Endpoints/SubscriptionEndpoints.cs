@@ -7,7 +7,7 @@ using MusicWebAPI.Application.Features.Properties.Subscription.Queries.GetSubscr
 using MusicWebAPI.Core.Utilities;
 using MusicWebAPI.Domain.Entities.Subscription_Models;
 using static MusicWebAPI.Application.DTOs.SubscribeDTOs;
-using static MusicWebAPI.Application.ViewModels.GatewayDTO;
+using static MusicWebAPI.Application.ViewModels.GatewayViewModel;
 
 namespace MusicWebAPI.API.Endpoints
 {
@@ -38,14 +38,14 @@ namespace MusicWebAPI.API.Endpoints
 
                 var paymentUrl = await mediator.Send(command, cancellationToken);
 
-                return Ok(new RedirectToGatewayResponseDTO
+                return Ok(new RedirectToGatewayResponseViewModel
                 {
                     CheckoutUrl = paymentUrl
                 });
             })
             .RequireAuthorization(policy => policy.RequireRole("User"))
             .WithName("SubscribeToPlan")
-            .Produces<RedirectToGatewayResponseDTO>(StatusCodes.Status200OK)
+            .Produces<RedirectToGatewayResponseViewModel>(StatusCodes.Status200OK)
             .Produces(StatusCodes.Status400BadRequest)
             .WithTags("Subscription")
             .RequireRateLimiting("main")

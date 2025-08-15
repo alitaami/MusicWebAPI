@@ -4,12 +4,11 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using MusicWebAPI.Application.Services;
 using MusicWebAPI.Domain.Interfaces.Services.MusicWebAPI.Domain.Interfaces;
-using MusicWebAPI.Infrastructure.Caching;
-using MusicWebAPI.Infrastructure.Logging;
 using System.Reflection;
 using MusicWebAPI.Domain.Interfaces.Services;
 using MusicWebAPI.Domain.External.Caching;
 using MusicWebAPI.Application.Features.Properties.Auth.Commands.Register;
+using MusicWebAPI.Infrastructure.External.Logging;
 
 namespace MusicWebAPI.Application
 {

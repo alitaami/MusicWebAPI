@@ -85,6 +85,8 @@ services:
     ports:
       - "${API_PORT}:8080"
     depends_on:
+      rabbitmq:
+        condition: service_healthy
       # minio-init:
         # condition: service_completed_successfully
       postgres:
@@ -189,6 +191,28 @@ services:
     env_file:
       - .env
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq_container
+    ports:
+      - "${RABBITMQ_PORT}:5672" 
+      - "${RABBITMQ_UI_PORT}:15672" 
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    restart: unless-stopped
+    networks:
+      - musicnet
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - rabbitmq_data:/data
+    env_file:
+      - .env
 
 volumes:
   postgres_data:
@@ -204,6 +228,8 @@ volumes:
   minio_data:
     driver: local
   redis_data:
+    driver: local
+  rabbitmq_data:
     driver: local
 
 networks:

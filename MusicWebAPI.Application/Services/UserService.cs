@@ -16,6 +16,7 @@ using System.Net;
 using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
+using static MusicWebAPI.Infrastructure.External.Outbox.OutboxProcessor;
 
 namespace MusicWebAPI.Application.Services
 {

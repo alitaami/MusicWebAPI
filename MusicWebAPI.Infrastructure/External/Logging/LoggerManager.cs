@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using MusicWebAPI.Domain.Interfaces.Services.MusicWebAPI.Domain.Interfaces;
 
-namespace MusicWebAPI.Infrastructure.Logging
+namespace MusicWebAPI.Infrastructure.External.Logging
 {
     public class LoggerManager : ILoggerManager
     {

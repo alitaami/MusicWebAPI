@@ -1,9 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MusicWebAPI.Core.Resources;
+using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Domain.Entities.Subscription_Models;
 using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 using MusicWebAPI.Domain.Interfaces.Services;
+using MusicWebAPI.Domain.Interfaces.Services.External;
+using MusicWebAPI.Infrastructure.Outbox;
 using Stripe.Checkout;
+using System.Text.Json;
+using static MusicWebAPI.Application.ViewModels.GatewayViewModel;
 using static MusicWebAPI.Domain.Base.Exceptions.CustomExceptions;
 
 namespace MusicWebAPI.Application.Services
@@ -11,12 +16,12 @@ namespace MusicWebAPI.Application.Services
     public class SubscriptionService : ISubscriptionService
     {
         private readonly IRepositoryManager _repositoryManager;
-        private readonly HttpClient _httpClient;
+        private readonly IOutboxService _outbox;
 
-        public SubscriptionService(IRepositoryManager repositoryManager, HttpClient httpClient)
+        public SubscriptionService(IRepositoryManager repositoryManager, IOutboxService outbox)
         {
             _repositoryManager = repositoryManager;
-            _httpClient = httpClient;
+            _outbox = outbox;
             Stripe.StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
         }
 
@@ -103,6 +108,21 @@ namespace MusicWebAPI.Application.Services
                     return true;
 
                 subscription.IsVerified = true;
+
+                #region Publish Subscription Events in RabbitMq
+                await _outbox.AddAsync(new OutboxMessage
+                {
+                    Type = "Event:SubscriptionPurchased",
+                    Content = JsonSerializer.Serialize(new SubscriptionEventViewModel
+                    {
+                        UserId = subscription.UserId,
+                        PlanId = subscription.PlanId,
+                        Timestamp = DateTime.UtcNow
+                    }),
+                    OccuredDate = DateTime.UtcNow
+                });
+                #endregion
+
                 await _repositoryManager.SaveChangesAsync(cancellationToken);
 
                 return true;

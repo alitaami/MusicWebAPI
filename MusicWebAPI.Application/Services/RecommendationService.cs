@@ -7,7 +7,6 @@ using MusicWebAPI.Application.ViewModels;
 using MusicWebAPI.Domain.External.Caching;
 using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 using MusicWebAPI.Domain.Interfaces.Services;
-using MusicWebAPI.Infrastructure.Caching;
 using System;
 using System.Collections.Generic;
 using System.IO;

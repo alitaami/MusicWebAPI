@@ -23,7 +23,6 @@ using Serilog.Formatting.Elasticsearch;
 using DotNetEnv;
 using Minio;
 using MusicWebAPI.Domain.Interfaces.Services;
-using MusicWebAPI.Infrastructure.FileService;
 using static System.Net.WebRequestMethods;
 using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 using MusicWebAPI.Infrastructure.Data.Repositories.Base;
@@ -31,14 +30,16 @@ using StackExchange.Redis;
 using MusicWebAPI.Core.Utilities;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
-using MusicWebAPI.Infrastructure.Caching;
 using System.Configuration;
 using Hangfire;
 using Hangfire.PostgreSql;
 using MusicWebAPI.Domain.External.Caching;
-using MusicWebAPI.Infrastructure.Outbox;
 using MusicWebAPI.Domain.Interfaces.Services.External;
 using MusicWebAPI.Domain.External.FileService;
+using MusicWebAPI.Infrastructure.External.FileService;
+using MusicWebAPI.Infrastructure.External.Outbox;
+using MusicWebAPI.Infrastructure.External.RabbitMq;
+using MusicWebAPI.Infrastructure.External.Caching;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -253,6 +254,7 @@ public static class WebApplicationBuilderExtensions
         // Register Repositories , Services and LoggerManager
         builder.Services.AddSingleton<FileStorageService>();
         builder.Services.AddSingleton<ICacheService, CacheService>();
+        builder.Services.AddSingleton<IRabbitMqService, RabbitMqService>();
         builder.Services.AddScoped<IOutboxService, OutboxService>();
         builder.Services.AddTransient<OutboxProcessor>();
 

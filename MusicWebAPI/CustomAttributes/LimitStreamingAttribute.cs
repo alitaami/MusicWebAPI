@@ -1,16 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.DependencyInjection;
-using MusicWebAPI.Core.Base;
-using MusicWebAPI.Domain.External.Caching;
-using MusicWebAPI.Domain.Entities.Subscription_Models;
-using System;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using MusicWebAPI.Infrastructure.Data.Context;
-using Microsoft.EntityFrameworkCore;
+﻿using MusicWebAPI.Core.Base;
 using MusicWebAPI.Core.Resources;
+using MusicWebAPI.Domain.External.Caching;
+using MusicWebAPI.Domain.Interfaces.Services.External;
+using MusicWebAPI.Infrastructure.Data.Context;
+using System.Security.Claims;
+using System.Text.Json;
+using static MusicWebAPI.Application.ViewModels.GatewayViewModel;
 
 [AttributeUsage(AttributeTargets.Method)]
 public class LimitStreamingAttribute : Attribute, IEndpointFilter
@@ -29,28 +24,43 @@ public class LimitStreamingAttribute : Attribute, IEndpointFilter
         }
 
         var cacheService = httpContext.RequestServices.GetService<ICacheService>();
+        var rabbitMqService = httpContext.RequestServices.GetService<IRabbitMqService>();
         var dbContext = httpContext.RequestServices.GetService<MusicDbContext>();
 
-        if (cacheService == null || dbContext == null)
+        if (cacheService == null || rabbitMqService == null || dbContext == null)
         {
             var errorResult = new ApiResult<string>(Resource.GeneralUnhandledError, 500, isSuccess: false);
             return Results.Json(errorResult, statusCode: 500);
         }
 
+        // *** it`s just for learning the main purpose of message brokers! we can have a separate background job to consume and cache the value in Redis ***
+        // Consume subscription events from RabbitMQ & update cache
+        rabbitMqService.Consume("SubscriptionPurchased", async message =>
+        {
+            var payload = JsonSerializer.Deserialize<SubscriptionEventViewModel>(message);
+            if (payload != null)
+            {
+                var key = $"Subscription:{payload.UserId}";
+                var expiration = payload.EndDate - DateTime.UtcNow;
+
+                if (expiration < TimeSpan.Zero)
+                {
+                    expiration = TimeSpan.FromMinutes(5); // safety fallback
+                }
+
+                await cacheService.SetAsync(key, value: true, expiration.Minutes);
+            }
+        });
+
         var now = DateTime.UtcNow;
 
-        var activeSubscription = await dbContext.UserSubscriptions
-            .Include(us => us.Plan)
-            .FirstOrDefaultAsync(us =>
-                us.UserId == userId &&
-                us.IsVerified &&
-                us.StartDate <= now &&
-                us.EndDate >= now &&
-                us.Plan.IsActive);
+        // Check if user has active subscription 
+        var subscriptionKey = $"Subscription:{userId}";
+        var hasActiveSubscription = await cacheService.GetAsync<bool>(subscriptionKey);
 
-        if (activeSubscription != null)
+        // User has an active subscription plan, So skip limit check
+        if (hasActiveSubscription)
         {
-            // User has an active subscription plan - skip limit check
             return await next(context);
         }
 

@@ -7,7 +7,7 @@ using MusicWebAPI.Domain.External.FileService;
 using MusicWebAPI.Domain.Interfaces.Services;
 using MusicWebAPI.Domain.Interfaces.Services.Base;
 using MusicWebAPI.Infrastructure.Data.Context;
-using MusicWebAPI.Infrastructure.FileService;
+using MusicWebAPI.Infrastructure.External.FileService;
 using System;
 using System.Data.Entity;
 using System.Linq;

@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MusicWebAPI.Domain.Interfaces.Services.External;
 using MusicWebAPI.Infrastructure.Data.Context;
+using MusicWebAPI.Infrastructure.Outbox;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MusicWebAPI.Infrastructure.Outbox
+namespace MusicWebAPI.Infrastructure.External.Outbox
 {
     public class OutboxService : IOutboxService
     {

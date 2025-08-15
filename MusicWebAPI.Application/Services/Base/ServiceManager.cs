@@ -7,7 +7,6 @@ using MusicWebAPI.Domain.Interfaces.Services.Base;
 using MusicWebAPI.Domain.Interfaces.Services;
 using Mappings.CustomMapping;
 using Minio;
-using MusicWebAPI.Infrastructure.FileService;
 using MusicWebAPI.Domain.Interfaces.Repositories.Base;
 using MusicWebAPI.Domain.External.Caching;
 using MusicWebAPI.Domain.Interfaces.Services.External;
@@ -45,7 +44,7 @@ public class ServiceManager : IServiceManager
         _userService = new Lazy<IUserService>(() => new UserService(_userManager, _repositoryManager, _outboxService, _mapper, _configuration));
         _homeService = new Lazy<ISongService>(() => new SongService(_repositoryManager, _mapper));
         _recommendService = new Lazy<IRecommendationService>(() => new RecommendationService(_repositoryManager, _cacheService, _configuration, _httpClient));
-        _subscriptionService = new Lazy<ISubscriptionService>(() => new SubscriptionService(_repositoryManager, _httpClient));
+        _subscriptionService = new Lazy<ISubscriptionService>(() => new SubscriptionService(_repositoryManager, _outboxService));
     }
 
     public IUserService User => _userService.Value;

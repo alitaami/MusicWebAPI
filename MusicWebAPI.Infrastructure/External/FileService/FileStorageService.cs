@@ -11,7 +11,7 @@ using System.IO;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace MusicWebAPI.Infrastructure.FileService
+namespace MusicWebAPI.Infrastructure.External.FileService
 {
     public class FileStorageService : IFileStorageService
     {

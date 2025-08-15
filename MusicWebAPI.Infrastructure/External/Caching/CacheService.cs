@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace MusicWebAPI.Infrastructure.Caching
+namespace MusicWebAPI.Infrastructure.External.Caching
 {
     public class CacheService : ICacheService
     {
