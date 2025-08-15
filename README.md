@@ -38,6 +38,7 @@
   <tr><td><strong>Docs</strong></td><td>Swagger / OpenAPI</td></tr>
   <tr><td><strong>Object Storage</strong></td><td>MinIO – store, download and stream uploaded songs securely</td></tr>
   <tr><td><strong>Caching</strong></td><td>Redis</td></tr>
+  <tr><td><strong>MessageBroker</strong></td><td>RabbitMQ + OutBox</td></tr>
   <tr><td><strong>Containerization</strong></td><td>Docker, Docker Compose</td></tr>
   <tr><td><strong>Database</strong></td><td>PostgreSQL</td></tr>
 </table>
