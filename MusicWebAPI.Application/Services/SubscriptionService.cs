@@ -17,11 +17,14 @@ namespace MusicWebAPI.Application.Services
     {
         private readonly IRepositoryManager _repositoryManager;
         private readonly IOutboxService _outbox;
+        private readonly IRedisLockFactory _lockFactory;
 
-        public SubscriptionService(IRepositoryManager repositoryManager, IOutboxService outbox)
+        public SubscriptionService(IRepositoryManager repositoryManager, IOutboxService outbox, IRedisLockFactory lockFactory)
         {
             _repositoryManager = repositoryManager;
             _outbox = outbox;
+            _lockFactory = lockFactory;
+
             Stripe.StripeConfiguration.ApiKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
         }
 
@@ -93,23 +96,34 @@ namespace MusicWebAPI.Application.Services
             var service = new SessionService();
             var session = await service.GetAsync(sessionId);
 
-            if (session.PaymentStatus == "paid")
+            if (session.PaymentStatus != "paid")
+                return false;
+
+            // One lock per Stripe session 
+            var resource = $"lock_subscription_session_{sessionId}";
+            var expiry = TimeSpan.FromSeconds(30);
+
+            using (var redLock = await _lockFactory.CreateLockAsync(resource, expiry))
             {
+                if (!redLock.IsAcquired)
+                    throw new LogicException(Resource.SubscriptionRedisLockError);
+                 
                 var subscription = await _repositoryManager
                     .UserSubscription
                     .Get(cancellationToken)
                     .Where(x => x.PaymentReference == sessionId)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(cancellationToken);
 
                 if (subscription == null)
                     throw new NotFoundException(Resource.SubscriptionNotFound);
 
+                //if already verified, do nothing but still succeed
                 if (subscription.IsVerified)
                     return true;
 
                 subscription.IsVerified = true;
 
-                #region Publish Subscription Events in RabbitMq
+                #region Publish Subscription Events in RabbitMQ
                 await _outbox.AddAsync(new OutboxMessage
                 {
                     Type = "Event:SubscriptionPurchased",
@@ -127,8 +141,6 @@ namespace MusicWebAPI.Application.Services
 
                 return true;
             }
-
-            return false;
         }
 
         private async Task<bool> ActivePlanExists(Guid userId, CancellationToken cancellationToken)

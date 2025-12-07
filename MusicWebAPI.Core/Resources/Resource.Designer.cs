@@ -334,6 +334,15 @@ namespace MusicWebAPI.Core.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not acquire payment verification lock. Please retry..
+        /// </summary>
+        public static string SubscriptionRedisLockError {
+            get {
+                return ResourceManager.GetString("VerifyPaymentRedisLockError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You have entered wrong or expired OTP code!.
         /// </summary>
         public static string WrongOtpCodeError {

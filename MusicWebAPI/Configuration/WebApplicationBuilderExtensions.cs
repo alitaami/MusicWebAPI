@@ -1,45 +1,49 @@
 ﻿using Common.Utilities;
 using Configuration.Swagger;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.OpenApi.Models;
-using Serilog;
-using System.Threading.RateLimiting;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System.Globalization;
-using Newtonsoft.Json.Serialization;
-using MusicWebAPI.Infrastructure.Data.Context;
-using Microsoft.EntityFrameworkCore;
-using MusicWebAPI.Domain.Interfaces.Services.Base;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using MusicWebAPI.Domain.Entities;
-using Microsoft.AspNetCore.Identity;
-using MusicWebAPI.Application;
-using Serilog.Sinks.Elasticsearch;
-using Serilog.Events;
-using Serilog.Formatting.Elasticsearch;
 using DotNetEnv;
-using Minio;
-using MusicWebAPI.Domain.Interfaces.Services;
-using static System.Net.WebRequestMethods;
-using MusicWebAPI.Domain.Interfaces.Repositories.Base;
-using MusicWebAPI.Infrastructure.Data.Repositories.Base;
-using StackExchange.Redis;
-using MusicWebAPI.Core.Utilities;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Options;
-using System.Configuration;
 using Hangfire;
 using Hangfire.PostgreSql;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Minio;
+using MusicWebAPI.Application;
+using MusicWebAPI.Core.Utilities;
+using MusicWebAPI.Domain.Entities;
 using MusicWebAPI.Domain.External.Caching;
-using MusicWebAPI.Domain.Interfaces.Services.External;
 using MusicWebAPI.Domain.External.FileService;
+using MusicWebAPI.Domain.Interfaces.Repositories.Base;
+using MusicWebAPI.Domain.Interfaces.Services;
+using MusicWebAPI.Domain.Interfaces.Services.Base;
+using MusicWebAPI.Domain.Interfaces.Services.External;
+using MusicWebAPI.Infrastructure.Data.Context;
+using MusicWebAPI.Infrastructure.Data.Repositories.Base;
+using MusicWebAPI.Infrastructure.External.Caching;
 using MusicWebAPI.Infrastructure.External.FileService;
 using MusicWebAPI.Infrastructure.External.Outbox;
 using MusicWebAPI.Infrastructure.External.RabbitMq;
-using MusicWebAPI.Infrastructure.External.Caching;
+using MusicWebAPI.Infrastructure.External.RedisLock;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
+using RedLockNet;
+using RedLockNet.SERedis;
+using RedLockNet.SERedis.Configuration;
+using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Elasticsearch;
+using Serilog.Sinks.Elasticsearch;
+using StackExchange.Redis;
+using System.Configuration;
+using System.Globalization;
+using System.Text;
+using System.Threading.RateLimiting;
+using static System.Net.WebRequestMethods;
 
 public static class WebApplicationBuilderExtensions
 {
@@ -147,11 +151,29 @@ public static class WebApplicationBuilderExtensions
             throw new InvalidOperationException("REDIS_CONNECTION_STRING environment variable is not set.");
         }
 
+        // Existing cache registration
         builder.Services.AddStackExchangeRedisCache(options =>
         {
             options.Configuration = redisConnectionString;
             options.InstanceName = "MusicWebAPI";
         });
+
+        // shared ConnectionMultiplexer
+        builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
+            ConnectionMultiplexer.Connect(redisConnectionString));
+
+        // RedLock factory
+        builder.Services.AddSingleton<IDistributedLockFactory>(sp =>
+        {
+            var multiplexer = sp.GetRequiredService<IConnectionMultiplexer>();
+
+            var multiplexers = new List<RedLockMultiplexer>
+            {
+            new RedLockMultiplexer(multiplexer)
+            };
+
+            return RedLockFactory.Create(multiplexers);
+        }); 
     }
 
     private static void HandleElasticsearchFailure(LogEvent logEvent, Exception ex)
@@ -257,6 +279,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSingleton<IRabbitMqService, RabbitMqService>();
         builder.Services.AddScoped<IOutboxService, OutboxService>();
         builder.Services.AddTransient<OutboxProcessor>();
+        builder.Services.AddSingleton<IRedisLockFactory, RedisLockFactory>();
 
         builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();

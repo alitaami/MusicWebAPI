@@ -216,6 +216,9 @@
   <data name="UserRole" xml:space="preserve">
     <value>User</value>
   </data>
+  <data name="VerifyPaymentRedisLockError" xml:space="preserve">
+    <value>Could not acquire payment verification lock. Please retry.</value>
+  </data>
   <data name="WrongOtpCodeError" xml:space="preserve">
     <value>You have entered wrong or expired OTP code!</value>
   </data>
