@@ -38,7 +38,6 @@ namespace MusicWebAPI.Domain.Base.Exceptions
             public int StatusCode => 401;
         }
 
-        // Update the ValidationException to accept a list of validation errors
         public class ValidationException : Exception
         {
             public ValidationException(List<string> errors)
@@ -48,7 +47,7 @@ namespace MusicWebAPI.Domain.Base.Exceptions
             }
 
             public List<string> Errors { get; }
-            public int StatusCode => 422; // Unprocessable Entity
+            public int StatusCode => 422; 
         }
     }
 }
